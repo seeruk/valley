@@ -26,7 +26,6 @@ func Required(field valley.Field, fieldType ast.Expr, _ interface{}) (string, er
 
 	switch expr := fieldType.(type) {
 	case *ast.StarExpr:
-		// Value is a pointer, unpack it:
 		predicate = fmt.Sprintf("%s == nil", field.AsVariable())
 	case *ast.ArrayType, *ast.MapType:
 		predicate = fmt.Sprintf("len(%s) == 0", field.AsVariable())

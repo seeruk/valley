@@ -1,4 +1,4 @@
-package vali
+package valley
 
 import "fmt"
 
