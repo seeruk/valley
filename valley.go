@@ -1,6 +1,6 @@
 package valley
 
-import "fmt"
+import "go/ast"
 
 // ConstraintViolation ...
 type ConstraintViolation struct {
@@ -10,13 +10,17 @@ type ConstraintViolation struct {
 }
 
 // Constraint ...
-type Constraint func(n, t string, opts interface{})
+type Constraint func(value Value, fieldType ast.Expr, opts interface{}) (string, error)
 
-type Field struct {
-	Receiver string
-	Name     string
+type Value interface {
+	isValue()
 }
 
-func (f Field) AsVariable() string {
-	return fmt.Sprintf("%s.%s", f.Receiver, f.Name)
+type Identifier struct {
+	Name string
+}
+
+type Selector struct {
+	Name string
+	On   Value
 }

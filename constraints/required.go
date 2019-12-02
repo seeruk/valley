@@ -21,20 +21,20 @@ const requiredFormat = `
 `
 
 // Required ...
-func Required(field valley.Field, fieldType ast.Expr, _ interface{}) (string, error) {
+func Required(value valley.Value, fieldType ast.Expr, _ interface{}) (string, error) {
 	var predicate string
 
 	switch expr := fieldType.(type) {
 	case *ast.StarExpr:
-		predicate = fmt.Sprintf("%s == nil", field.AsVariable())
+		predicate = fmt.Sprintf("%s == nil", value.FullName())
 	case *ast.ArrayType, *ast.MapType:
-		predicate = fmt.Sprintf("len(%s) == 0", field.AsVariable())
+		predicate = fmt.Sprintf("len(%s) == 0", value.FullName())
 	case *ast.Ident:
 		switch expr.Name {
 		case "string":
-			predicate = fmt.Sprintf("len(%s) == 0", field.AsVariable())
+			predicate = fmt.Sprintf("len(%s) == 0", value.FullName())
 		case "int":
-			predicate = fmt.Sprintf("%s == 0", field.AsVariable())
+			predicate = fmt.Sprintf("%s == 0", value.FullName())
 		default:
 			return "", fmt.Errorf("valley: can't handle %q in `Required`", fieldType)
 		}
@@ -42,5 +42,5 @@ func Required(field valley.Field, fieldType ast.Expr, _ interface{}) (string, er
 		return "", fmt.Errorf("valley: can't handle %q in `Required`", fieldType)
 	}
 
-	return fmt.Sprintf(requiredFormat, predicate, field.Name), nil
+	return fmt.Sprintf(requiredFormat, predicate, value.Name()), nil
 }
