@@ -1,50 +1,87 @@
 package main
 
 import (
-	"go/parser"
-	"go/token"
+	"fmt"
+	"go/ast"
+	"io/ioutil"
+	"os"
+	"path"
+
+	"github.com/davecgh/go-spew/spew"
+	"github.com/ghodss/yaml"
+	"github.com/seeruk/valley"
+	"github.com/seeruk/valley/constraint"
 )
 
 func main() {
-	//field := valley.Field{
-	//	Receiver: "r",
-	//	Name:     "ProjectID",
-	//}
-	//
-	//fmt.Println(constraints.Required(field, &ast.StarExpr{
-	//	X: &ast.Ident{
-	//		Name: "int",
-	//	},
-	//}, nil))
+	constraints := valley.DefaultConstraints
+	_ = constraints
 
-	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, "src.go", `
-	package example
+	field := valley.Value{
+		FieldName: "Text",
+		VarName:   "r.Text",
+	}
 
-	func foo(bar []Bar) {
-		bar[12].Baz.Qux()
-	}
-	
-	type Example struct {
-		Text string
-		Texts []string
-		Number int
-		Numbers []int
-		TriState *string
-		TriStates []*string
-		Object map[string]interface{}
-		Nested Nested
-		NestedMaybe *Nested
-	}
-	
-	type Nested struct {
-		Foo string
-	}
-		`, 0)
+	fmt.Println(constraint.Required(field, &ast.Ident{
+		Name: "int",
+	}, nil))
 
+	wd, _ := os.Getwd()
+
+	configPath := path.Join(wd, "example", "valleydemo", "todo.valley.yml")
+
+	file, err := os.Open(configPath)
 	if err != nil {
 		panic(err)
 	}
 
-	_ = f
+	defer file.Close()
+
+	bs, err := ioutil.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
+
+	var config valley.Config
+
+	err = yaml.Unmarshal(bs, &config)
+	if err != nil {
+		panic(err)
+	}
+
+	spew.Dump(config)
+
+	//os.Open()
+	//yaml.Unmarshal()
+
+	//fset := token.NewFileSet()
+	//f, err := parser.ParseFile(fset, "src.go", `
+	//package example
+	//
+	//func foo(bar []Bar) {
+	//	bar[12].Baz.Qux()
+	//}
+	//
+	//type Example struct {
+	//	Text bool
+	//	Texts []string
+	//	Number int
+	//	Numbers []int
+	//	TriState *string
+	//	TriStates []*string
+	//	Object map[string]interface{}
+	//	Nested Nested
+	//	NestedMaybe *Nested
+	//}
+	//
+	//type Nested struct {
+	//	Foo string
+	//}
+	//	`, 0)
+	//
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//_ = f
 }

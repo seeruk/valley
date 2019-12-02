@@ -1,0 +1,14 @@
+types:
+  Example:
+    constraints: ~
+
+    fields:
+      Text:
+        constraints:
+        - Required: ~
+      Texts:
+        constraints:
+        - Required: ~
+        elements:
+          constraints:
+          - Required: ~
