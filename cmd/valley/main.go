@@ -22,9 +22,9 @@ func main() {
 		VarName:   "r.Text",
 	}
 
-	fmt.Println(constraints.Required(field, &ast.Ident{
+	fmt.Println(constraints.Required(field, &ast.StarExpr{X: &ast.Ident{
 		Name: "int",
-	}, nil))
+	}}, nil))
 
 	wd, _ := os.Getwd()
 
