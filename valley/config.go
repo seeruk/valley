@@ -7,17 +7,23 @@ type Config struct {
 
 // TypeConfig ...
 type TypeConfig struct {
-	Constraints []interface{}          `json:"constraints"`
+	Constraints []ConstraintConfig     `json:"constraints"`
 	Fields      map[string]FieldConfig `json:"fields"`
 }
 
 // FieldConfig ...
 type FieldConfig struct {
-	Constraints []interface{}  `json:"constraints"`
-	Elements    ElementsConfig `json:"elements"`
+	Constraints []ConstraintConfig `json:"constraints"`
+	Elements    ElementsConfig     `json:"elements"`
 }
 
 // ElementsConfig ...
 type ElementsConfig struct {
-	Constraints []interface{} `json:"constraints"`
+	Constraints []ConstraintConfig `json:"constraints"`
+}
+
+// ConstraintConfig ...
+type ConstraintConfig struct {
+	Name string      `json:"name"`
+	Opts interface{} `json:"opts"`
 }

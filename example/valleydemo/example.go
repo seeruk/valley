@@ -1,3 +1,4 @@
+//go:generate valley ./todo.go
 package valleydemo
 
 // Example ...

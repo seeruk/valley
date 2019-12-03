@@ -1,0 +1,16 @@
+types:
+  Example:
+    constraints:
+    - name: MutuallyExclusive
+      opts: [Text, Texts]
+
+    fields:
+      Text:
+        constraints:
+        - name: Required
+      Texts:
+        constraints:
+        - name: Required
+        elements:
+          constraints:
+          - name: Required

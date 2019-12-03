@@ -12,9 +12,10 @@ import (
 //   [2]: Field name  (e.g. ProjectID)
 const requiredFormat = `
 	if %[1]s {
-		// TODO: Calculate Field value properly.
 		violations = append(violations, valley.ConstraintViolation{
-			Field: path.Render(),
+			// TODO: Calculate Field value properly.
+			// Field: path.Render(),
+			Field: "%[2]s",
 			Message: "a value is required",
 		})
 	}
