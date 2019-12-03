@@ -9,20 +9,20 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ghodss/yaml"
-	"github.com/seeruk/valley"
-	"github.com/seeruk/valley/constraint"
+	"github.com/seeruk/valley/constraints"
+	"github.com/seeruk/valley/valley"
 )
 
 func main() {
-	constraints := valley.DefaultConstraints
-	_ = constraints
+	builtIn := constraints.BuiltIn
+	_ = builtIn
 
 	field := valley.Value{
 		FieldName: "Text",
 		VarName:   "r.Text",
 	}
 
-	fmt.Println(constraint.Required(field, &ast.Ident{
+	fmt.Println(constraints.Required(field, &ast.Ident{
 		Name: "int",
 	}, nil))
 

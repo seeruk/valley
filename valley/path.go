@@ -1,32 +1,6 @@
 package valley
 
-import (
-	"go/ast"
-	"strings"
-
-	"github.com/seeruk/valley/constraint"
-)
-
-// DefaultConstraints specifies the list of built-in constraints used by default.
-var DefaultConstraints = []Constraint{
-	constraint.Required,
-}
-
-// ConstraintViolation ...
-type ConstraintViolation struct {
-	Field   string                 `json:"field"`
-	Message string                 `json:"message"`
-	Details map[string]interface{} `json:"details"`
-}
-
-// Constraint ...
-type Constraint func(value Value, fieldType ast.Expr, opts interface{}) (string, error)
-
-// Value ...
-type Value struct {
-	FieldName string
-	VarName   string
-}
+import "strings"
 
 // Path is used to represent the current position in a structure, to output a useful field value to
 // identify where a ConstraintViolation occurred.

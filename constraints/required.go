@@ -1,10 +1,10 @@
-package constraint
+package constraints
 
 import (
 	"fmt"
 	"go/ast"
 
-	"github.com/seeruk/valley"
+	valley2 "github.com/seeruk/valley/valley"
 )
 
 // Arguments to format are:
@@ -21,7 +21,7 @@ const requiredFormat = `
 `
 
 // Required ...
-func Required(value valley.Value, fieldType ast.Expr, _ interface{}) (string, error) {
+func Required(value valley2.Value, fieldType ast.Expr, _ interface{}) (string, error) {
 	var predicate string
 
 	switch expr := fieldType.(type) {
