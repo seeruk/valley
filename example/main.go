@@ -8,6 +8,8 @@ import (
 func main() {
 	var example primary.Example
 
+	example.Ints = []int{0, 1, 2, 3, 0, 5}
+
 	violations := example.Validate()
 	spew.Dump(violations)
 }

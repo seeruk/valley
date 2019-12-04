@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"io"
+	"go/format"
 	"io/ioutil"
 	"os"
 
 	"github.com/ghodss/yaml"
 	"github.com/seeruk/valley/source"
 	"github.com/seeruk/valley/validation"
+	"github.com/seeruk/valley/validation/constraints"
 	"github.com/seeruk/valley/valley"
 )
 
@@ -46,7 +47,7 @@ func main() {
 	}
 
 	reader := source.NewReader()
-	generator := validation.NewGenerator()
+	generator := validation.NewGenerator(constraints.BuiltIn)
 
 	pkg, err := reader.Read(srcPath)
 	if err != nil {
@@ -66,11 +67,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Write output to stdout.
-	_, err = io.Copy(destFile, buffer)
+	bs, err = ioutil.ReadAll(buffer)
 	if err != nil {
-		fmt.Printf("valley: failed to write generated code: %v", err)
+		fmt.Printf("valley: failed to read generated source from buffer: %v", err)
 		os.Exit(1)
 	}
 
+	formatted, err := format.Source(bs)
+	if err != nil {
+		fmt.Printf("valley: failed to format generated source: %v", err)
+		os.Exit(1)
+	}
+
+	_, err = destFile.Write(formatted)
+	if err != nil {
+		fmt.Printf("valley: failed to write generated source to file: %v", err)
+		os.Exit(1)
+	}
 }
