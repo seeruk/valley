@@ -21,46 +21,50 @@ func NewReader() *Reader {
 
 // Read attempts to read a Go file, and based on it's contents return the package name, along with
 // an extract of information about the structs in that file.
-func (r *Reader) Read(fileName string) (string, valley.Structs, error) {
+func (r *Reader) Read(fileName string) (valley.Package, error) {
+	var pkg valley.Package
+
 	fset := token.NewFileSet()
 
 	// Read the source file with the given name.
 	// TODO: We can also read entire directories like this...
 	f, err := parser.ParseFile(fset, fileName, nil, 0)
 	if err != nil {
-		return "", nil, err
+		return pkg, err
 	}
 
-	structs := make(valley.Structs)
+	if len(f.Decls) > 0 {
+		pkg.Structs = make(valley.Structs)
 
-	for _, decl := range f.Decls {
-		genDecl, ok := decl.(*ast.GenDecl)
-		if !ok || genDecl.Tok != token.TYPE {
-			continue
-		}
-
-		for _, spec := range genDecl.Specs {
-			typeSpec, ok := spec.(*ast.TypeSpec)
-			if !ok {
+		for _, decl := range f.Decls {
+			genDecl, ok := decl.(*ast.GenDecl)
+			if !ok || genDecl.Tok != token.TYPE {
 				continue
 			}
 
-			structType, ok := typeSpec.Type.(*ast.StructType)
-			if !ok {
-				continue
-			}
+			for _, spec := range genDecl.Specs {
+				typeSpec, ok := spec.(*ast.TypeSpec)
+				if !ok {
+					continue
+				}
 
-			// At this point, we definitely have a struct.
-			structName := typeSpec.Name.Name
-			structs[structName] = valley.Struct{
-				Name:   structName,
-				Node:   structType,
-				Fields: r.readStructFields(structType),
+				structType, ok := typeSpec.Type.(*ast.StructType)
+				if !ok {
+					continue
+				}
+
+				// At this point, we definitely have a struct.
+				structName := typeSpec.Name.Name
+				pkg.Structs[structName] = valley.Struct{
+					Name:   structName,
+					Node:   structType,
+					Fields: r.readStructFields(structType),
+				}
 			}
 		}
 	}
 
-	return f.Name.Name, structs, nil
+	return pkg, nil
 }
 
 // readStructFields reads information about the fields on a given struct type, returning them in a

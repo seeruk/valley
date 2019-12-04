@@ -22,6 +22,12 @@ type Value struct {
 	VarName   string
 }
 
+// Package ...
+type Package struct {
+	Name    string
+	Structs Structs
+}
+
 // Structs is a map from struct name to Struct.
 type Structs map[string]Struct
 

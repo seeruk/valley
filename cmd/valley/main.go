@@ -7,9 +7,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/seeruk/valley/constraints"
-
 	"github.com/ghodss/yaml"
+	"github.com/seeruk/valley/constraints"
 	"github.com/seeruk/valley/source"
 	"github.com/seeruk/valley/valley"
 )
@@ -47,18 +46,18 @@ func main() {
 
 	reader := source.NewReader()
 
-	pkgName, structs, err := reader.Read(srcPath)
+	pkg, err := reader.Read(srcPath)
 	if err != nil {
 		fmt.Printf("valley: failed to read structs in: %q: %v", srcPath, err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("package %s\n", pkgName)
+	fmt.Printf("package %s\n", pkg)
 	fmt.Println()
 	fmt.Println(`import "github.com/seeruk/valley/valley"`)
 
 	for typeName, typ := range config.Types {
-		s, ok := structs[typeName]
+		s, ok := pkg.Structs[typeName]
 		if !ok {
 			continue
 		}
