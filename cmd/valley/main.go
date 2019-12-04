@@ -3,10 +3,8 @@ package main
 import (
 	"fmt"
 	"go/format"
-	"io/ioutil"
 	"os"
 
-	"github.com/ghodss/yaml"
 	"github.com/seeruk/valley/source"
 	"github.com/seeruk/valley/validation"
 	"github.com/seeruk/valley/validation/constraints"
@@ -15,8 +13,7 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Println("valley: a package path, and a config file path must be given")
-		os.Exit(1)
+		fatalf("valley: a package path, and a config file path must be given\n")
 	}
 
 	// TODO: This is pretty crap.
@@ -24,26 +21,20 @@ func main() {
 	configPath := os.Args[2]
 	destPath := os.Args[3]
 
+	// TODO: Should the destPath be removed at this point? If it fails to compile, other parts of
+	// this process will likely fail. Maybe if a struct field has been changed or something, it
+	// might mean that Valley can't run.
+
 	file, err := os.Open(configPath)
 	if err != nil {
-		fmt.Printf("valley: failed to open config file: %q: %v\n", configPath, err)
-		os.Exit(1)
+		fatalf("valley: failed to open config file: %q: %v\n", configPath, err)
 	}
 
 	defer file.Close()
 
-	bs, err := ioutil.ReadAll(file)
+	config, err := valley.ReadConfig(file)
 	if err != nil {
-		fmt.Printf("valley: failed to read config file: %q: %v\n", configPath, err)
-		os.Exit(1)
-	}
-
-	var config valley.Config
-
-	err = yaml.Unmarshal(bs, &config)
-	if err != nil {
-		fmt.Printf("valley: failed to unmarshal config: %q: %v\n", configPath, err)
-		os.Exit(1)
+		fatalf("valley: failed to read config file: %q: %v\n", configPath, err)
 	}
 
 	reader := source.NewReader()
@@ -51,33 +42,35 @@ func main() {
 
 	pkg, err := reader.Read(srcPath)
 	if err != nil {
-		fmt.Printf("valley: failed to read structs in: %q: %v", srcPath, err)
-		os.Exit(1)
+		fatalf("valley: failed to read structs in: %q: %v\n", srcPath, err)
 	}
 
-	bs, err = generator.Generate(config, pkg)
+	bs, err := generator.Generate(config, pkg)
 	if err != nil {
-		fmt.Printf("valley: failed to generate code: %v", err)
-		os.Exit(1)
+		fatalf("valley: failed to generate code: %v\n", err)
 	}
 
 	destFile, err := os.Create(destPath)
 	if err != nil {
-		fmt.Printf("valley: failed to open destination file for writing: %s: %q", destPath, err)
-		os.Exit(1)
+		fatalf("valley: failed to open destination file for writing: %s: %q\n", destPath, err)
 	}
 
 	defer destFile.Close()
 
 	formatted, err := format.Source(bs)
 	if err != nil {
-		fmt.Printf("valley: failed to format generated source: %v", err)
-		os.Exit(1)
+		fatalf("valley: failed to format generated source: %v\n", err)
 	}
 
 	_, err = destFile.Write(formatted)
 	if err != nil {
-		fmt.Printf("valley: failed to write generated source to file: %v", err)
-		os.Exit(1)
+		fatalf("valley: failed to write generated source to file: %v\n", err)
 	}
+}
+
+// fatalf writes the given formatted message to stdout, then exits the application with an error
+// exit code.
+func fatalf(format string, a ...interface{}) {
+	fmt.Printf(format, a...)
+	os.Exit(1)
 }

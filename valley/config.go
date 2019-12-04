@@ -1,8 +1,34 @@
 package valley
 
+import (
+	"io"
+	"io/ioutil"
+
+	"github.com/ghodss/yaml"
+)
+
 // Config ...
 type Config struct {
 	Types map[string]TypeConfig `json:"types"`
+}
+
+// ReadConfig attempts to read some Valley configuration from the given Reader.
+func ReadConfig(reader io.Reader) (Config, error) {
+	var config Config
+
+	bs, err := ioutil.ReadAll(reader)
+	if err != nil {
+		// TODO: Wrap.
+		return config, err
+	}
+
+	err = yaml.Unmarshal(bs, &config)
+	if err != nil {
+		// TODO: Wrap.
+		return config, err
+	}
+
+	return config, nil
 }
 
 // TypeConfig ...
