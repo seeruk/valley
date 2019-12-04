@@ -55,7 +55,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	buffer, err := generator.Generate(config, pkg)
+	bs, err = generator.Generate(config, pkg)
 	if err != nil {
 		fmt.Printf("valley: failed to generate code: %v", err)
 		os.Exit(1)
@@ -67,11 +67,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	bs, err = ioutil.ReadAll(buffer)
-	if err != nil {
-		fmt.Printf("valley: failed to read generated source from buffer: %v", err)
-		os.Exit(1)
-	}
+	defer destFile.Close()
 
 	formatted, err := format.Source(bs)
 	if err != nil {
