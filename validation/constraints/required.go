@@ -18,7 +18,8 @@ const requiredFormat = `
 `
 
 // Required ...
-func Required(value valley.Value, fieldType ast.Expr, _ interface{}) (string, error) {
+func Required(value valley.Value, fieldType ast.Expr, _ interface{}) (valley.ConstraintOutput, error) {
+	var output valley.ConstraintOutput
 	var predicate string
 
 	switch expr := fieldType.(type) {
@@ -33,11 +34,13 @@ func Required(value valley.Value, fieldType ast.Expr, _ interface{}) (string, er
 		case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "float32", "float64":
 			predicate = fmt.Sprintf("%s == 0", value.VarName)
 		default:
-			return "", fmt.Errorf("valley: can't handle %T (%s) in `Required`", fieldType, expr.Name)
+			return output, fmt.Errorf("valley: can't handle %T (%s) in `Required`", fieldType, expr.Name)
 		}
 	default:
-		return "", fmt.Errorf("valley: can't handle %T in `Required`", fieldType)
+		return output, fmt.Errorf("valley: can't handle %T in `Required`", fieldType)
 	}
 
-	return fmt.Sprintf(requiredFormat, predicate), nil
+	output.Code = fmt.Sprintf(requiredFormat, predicate)
+
+	return output, nil
 }

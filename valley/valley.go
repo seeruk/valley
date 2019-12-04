@@ -12,7 +12,27 @@ type ConstraintViolation struct {
 }
 
 // Constraint ...
-type Constraint func(value Value, fieldType ast.Expr, opts interface{}) (string, error)
+type Constraint func(value Value, fieldType ast.Expr, opts interface{}) (ConstraintOutput, error)
+
+// ConstraintOutput ...
+type ConstraintOutput struct {
+	Imports []Import
+	Code    string
+}
+
+// Import represents information about a Go import that Valley uses to generate code.
+type Import struct {
+	Path  string
+	Alias string
+}
+
+// NewImport returns a new Import value.
+func NewImport(path, alias string) Import {
+	return Import{
+		Path:  path,
+		Alias: alias,
+	}
+}
 
 // Value ...
 // TODO: Move to a generator package or something? Generator is maybe a poor name, because it makes
