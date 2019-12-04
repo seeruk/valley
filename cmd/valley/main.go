@@ -6,10 +6,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/seeruk/valley/validation"
-
 	"github.com/ghodss/yaml"
 	"github.com/seeruk/valley/source"
+	"github.com/seeruk/valley/validation"
 	"github.com/seeruk/valley/valley"
 )
 
@@ -19,8 +18,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	// TODO: This is pretty crap.
 	srcPath := os.Args[1]
 	configPath := os.Args[2]
+	destPath := os.Args[3]
 
 	file, err := os.Open(configPath)
 	if err != nil {
@@ -53,12 +54,23 @@ func main() {
 		os.Exit(1)
 	}
 
-	buffer := generator.Generate(config, pkg)
-
-	// Write output to stdout.
-	_, err = io.Copy(os.Stdout, buffer)
+	buffer, err := generator.Generate(config, pkg)
 	if err != nil {
-		fmt.Printf("valley: failed to write generatede code: %v", err)
+		fmt.Printf("valley: failed to generate code: %v", err)
 		os.Exit(1)
 	}
+
+	destFile, err := os.Create(destPath)
+	if err != nil {
+		fmt.Printf("valley: failed to open destination file for writing: %s: %q", destPath, err)
+		os.Exit(1)
+	}
+
+	// Write output to stdout.
+	_, err = io.Copy(destFile, buffer)
+	if err != nil {
+		fmt.Printf("valley: failed to write generated code: %v", err)
+		os.Exit(1)
+	}
+
 }

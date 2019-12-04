@@ -11,7 +11,7 @@ import (
 const requiredFormat = `
 	if %s {
 		violations = append(violations, valley.ConstraintViolation{
-			Field: path.Render(),
+			Field:   path.Render(),
 			Message: "a value is required",
 		})
 	}
