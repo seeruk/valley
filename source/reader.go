@@ -50,9 +50,8 @@ func (r *Reader) Read(fileName string) (string, valley.Structs, error) {
 				continue
 			}
 
-			// Okay, we're definitely looking at a struct right now, nothing else.
+			// At this point, we definitely have a struct.
 			structName := typeSpec.Name.Name
-
 			structs[structName] = valley.Struct{
 				Name:   structName,
 				Node:   structType,
