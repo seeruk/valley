@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 	"unicode/utf8"
 
@@ -30,7 +31,17 @@ func NewGenerator() *Generator {
 func (g *Generator) Generate(config valley.Config, pkg valley.Package) (io.Reader, error) {
 	g.wi("github.com/seeruk/valley/valley", "")
 
-	for typeName, typ := range config.Types {
+	typeNames := make([]string, 0, len(config.Types))
+	for typeName := range config.Types {
+		typeNames = append(typeNames, typeName)
+	}
+
+	// Ensure we generate methods in the same order each time.
+	sort.Strings(typeNames)
+
+	for _, typeName := range typeNames {
+		typ := config.Types[typeName]
+
 		s, ok := pkg.Structs[typeName]
 		if !ok {
 			continue
@@ -52,42 +63,34 @@ func (g *Generator) Generate(config valley.Config, pkg valley.Package) (io.Reade
 		g.wc("\n")
 		g.wc("	path := valley.NewPath()\n")
 
-		for fieldName, fieldConfig := range typ.Fields {
+		fieldNames := make([]string, 0, len(typ.Fields))
+		for fieldName := range typ.Fields {
+			fieldNames = append(fieldNames, fieldName)
+		}
+
+		// Ensure that each field's validation is generated in the same order each time.
+		sort.Strings(fieldNames)
+
+		for _, fieldName := range fieldNames {
+			fieldConfig := typ.Fields[fieldName]
+
 			f, ok := s.Fields[fieldName]
 			if !ok {
-				// TODO: Error, bad config
-				g.wc("valley: field %q does not exist in Go source", fieldName)
-				continue
+				return nil, fmt.Errorf("valley: field %q does not exist in Go source", fieldName)
 			}
 
-			g.wc("	path.Push(\"%s\")\n", fieldName)
-
-			for _, constraintConfig := range fieldConfig.Constraints {
-				constraint, ok := constraints.BuiltIn[constraintConfig.Name]
-				if !ok {
-					// TODO: Error, bad config.
-					g.wc("valley: unknown validation constraint: %q", constraintConfig.Name)
-					continue
-				}
-
-				value := valley.Value{
-					FieldName: fieldName,
-					VarName:   fmt.Sprintf("%s.%s", receiver, fieldName),
-				}
-
-				code, err := constraint(value, f.Type, constraintConfig.Opts)
-				if err != nil {
-					// TODO: Error, invalid config.
-					g.wc("valley: failed to generate code for %q.%q's %q constraint: %v", typeName, fieldName, constraintConfig.Name, err)
-					continue
-				}
-
-				g.wc(code)
-				g.wc("\n")
+			value := valley.Value{
+				TypeName:  typeName,
+				Receiver:  receiver,
+				FieldName: fieldName,
+				VarName:   fmt.Sprintf("%s.%s", receiver, fieldName),
 			}
 
-			g.wc("	path.Pop()\n")
-			g.wc("\n")
+			err := g.generateField(value, fieldConfig, f)
+			if err != nil {
+				// TODO: Wrap?
+				return nil, err
+			}
 		}
 
 		g.wc("	return violations\n")
@@ -113,6 +116,32 @@ func (g *Generator) Generate(config valley.Config, pkg valley.Package) (io.Reade
 	}
 
 	return buf, nil
+}
+
+// generateField generates all of the code for a specific field.
+func (g *Generator) generateField(value valley.Value, fieldConfig valley.FieldConfig, field valley.Field) error {
+	g.wc("	path.Push(\"%s\")\n", value.FieldName)
+
+	for _, constraintConfig := range fieldConfig.Constraints {
+		constraint, ok := constraints.BuiltIn[constraintConfig.Name]
+		if !ok {
+			return fmt.Errorf("valley: unknown validation constraint: %q", constraintConfig.Name)
+		}
+
+		code, err := constraint(value, field.Type, constraintConfig.Opts)
+		if err != nil {
+			return fmt.Errorf("valley: failed to generate code for %q.%q's %q constraint: %v",
+				value.TypeName, value.FieldName, constraintConfig.Name, err)
+		}
+
+		g.wc(code)
+		g.wc("\n")
+	}
+
+	g.wc("	path.Pop()\n")
+	g.wc("\n")
+
+	return nil
 }
 
 // wc writes code to the code buffer.

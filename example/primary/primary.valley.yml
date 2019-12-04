@@ -17,3 +17,9 @@ types:
       TextMap:
         constraints:
         - name: Required
+
+  NestedExample:
+    fields:
+      Text:
+        constraints:
+        - name: Required

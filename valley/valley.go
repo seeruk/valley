@@ -18,6 +18,8 @@ type Constraint func(value Value, fieldType ast.Expr, opts interface{}) (string,
 // TODO: Move to a generator package or something? Generator is maybe a poor name, because it makes
 // a pretty code type name. Using something like `code` feels a bit crap though too.
 type Value struct {
+	TypeName  string
+	Receiver  string
 	FieldName string
 	VarName   string
 }
