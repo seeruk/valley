@@ -25,7 +25,17 @@ type Value struct {
 // Package ...
 type Package struct {
 	Name    string
+	Methods Methods
 	Structs Structs
+}
+
+// Methods is a map from struct name to Method.
+type Methods map[string][]Method
+
+// Method represents the information we need about a method in some Go source code.
+type Method struct {
+	Receiver string
+	Name     string
 }
 
 // Structs is a map from struct name to Struct.

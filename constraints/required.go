@@ -7,15 +7,11 @@ import (
 	"github.com/seeruk/valley/valley"
 )
 
-// Arguments to format are:
-//   [1]: Predicate   (e.g. `== ""`)
-//   [2]: Field name  (e.g. ProjectID)
+// requiredFormat is the format used for rendering a `Required` constraint.
 const requiredFormat = `
-	if %[1]s {
+	if %s {
 		violations = append(violations, valley.ConstraintViolation{
-			// TODO: Calculate Field value properly.
-			// Field: path.Render(),
-			Field: "%[2]s",
+			Field: path.Render(),
 			Message: "a value is required",
 		})
 	}
@@ -29,14 +25,13 @@ func Required(value valley.Value, fieldType ast.Expr, _ interface{}) (string, er
 	case *ast.StarExpr:
 		predicate = fmt.Sprintf("%s == nil", value.VarName)
 	case *ast.ArrayType, *ast.MapType:
-		predicate = fmt.Sprintf("%[1]s == nil || len(%[1]s) == 0", value.VarName)
+		predicate = fmt.Sprintf("len(%s) == 0", value.VarName)
 	case *ast.Ident:
 		switch expr.Name {
 		case "string":
 			predicate = fmt.Sprintf("len(%s) == 0", value.VarName)
 		case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "float32", "float64":
 			predicate = fmt.Sprintf("%s == 0", value.VarName)
-
 		default:
 			return "", fmt.Errorf("valley: can't handle %T (%s) in `Required`", fieldType, expr.Name)
 		}
@@ -44,5 +39,5 @@ func Required(value valley.Value, fieldType ast.Expr, _ interface{}) (string, er
 		return "", fmt.Errorf("valley: can't handle %T in `Required`", fieldType)
 	}
 
-	return fmt.Sprintf(requiredFormat, predicate, value.FieldName), nil
+	return fmt.Sprintf(requiredFormat, predicate), nil
 }
