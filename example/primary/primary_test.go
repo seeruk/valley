@@ -15,7 +15,7 @@ func BenchmarkExample_ValidateHappy(b *testing.B) {
 	example.Texts = []string{"Hello", "World!"}
 	example.TextMap = map[string]string{"hello": "world"}
 	example.Int = 999
-	example.Ints = []int{1, 2, 3, 4, 5}
+	example.Ints = []int{1}
 	example.Nested = primary.NestedExample{Text: "Hello, World!"}
 
 	b.ReportAllocs()
@@ -41,5 +41,7 @@ func BenchmarkExample_ValidateUnhappy(b *testing.B) {
 		violations = example.Validate()
 	}
 
-	_ = violations
+	if len(violations) == 0 {
+		b.Error("expected no violations")
+	}
 }
