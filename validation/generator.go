@@ -140,7 +140,7 @@ func (g *Generator) generateType(config valley.Config, pkg valley.Package, typeN
 
 // generateField generates all of the code for a specific field.
 func (g *Generator) generateField(value valley.Value, fieldConfig valley.FieldConfig, field valley.Field) error {
-	g.wc("	path.Push(\"%s\")\n", value.FieldName)
+	value.Path = fmt.Sprintf("\".%s\"", value.FieldName)
 
 	err := g.generateFieldConstraints(value, fieldConfig, field)
 	if err != nil {
@@ -154,7 +154,6 @@ func (g *Generator) generateField(value valley.Value, fieldConfig valley.FieldCo
 		return err
 	}
 
-	g.wc("	path.Pop()\n")
 	g.wc("\n")
 
 	return nil
@@ -181,13 +180,13 @@ func (g *Generator) generateFieldConstraints(value valley.Value, fieldConfig val
 func (g *Generator) generateFieldElementsConstraints(value valley.Value, fieldConfig valley.FieldConfig, field valley.Field) error {
 	for _, constraintConfig := range fieldConfig.Elements.Constraints {
 		g.wc("	for i, element := range %s {\n", value.VarName)
-		g.wc("		path.Push(\"[\" + strconv.Itoa(i) + \"]\")\n")
 
 		elementValue := valley.Value{
 			TypeName:  value.TypeName,
 			Receiver:  value.Receiver,
 			FieldName: value.FieldName,
 			VarName:   "element",
+			Path:      fmt.Sprintf("\".%s.[\" + strconv.Itoa(i) + \"]\"", value.FieldName),
 		}
 
 		arrayType, ok := field.Type.(*ast.ArrayType)
@@ -206,7 +205,6 @@ func (g *Generator) generateFieldElementsConstraints(value valley.Value, fieldCo
 			return err
 		}
 
-		g.wc("		path.Pop()\n")
 		g.wc("	}\n\n")
 	}
 

@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 3 {
+	if len(os.Args) < 4 {
 		fatalf("valley: a package path, and a config file path must be given\n")
 	}
 

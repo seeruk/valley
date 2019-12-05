@@ -27,7 +27,7 @@ func (r *Path) TruncateRight(amount int) {
 	r.buf = r.buf[:len(r.buf)-amount]
 }
 
-// Render renders this path as a string, to be sent to the frontend.
-func (r *Path) Render() string {
-	return Btos(r.buf)
+// String renders this path as a string, to be sent to the frontend.
+func (r *Path) String() string {
+	return string(r.buf)
 }

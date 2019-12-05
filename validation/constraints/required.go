@@ -8,12 +8,17 @@ import (
 )
 
 // requiredFormat is the format used for rendering a `Required` constraint.
+// TODO: Maybe there could be a before / after value passed in instead?
 const requiredFormat = `
 	if %s {
+		size := path.Write(%s)
+
 		violations = append(violations, valley.ConstraintViolation{
-			Field:   path.Render(),
+			Field:   path.String(),
 			Message: "a value is required",
 		})
+
+		path.TruncateRight(size)
 	}
 `
 
@@ -40,7 +45,7 @@ func Required(value valley.Value, fieldType ast.Expr, _ interface{}) (valley.Con
 		return output, fmt.Errorf("valley: can't handle %T in `Required`", fieldType)
 	}
 
-	output.Code = fmt.Sprintf(requiredFormat, predicate)
+	output.Code = fmt.Sprintf(requiredFormat, predicate, value.Path)
 
 	return output, nil
 }

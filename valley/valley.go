@@ -43,6 +43,7 @@ type Value struct {
 	Receiver  string
 	FieldName string
 	VarName   string
+	Path      string
 }
 
 // Package ...
