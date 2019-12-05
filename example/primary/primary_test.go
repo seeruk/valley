@@ -7,6 +7,26 @@ import (
 	"github.com/seeruk/valley/valley"
 )
 
+func BenchmarkRequired(b *testing.B) {
+	var violations []valley.ConstraintViolation
+
+	ints := []int{}
+
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		if len(ints) == 0 {
+			violations = []valley.ConstraintViolation{{
+				Field:   "test",
+				Message: "a value is required",
+			}}
+		}
+	}
+
+	_ = violations
+}
+
 func BenchmarkExample_ValidateHappy(b *testing.B) {
 	var example primary.Example
 	var violations []valley.ConstraintViolation
