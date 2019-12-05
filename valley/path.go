@@ -1,31 +1,33 @@
 package valley
 
-import "strings"
+// InitialPathSize sets the default size of a new Path's internal buffer.
+var InitialPathSize = 32
 
 // Path is used to represent the current position in a structure, to output a useful field value to
 // identify where a ConstraintViolation occurred.
 type Path struct {
-	items []string
+	buf []byte
 }
 
 // NewPath returns a new Path instance.
 func NewPath() *Path {
-	return &Path{}
+	return &Path{
+		buf: make([]byte, 0, InitialPathSize),
+	}
 }
 
-// Push adds an item to the end of the path.
-func (r *Path) Push(item string) {
-	r.items = append(r.items, item)
+// Write ...
+func (r *Path) Write(in string) int {
+	r.buf = append(r.buf, in...)
+	return len(in)
 }
 
-// Pop removes an item from the end of the path, and returns it.
-func (r *Path) Pop() string {
-	var p string
-	p, r.items = r.items[len(r.items)-1], r.items[:len(r.items)-1]
-	return p
+// TruncateRight ...
+func (r *Path) TruncateRight(amount int) {
+	r.buf = r.buf[:len(r.buf)-amount]
 }
 
 // Render renders this path as a string, to be sent to the frontend.
 func (r *Path) Render() string {
-	return strings.Join(r.items, ".")
+	return Btos(r.buf)
 }
