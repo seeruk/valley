@@ -22,7 +22,7 @@ func (e Example) Validate(path string) []valley.ConstraintViolation {
 	for i, element := range e.Ints {
 		if element == 0 {
 			violations = append(violations, valley.ConstraintViolation{
-				Field:   path + ".Ints" + ".[" + strconv.Itoa(i) + "]",
+				Field:   path + ".Ints.[" + strconv.Itoa(i) + "]",
 				Message: "a value is required",
 			})
 		}
