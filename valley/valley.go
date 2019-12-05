@@ -2,7 +2,6 @@ package valley
 
 import (
 	"go/ast"
-	"unsafe"
 )
 
 // ConstraintViolation ...
@@ -79,9 +78,4 @@ type Fields map[string]Field
 type Field struct {
 	Name string
 	Type ast.Expr
-}
-
-// Btos returns the given byte slice as a string, without allocating any new memory.
-func Btos(bs []byte) string {
-	return *(*string)(unsafe.Pointer(&bs))
 }
