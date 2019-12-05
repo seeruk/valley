@@ -42,7 +42,7 @@ func BenchmarkExample_ValidateHappy(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		violations = example.Validate()
+		violations = example.Validate("")
 	}
 
 	if len(violations) > 0 {
@@ -58,7 +58,7 @@ func BenchmarkExample_ValidateUnhappy(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		violations = example.Validate()
+		violations = example.Validate("")
 	}
 
 	if len(violations) == 0 {
