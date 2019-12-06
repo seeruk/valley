@@ -1,8 +1,18 @@
 package valley
 
 import (
+	"encoding/json"
 	"go/ast"
 )
+
+// Constraint ...
+type Constraint func(value Context, fieldType ast.Expr, opts json.RawMessage) (ConstraintOutput, error)
+
+// ConstraintOutput ...
+type ConstraintOutput struct {
+	Imports []Import
+	Code    string
+}
 
 // ConstraintViolation ...
 type ConstraintViolation struct {
@@ -11,13 +21,23 @@ type ConstraintViolation struct {
 	Details map[string]interface{} `json:"details"`
 }
 
-// Constraint ...
-type Constraint func(value Value, fieldType ast.Expr, opts interface{}) (ConstraintOutput, error)
+// Context ...
+// TODO: Move to a generator package or something? Generator is maybe a poor name, because it makes
+// a pretty code type name. Using something like `code` feels a bit crap though too.
+type Context struct {
+	TypeName  string
+	Receiver  string
+	FieldName string
+	VarName   string
+	Path      string
 
-// ConstraintOutput ...
-type ConstraintOutput struct {
-	Imports []Import
-	Code    string
+	BeforeViolation string
+	AfterViolation  string
+}
+
+// Clone returns a clone of this Context by utilising the properties of Go values.
+func (c Context) Clone() Context {
+	return c
 }
 
 // Import represents information about a Go import that Valley uses to generate code.
@@ -32,17 +52,6 @@ func NewImport(path, alias string) Import {
 		Path:  path,
 		Alias: alias,
 	}
-}
-
-// Value ...
-// TODO: Move to a generator package or something? Generator is maybe a poor name, because it makes
-// a pretty code type name. Using something like `code` feels a bit crap though too.
-type Value struct {
-	TypeName  string
-	Receiver  string
-	FieldName string
-	VarName   string
-	Path      string
 }
 
 // Package ...
@@ -71,11 +80,12 @@ type Struct struct {
 	Fields Fields
 }
 
-// Fields is a map from struct field name to Field.
-type Fields map[string]Field
+// Fields is a map from struct field name to Value.
+type Fields map[string]Value
 
-// Field represents the information we need about a struct field in some Go source code.
-type Field struct {
+// Value represents the information we need about a value (e.g. a struct, or a field on a struct) in
+// some Go source code.
+type Value struct {
 	Name string
 	Type ast.Expr
 }

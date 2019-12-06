@@ -147,7 +147,7 @@ func (r *Reader) readStructFields(structType *ast.StructType) valley.Fields {
 
 	for _, field := range structType.Fields.List {
 		for _, name := range field.Names {
-			fields[name.Name] = valley.Field{
+			fields[name.Name] = valley.Value{
 				Name: name.Name,
 				Type: field.Type,
 			}

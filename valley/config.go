@@ -1,6 +1,7 @@
 package valley
 
 import (
+	"encoding/json"
 	"io"
 	"io/ioutil"
 
@@ -50,6 +51,6 @@ type ElementsConfig struct {
 
 // ConstraintConfig ...
 type ConstraintConfig struct {
-	Name string      `json:"name"`
-	Opts interface{} `json:"opts"`
+	Name string          `json:"name"`
+	Opts json.RawMessage `json:"opts"`
 }

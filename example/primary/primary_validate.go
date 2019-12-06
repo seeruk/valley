@@ -10,52 +10,74 @@ func (e Example) Validate() []valley.ConstraintViolation {
 	var violations []valley.ConstraintViolation
 
 	path := valley.NewPath()
+	path.Write(".")
 
-	if len(e.Ints) == 0 {
-		size := path.Write(".Ints")
+	{
+		// MutuallyExclusive uses it's own block to lock down nonEmpty's scope.
+		var nonEmpty []string
 
+		if !(len(e.Text) == 0) {
+			nonEmpty = append(nonEmpty, "Text")
+		}
+
+		if !(len(e.Texts) == 0) {
+			nonEmpty = append(nonEmpty, "Texts")
+		}
+
+		if !(len(e.TextMap) == 0) {
+			nonEmpty = append(nonEmpty, "TextMap")
+		}
+
+		if len(nonEmpty) > 1 {
+
+			violations = append(violations, valley.ConstraintViolation{
+				Field:   path.String(),
+				Message: "fields are mutually exclusive",
+				Details: map[string]interface{}{
+					"fields": nonEmpty,
+				},
+			})
+
+		}
+	}
+
+	if e.Int == 0 {
+		size := path.Write("Int")
 		violations = append(violations, valley.ConstraintViolation{
 			Field:   path.String(),
 			Message: "a value is required",
 		})
+		path.TruncateRight(size)
+	}
 
+	if len(e.Ints) == 0 {
+		size := path.Write("Ints")
+		violations = append(violations, valley.ConstraintViolation{
+			Field:   path.String(),
+			Message: "a value is required",
+		})
 		path.TruncateRight(size)
 	}
 
 	for i, element := range e.Ints {
 
 		if element == 0 {
-			size := path.Write(".Ints.[" + strconv.Itoa(i) + "]")
-
+			size := path.Write("Ints.[" + strconv.Itoa(i) + "]")
 			violations = append(violations, valley.ConstraintViolation{
 				Field:   path.String(),
 				Message: "a value is required",
 			})
-
 			path.TruncateRight(size)
 		}
 
 	}
 
 	if len(e.Text) == 0 {
-		size := path.Write(".Text")
-
+		size := path.Write("Text")
 		violations = append(violations, valley.ConstraintViolation{
 			Field:   path.String(),
 			Message: "a value is required",
 		})
-
-		path.TruncateRight(size)
-	}
-
-	if len(e.TextMap) == 0 {
-		size := path.Write(".TextMap")
-
-		violations = append(violations, valley.ConstraintViolation{
-			Field:   path.String(),
-			Message: "a value is required",
-		})
-
 		path.TruncateRight(size)
 	}
 
@@ -68,15 +90,14 @@ func (n NestedExample) Validate() []valley.ConstraintViolation {
 	var violations []valley.ConstraintViolation
 
 	path := valley.NewPath()
+	path.Write(".")
 
 	if len(n.Text) == 0 {
-		size := path.Write(".Text")
-
+		size := path.Write("Text")
 		violations = append(violations, valley.ConstraintViolation{
 			Field:   path.String(),
 			Message: "a value is required",
 		})
-
 		path.TruncateRight(size)
 	}
 

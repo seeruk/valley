@@ -2,10 +2,13 @@ types:
   Example:
     constraints:
     - name: MutuallyExclusive
-      opts: [Text, Texts]
+      opts: [Text, Texts, TextMap]
 
     fields:
       Text:
+        constraints:
+        - name: Required
+      Int:
         constraints:
         - name: Required
       Ints:
@@ -14,9 +17,6 @@ types:
         elements:
           constraints:
           - name: Required
-      TextMap:
-        constraints:
-        - name: Required
 
   NestedExample:
     fields:

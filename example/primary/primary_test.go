@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/seeruk/valley/example/primary"
+
 	"github.com/seeruk/valley/valley"
 )
 
@@ -27,36 +28,13 @@ func BenchmarkRequired(b *testing.B) {
 	_ = violations
 }
 
-//func BenchmarkExample_ValidateHappy(b *testing.B) {
-//	var example primary.Example
-//	var violations []valley.ConstraintViolation
-//
-//	example.Text = "Hello"
-//	example.Texts = []string{"Hello", "World!"}
-//	example.TextMap = map[string]string{"hello": "world"}
-//	example.Int = 999
-//	example.Ints = []int{1}
-//	example.Nested = primary.NestedExample{Text: "Hello, World!"}
-//
-//	b.ReportAllocs()
-//	b.ResetTimer()
-//
-//	for i := 0; i < b.N; i++ {
-//		violations = example.Validate()
-//	}
-//
-//	if len(violations) > 0 {
-//		b.Error("expected no violations")
-//	}
-//}
-
-func BenchmarkExample_ValidateBufferHappy(b *testing.B) {
+func BenchmarkExample_ValidateHappy(b *testing.B) {
 	var example primary.Example
 	var violations []valley.ConstraintViolation
 
 	example.Text = "Hello"
-	example.Texts = []string{"Hello", "World!"}
-	example.TextMap = map[string]string{"hello": "world"}
+	//example.Texts = []string{"Hello", "World!"}
+	//example.TextMap = map[string]string{"hello": "world"}
 	example.Int = 999
 	example.Ints = []int{1}
 	example.Nested = primary.NestedExample{Text: "Hello, World!"}
@@ -65,7 +43,7 @@ func BenchmarkExample_ValidateBufferHappy(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		violations = example.ValidateBuffer()
+		violations = example.Validate()
 	}
 
 	if len(violations) > 0 {
@@ -73,23 +51,7 @@ func BenchmarkExample_ValidateBufferHappy(b *testing.B) {
 	}
 }
 
-//func BenchmarkExample_ValidateUnhappy(b *testing.B) {
-//	var example primary.Example
-//	var violations []valley.ConstraintViolation
-//
-//	b.ReportAllocs()
-//	b.ResetTimer()
-//
-//	for i := 0; i < b.N; i++ {
-//		violations = example.Validate()
-//	}
-//
-//	if len(violations) == 0 {
-//		b.Error("expected no violations")
-//	}
-//}
-
-func BenchmarkExample_ValidateBufferUnhappy(b *testing.B) {
+func BenchmarkExample_ValidateUnhappy(b *testing.B) {
 	var example primary.Example
 	var violations []valley.ConstraintViolation
 
@@ -97,7 +59,7 @@ func BenchmarkExample_ValidateBufferUnhappy(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		violations = example.ValidateBuffer()
+		violations = example.Validate()
 	}
 
 	if len(violations) == 0 {

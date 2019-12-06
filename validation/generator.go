@@ -101,6 +101,26 @@ func (g *Generator) generateType(config valley.Config, pkg valley.Package, typeN
 	g.wc("	var violations []valley.ConstraintViolation\n")
 	g.wc("\n")
 	g.wc("	path := valley.NewPath()\n")
+	g.wc("	path.Write(\".\")\n\n")
+
+	ctx := valley.Context{
+		TypeName: typeName,
+		Receiver: receiver,
+		VarName:  receiver,
+	}
+
+	for _, constraint := range typ.Constraints {
+		value := valley.Value{
+			Name: s.Name,
+			Type: s.Node,
+		}
+
+		err := g.generateConstraint(ctx, constraint, value)
+		if err != nil {
+			// TODO: Wrap.
+			return err
+		}
+	}
 
 	fieldNames := make([]string, 0, len(typ.Fields))
 	for fieldName := range typ.Fields {
@@ -118,14 +138,13 @@ func (g *Generator) generateType(config valley.Config, pkg valley.Package, typeN
 			return fmt.Errorf("valley: field %q does not exist in Go source", fieldName)
 		}
 
-		value := valley.Value{
-			TypeName:  typeName,
-			Receiver:  receiver,
-			FieldName: fieldName,
-			VarName:   fmt.Sprintf("%s.%s", receiver, fieldName),
-		}
+		ctx.FieldName = fieldName
+		ctx.VarName = fmt.Sprintf("%s.%s", receiver, fieldName)
+		ctx.Path = fmt.Sprintf("\"%s\"", fieldName)
+		ctx.BeforeViolation = fmt.Sprintf("size := path.Write(%s)", ctx.Path)
+		ctx.AfterViolation = "path.TruncateRight(size)"
 
-		err := g.generateField(value, fieldConfig, f)
+		err := g.generateField(ctx, fieldConfig, f)
 		if err != nil {
 			// TODO: Wrap?
 			return err
@@ -139,16 +158,14 @@ func (g *Generator) generateType(config valley.Config, pkg valley.Package, typeN
 }
 
 // generateField generates all of the code for a specific field.
-func (g *Generator) generateField(value valley.Value, fieldConfig valley.FieldConfig, field valley.Field) error {
-	value.Path = fmt.Sprintf("\".%s\"", value.FieldName)
-
-	err := g.generateFieldConstraints(value, fieldConfig, field)
+func (g *Generator) generateField(ctx valley.Context, fieldConfig valley.FieldConfig, value valley.Value) error {
+	err := g.generateFieldConstraints(ctx, fieldConfig, value)
 	if err != nil {
 		// TODO: Wrap.
 		return err
 	}
 
-	err = g.generateFieldElementsConstraints(value, fieldConfig, field)
+	err = g.generateFieldElementsConstraints(ctx, fieldConfig, value)
 	if err != nil {
 		// TODO: Wrap.
 		return err
@@ -161,10 +178,10 @@ func (g *Generator) generateField(value valley.Value, fieldConfig valley.FieldCo
 
 // generateFieldConstraints generates the code for constraints that apply directly to a specific
 // field (i.e. not including things like the element constraints).
-func (g *Generator) generateFieldConstraints(value valley.Value, fieldConfig valley.FieldConfig, field valley.Field) error {
+func (g *Generator) generateFieldConstraints(ctx valley.Context, fieldConfig valley.FieldConfig, value valley.Value) error {
 	// Generate the constraint code for the field as a whole.
 	for _, constraintConfig := range fieldConfig.Constraints {
-		err := g.generateConstraint(value, constraintConfig, field)
+		err := g.generateConstraint(ctx, constraintConfig, value)
 		if err != nil {
 			// TODO: Wrap.
 			return err
@@ -176,26 +193,24 @@ func (g *Generator) generateFieldConstraints(value valley.Value, fieldConfig val
 
 // generateFieldElementsConstraints generate the constraint code for each element of an
 // array/map/slice field.
-// TODO: Only works with array/slice currently, need more info on Value to handle maps?
-func (g *Generator) generateFieldElementsConstraints(value valley.Value, fieldConfig valley.FieldConfig, field valley.Field) error {
+// TODO: Only works with array/slice currently, need more info on Context to handle maps?
+func (g *Generator) generateFieldElementsConstraints(ctx valley.Context, fieldConfig valley.FieldConfig, value valley.Value) error {
+	ctx.Path = fmt.Sprintf("\"%s.[\" + strconv.Itoa(i) + \"]\"", ctx.FieldName)
+	ctx.BeforeViolation = fmt.Sprintf("size := path.Write(%s)", ctx.Path)
+
 	for _, constraintConfig := range fieldConfig.Elements.Constraints {
-		g.wc("	for i, element := range %s {\n", value.VarName)
+		g.wc("	for i, element := range %s {\n", ctx.VarName)
 
-		elementValue := valley.Value{
-			TypeName:  value.TypeName,
-			Receiver:  value.Receiver,
-			FieldName: value.FieldName,
-			VarName:   "element",
-			Path:      fmt.Sprintf("\".%s.[\" + strconv.Itoa(i) + \"]\"", value.FieldName),
-		}
+		elementValue := ctx.Clone()
+		elementValue.VarName = "element"
 
-		arrayType, ok := field.Type.(*ast.ArrayType)
+		arrayType, ok := value.Type.(*ast.ArrayType)
 		if !ok {
 			return errors.New("valley: 'elements' config applied to non-iterable type")
 		}
 
-		elementField := valley.Field{
-			Name: field.Name,
+		elementField := valley.Value{
+			Name: value.Name,
 			Type: arrayType.Elt,
 		}
 
@@ -212,16 +227,16 @@ func (g *Generator) generateFieldElementsConstraints(value valley.Value, fieldCo
 }
 
 // generateConstraint attempts to generate the code for a particular constraint.
-func (g *Generator) generateConstraint(value valley.Value, constraintConfig valley.ConstraintConfig, field valley.Field) error {
+func (g *Generator) generateConstraint(ctx valley.Context, constraintConfig valley.ConstraintConfig, value valley.Value) error {
 	constraint, ok := g.constraints[constraintConfig.Name]
 	if !ok {
 		return fmt.Errorf("valley: unknown validation constraint: %q", constraintConfig.Name)
 	}
 
-	output, err := constraint(value, field.Type, constraintConfig.Opts)
+	output, err := constraint(ctx, value.Type, constraintConfig.Opts)
 	if err != nil {
 		return fmt.Errorf("valley: failed to generate code for %q.%q's %q constraint: %v",
-			value.TypeName, value.FieldName, constraintConfig.Name, err)
+			ctx.TypeName, ctx.FieldName, constraintConfig.Name, err)
 	}
 
 	for _, ipt := range output.Imports {
