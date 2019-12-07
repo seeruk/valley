@@ -1,5 +1,6 @@
-//go:generate valley ./example.go
 package primary
+
+//go:generate valley ./example.go
 
 import (
 	"github.com/seeruk/valley/validation/constraints"
@@ -37,8 +38,11 @@ func (e Example) Constraints(t valley.Type) {
 	//   * Maybe this should add package-local variables for the patterns or something?
 	// * Predicate: Custom code... as real code maybe?
 
+	// Example of Predicate constraint.
+	//t.Field(e.Text).Constraints(constraints.Predicate(e.Text == "Hello, World!"))
+
 	// Field constraints.
-	t.Field(e.Text).Constraints(constraints.Required(), constraints.Predicate(e.Text == "Hello, World!"))
+	t.Field(e.Text).Constraints(constraints.Required())
 	t.Field(e.Int).Constraints(constraints.Required())
 	t.Field(e.Ints).Constraints(constraints.Required()).
 		Elements(constraints.Required(), constraints.Min(12))
