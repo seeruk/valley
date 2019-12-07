@@ -2,6 +2,8 @@
 package primary
 
 import (
+	"fmt"
+
 	"github.com/seeruk/valley/validation/constraints"
 	"github.com/seeruk/valley/valley"
 )
@@ -17,17 +19,20 @@ type Example struct {
 }
 
 // Constraints ...
-func (e Example) Constraints() {
+func (e Example) Constraints(t valley.Type) {
 	// Constraints on type as a whole.
-	valley.Constraints(constraints.MutuallyExclusive(e.Text, e.Texts, e.TextMap))
+	t.Constraints(constraints.MutuallyExclusive(e.Text, e.Texts, e.TextMap))
+
+	fmt.Println("lolwut")
 
 	// Field constraints.
-	valley.Field(e.Text).Constraints(constraints.Required())
-	valley.Field(e.Int).Constraints(constraints.Required())
-	valley.Field(e.Ints).Constraints(constraints.Required()).
+	t.Field(e.Text).Constraints(constraints.Required())
+	t.Field(e.Int).Constraints(constraints.Required())
+	t.Field(e.Ints).Constraints(constraints.Required()).
 		Elements(constraints.Required(), constraints.Min(12))
 
-	valley.Field(e.Nested).Constraints(constraints.Valid())
+	// Nested constraints to be called.
+	t.Field(e.Nested).Constraints(constraints.Valid())
 }
 
 // NestedExample ...
@@ -36,6 +41,6 @@ type NestedExample struct {
 }
 
 // Constraints ...
-func (n NestedExample) Constraints() {
-	valley.Field(n.Text).Constraints(constraints.Required())
+func (n NestedExample) Constraints(t valley.Type) {
+	t.Field(n.Text).Constraints(constraints.Required())
 }

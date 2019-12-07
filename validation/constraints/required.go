@@ -1,7 +1,6 @@
 package constraints
 
 import (
-	"encoding/json"
 	"fmt"
 	"go/ast"
 
@@ -26,7 +25,7 @@ func Required() valley.Constraint {
 }
 
 // required ...
-func required(ctx valley.Context, fieldType ast.Expr, _ json.RawMessage) (valley.ConstraintOutput, error) {
+func required(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.ConstraintOutput, error) {
 	var output valley.ConstraintOutput
 
 	predicate, err := GenerateEmptinessPredicate(ctx.VarName, fieldType)

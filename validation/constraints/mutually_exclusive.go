@@ -1,7 +1,6 @@
 package constraints
 
 import (
-	"encoding/json"
 	"fmt"
 	"go/ast"
 	"strings"
@@ -40,15 +39,15 @@ func MutuallyExclusive(fields ...interface{}) valley.Constraint {
 }
 
 // mutuallyExclusive ...
-func mutuallyExclusive(ctx valley.Context, fieldType ast.Expr, opts json.RawMessage) (valley.ConstraintOutput, error) {
+func mutuallyExclusive(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintOutput, error) {
 	var output valley.ConstraintOutput
 	var fields mutuallyExclusiveFields
 
-	err := json.Unmarshal(opts, &fields)
-	if err != nil {
-		// TODO: Wrap.
-		return output, err
-	}
+	//err := json.Unmarshal(opts, &fields)
+	//if err != nil {
+	//	// TODO: Wrap.
+	//	return output, err
+	//}
 
 	structType, ok := fieldType.(*ast.StructType)
 	if !ok {

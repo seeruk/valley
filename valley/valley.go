@@ -1,20 +1,15 @@
 package valley
 
 import (
-	"encoding/json"
 	"go/ast"
+	"go/token"
 )
-
-// Constraints ...
-func Constraints(_ ...Constraint) {
-	// NOTE: This function is no-op, it's used for configuration by reading the Go AST.
-}
 
 // Constraint ...
 type Constraint struct{}
 
 // ConstraintGenerator ...
-type ConstraintGenerator func(value Context, fieldType ast.Expr, opts json.RawMessage) (ConstraintOutput, error)
+type ConstraintGenerator func(value Context, fieldType ast.Expr, opts []ast.Expr) (ConstraintOutput, error)
 
 // ConstraintOutput ...
 type ConstraintOutput struct {
@@ -48,42 +43,19 @@ func (c Context) Clone() Context {
 	return c
 }
 
-// Field ...
-func Field(interface{}) ConfigField {
-	// NOTE: This function is no-op, it's used for configuration by reading the Go AST.
-	return ConfigField{}
-}
-
-type ConfigField struct{}
-
-func (f ConfigField) Constraints(_ ...Constraint) ConfigField {
-	return f
-}
-
-func (f ConfigField) Elements(_ ...Constraint) ConfigField {
-	return f
+// File ...
+type File struct {
+	FileSet *token.FileSet
+	Package string
+	Imports []Import
+	Methods Methods
+	Structs Structs
 }
 
 // Import represents information about a Go import that Valley uses to generate code.
 type Import struct {
 	Path  string
 	Alias string
-}
-
-// NewImport returns a new Import value.
-func NewImport(path, alias string) Import {
-	return Import{
-		Path:  path,
-		Alias: alias,
-	}
-}
-
-// File ...
-type File struct {
-	PkgName string
-	Imports []Import
-	Methods Methods
-	Structs Structs
 }
 
 // Methods is a map from struct name to Method.

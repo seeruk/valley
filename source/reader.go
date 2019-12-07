@@ -10,23 +10,14 @@ import (
 	"github.com/seeruk/valley/valley"
 )
 
-// Reader is a type used to read Go source code, and return information that Valley needs to then
-// generate validation code.
-type Reader struct {
-	// ...
-}
-
-// NewReader returns a new Reader instance.
-func NewReader() *Reader {
-	return &Reader{}
-}
-
 // Read attempts to read a Go file, and based on it's contents return the package name, along
 // with an extract of information about the methods and structs in that file.
-func (r *Reader) Read(srcPath string) (valley.File, error) {
+func Read(srcPath string) (valley.File, error) {
 	var file valley.File
 
-	f, err := parser.ParseFile(token.NewFileSet(), srcPath, nil, 0)
+	fileSet := token.NewFileSet()
+
+	f, err := parser.ParseFile(fileSet, srcPath, nil, 0)
 	if err != nil {
 		// TODO: Wrap.
 		return file, err
@@ -45,7 +36,8 @@ func (r *Reader) Read(srcPath string) (valley.File, error) {
 		})
 	}
 
-	file.PkgName = f.Name.Name
+	file.FileSet = fileSet
+	file.Package = f.Name.Name
 	file.Methods = make(valley.Methods)
 	file.Structs = make(valley.Structs)
 
@@ -54,9 +46,9 @@ func (r *Reader) Read(srcPath string) (valley.File, error) {
 			// TODO: Split into multiple methods.
 			switch d := decl.(type) {
 			case *ast.FuncDecl:
-				r.readFuncDecl(d, &file)
+				readFuncDecl(d, &file)
 			case *ast.GenDecl:
-				r.readGenDecl(d, &file)
+				readGenDecl(d, &file)
 			}
 		}
 	}
@@ -66,7 +58,7 @@ func (r *Reader) Read(srcPath string) (valley.File, error) {
 
 // readFuncDecl reads a Go function declaration and adds contents that are relevant to the given
 // valley File.
-func (r *Reader) readFuncDecl(d *ast.FuncDecl, file *valley.File) {
+func readFuncDecl(d *ast.FuncDecl, file *valley.File) {
 	if d.Recv == nil {
 		return
 	}
@@ -94,7 +86,7 @@ func (r *Reader) readFuncDecl(d *ast.FuncDecl, file *valley.File) {
 
 // readGenDecl reads a Go generic declaration and adds contents that are relevant to the given
 // valley File.
-func (r *Reader) readGenDecl(d *ast.GenDecl, file *valley.File) {
+func readGenDecl(d *ast.GenDecl, file *valley.File) {
 	if d.Tok != token.TYPE {
 		return
 	}
@@ -115,14 +107,14 @@ func (r *Reader) readGenDecl(d *ast.GenDecl, file *valley.File) {
 		file.Structs[structName] = valley.Struct{
 			Name:   structName,
 			Node:   structType,
-			Fields: r.readStructFields(structType),
+			Fields: readStructFields(structType),
 		}
 	}
 }
 
 // readStructFields reads information about the fields on a given struct type, returning them in a
 // more easily accessible format, with only the information we need.
-func (r *Reader) readStructFields(structType *ast.StructType) valley.Fields {
+func readStructFields(structType *ast.StructType) valley.Fields {
 	fields := make(valley.Fields)
 
 	for _, field := range structType.Fields.List {
