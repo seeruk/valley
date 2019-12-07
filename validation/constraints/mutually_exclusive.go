@@ -35,7 +35,12 @@ const mutuallyExclusiveFormat = `
 `
 
 // MutuallyExclusive ...
-func MutuallyExclusive(ctx valley.Context, fieldType ast.Expr, opts json.RawMessage) (valley.ConstraintOutput, error) {
+func MutuallyExclusive(fields ...interface{}) valley.Constraint {
+	return valley.Constraint{}
+}
+
+// mutuallyExclusive ...
+func mutuallyExclusive(ctx valley.Context, fieldType ast.Expr, opts json.RawMessage) (valley.ConstraintOutput, error) {
 	var output valley.ConstraintOutput
 	var fields mutuallyExclusiveFields
 

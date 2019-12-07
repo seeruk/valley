@@ -5,8 +5,16 @@ import (
 	"go/ast"
 )
 
+// Constraints ...
+func Constraints(_ ...Constraint) {
+	// NOTE: This function is no-op, it's used for configuration by reading the Go AST.
+}
+
 // Constraint ...
-type Constraint func(value Context, fieldType ast.Expr, opts json.RawMessage) (ConstraintOutput, error)
+type Constraint struct{}
+
+// ConstraintGenerator ...
+type ConstraintGenerator func(value Context, fieldType ast.Expr, opts json.RawMessage) (ConstraintOutput, error)
 
 // ConstraintOutput ...
 type ConstraintOutput struct {
@@ -40,6 +48,22 @@ func (c Context) Clone() Context {
 	return c
 }
 
+// Field ...
+func Field(interface{}) ConfigField {
+	// NOTE: This function is no-op, it's used for configuration by reading the Go AST.
+	return ConfigField{}
+}
+
+type ConfigField struct{}
+
+func (f ConfigField) Constraints(_ ...Constraint) ConfigField {
+	return f
+}
+
+func (f ConfigField) Elements(_ ...Constraint) ConfigField {
+	return f
+}
+
 // Import represents information about a Go import that Valley uses to generate code.
 type Import struct {
 	Path  string
@@ -54,9 +78,10 @@ func NewImport(path, alias string) Import {
 	}
 }
 
-// Package ...
-type Package struct {
-	Name    string
+// File ...
+type File struct {
+	PkgName string
+	Imports []Import
 	Methods Methods
 	Structs Structs
 }
@@ -68,6 +93,9 @@ type Methods map[string][]Method
 type Method struct {
 	Receiver string
 	Name     string
+	Params   *ast.FieldList
+	Results  *ast.FieldList
+	Body     *ast.BlockStmt
 }
 
 // Structs is a map from struct name to Struct.

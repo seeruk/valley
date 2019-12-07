@@ -10,9 +10,17 @@ import (
 // BuiltIn is a slice of all of the built-in validation constraints provided by Valley. This is
 // exposed so that custom code generators can build on the set of built-in rules, and also use the
 // logic exposed. It's tricky to otherwise make Valley extensible.
-var BuiltIn = map[string]valley.Constraint{
-	"Required":          Required,
-	"MutuallyExclusive": MutuallyExclusive,
+var BuiltIn = map[string]valley.ConstraintGenerator{
+	"Required":          required,
+	"MutuallyExclusive": mutuallyExclusive,
+}
+
+// BuiltIn2 ...
+var BuiltIn2 = map[string]valley.ConstraintGenerator{
+	"github.com/seeruk/valley/validation/constraints.Required":          required,
+	"github.com/seeruk/valley/validation/constraints.Min":               min,
+	"github.com/seeruk/valley/validation/constraints.MutuallyExclusive": mutuallyExclusive,
+	"github.com/seeruk/valley/validation/constraints.Valid":             valid,
 }
 
 // GenerateEmptinessPredicate ...

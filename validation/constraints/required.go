@@ -8,7 +8,7 @@ import (
 	"github.com/seeruk/valley/valley"
 )
 
-// requiredFormat is the format used for rendering a `Required` constraint.
+// requiredFormat is the format used for rendering a `required` constraint.
 const requiredFormat = `
 	if %s {
 		%s
@@ -21,7 +21,12 @@ const requiredFormat = `
 `
 
 // Required ...
-func Required(ctx valley.Context, fieldType ast.Expr, _ json.RawMessage) (valley.ConstraintOutput, error) {
+func Required() valley.Constraint {
+	return valley.Constraint{}
+}
+
+// required ...
+func required(ctx valley.Context, fieldType ast.Expr, _ json.RawMessage) (valley.ConstraintOutput, error) {
 	var output valley.ConstraintOutput
 
 	predicate, err := GenerateEmptinessPredicate(ctx.VarName, fieldType)
