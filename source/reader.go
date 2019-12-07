@@ -54,60 +54,70 @@ func (r *Reader) Read(srcPath string) (valley.File, error) {
 			// TODO: Split into multiple methods.
 			switch d := decl.(type) {
 			case *ast.FuncDecl:
-				if d.Recv == nil {
-					continue
-				}
-
-				// This should probably never happen.
-				if len(d.Recv.List) != 1 {
-					continue
-				}
-
-				receiver := d.Recv.List[0]
-				receiverName := receiver.Names[0].Name
-				receiverType := unpackStarExpr(receiver.Type)
-
-				switch t := receiverType.(type) {
-				case *ast.Ident:
-
-					file.Methods[t.Name] = append(file.Methods[t.Name], valley.Method{
-						Receiver: receiverName,
-						Name:     d.Name.Name,
-						Params:   d.Type.Params,
-						Results:  d.Type.Results,
-						Body:     d.Body,
-					})
-				}
-
+				r.readFuncDecl(d, &file)
 			case *ast.GenDecl:
-				if d.Tok != token.TYPE {
-					continue
-				}
-
-				for _, spec := range d.Specs {
-					typeSpec, ok := spec.(*ast.TypeSpec)
-					if !ok {
-						continue
-					}
-
-					structType, ok := typeSpec.Type.(*ast.StructType)
-					if !ok {
-						continue
-					}
-
-					// At this point, we definitely have a struct.
-					structName := typeSpec.Name.Name
-					file.Structs[structName] = valley.Struct{
-						Name:   structName,
-						Node:   structType,
-						Fields: r.readStructFields(structType),
-					}
-				}
+				r.readGenDecl(d, &file)
 			}
 		}
 	}
 
 	return file, nil
+}
+
+// readFuncDecl reads a Go function declaration and adds contents that are relevant to the given
+// valley File.
+func (r *Reader) readFuncDecl(d *ast.FuncDecl, file *valley.File) {
+	if d.Recv == nil {
+		return
+	}
+
+	// This should probably never happen.
+	if len(d.Recv.List) != 1 {
+		return
+	}
+
+	receiver := d.Recv.List[0]
+	receiverName := receiver.Names[0].Name
+	receiverType := unpackStarExpr(receiver.Type)
+
+	switch t := receiverType.(type) {
+	case *ast.Ident:
+		file.Methods[t.Name] = append(file.Methods[t.Name], valley.Method{
+			Receiver: receiverName,
+			Name:     d.Name.Name,
+			Params:   d.Type.Params,
+			Results:  d.Type.Results,
+			Body:     d.Body,
+		})
+	}
+}
+
+// readGenDecl reads a Go generic declaration and adds contents that are relevant to the given
+// valley File.
+func (r *Reader) readGenDecl(d *ast.GenDecl, file *valley.File) {
+	if d.Tok != token.TYPE {
+		return
+	}
+
+	for _, spec := range d.Specs {
+		typeSpec, ok := spec.(*ast.TypeSpec)
+		if !ok {
+			continue
+		}
+
+		structType, ok := typeSpec.Type.(*ast.StructType)
+		if !ok {
+			continue
+		}
+
+		// At this point, we definitely have a struct.
+		structName := typeSpec.Name.Name
+		file.Structs[structName] = valley.Struct{
+			Name:   structName,
+			Node:   structType,
+			Fields: r.readStructFields(structType),
+		}
+	}
 }
 
 // readStructFields reads information about the fields on a given struct type, returning them in a
