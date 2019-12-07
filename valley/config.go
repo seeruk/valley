@@ -77,69 +77,82 @@ func buildTypeConfig(file File, method Method) TypeConfig {
 			continue
 		}
 
-		if chain.Next.Call == nil {
-			continue // TODO: Something has gone wrong, no call on ident?
+		if chain.Next == nil || chain.Next.Call == nil {
+			// No call after ident, i.e. a lone reference to the valley.Type? Can this happen?
+			continue
 		}
 
-		selectorExpr, ok := chain.Next.Call.Fun.(*ast.SelectorExpr)
+		typeMethod := chain.Next
+		typeMethodCall := typeMethod.Call
+		typeMethodFunc, ok := typeMethodCall.Fun.(*ast.SelectorExpr)
 		if !ok {
-			continue // TODO: Invalid config, statement is a call on nothing?
+			// This should probably never happen given we know we're calling a method on valley.Type
+			// at this point. It should always have a selector, and it should always be the Type.
+			continue
 		}
 
-		switch selectorExpr.Sel.Name {
+		// TODO: How much stuff can we trust above to remove some code above?
+
+		switch typeMethodFunc.Sel.Name {
 		case "Constraints":
 			for _, expr := range chain.Next.Call.Args {
-				callExpr, ok := expr.(*ast.CallExpr)
+				constraintCall, ok := expr.(*ast.CallExpr)
 				if !ok {
-					continue // TODO: Invalid config.
+					// If the argument to the Constraints call wasn't a function call, it's invalid.
+					continue
 				}
 
-				selectorExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
+				constraintFunc, ok := constraintCall.Fun.(*ast.SelectorExpr)
 				if !ok {
-					continue // TODO: Invalid config.
+					// If the function call wasn't on a selector (i.e. a function in a package is
+					// what we're looking for). This could still pass if we're calling a method
+					// returned by a function that returns another type, so continue...
+					continue
 				}
 
-				// This assumes everything is a function in a package?
-				ident, ok := selectorExpr.X.(*ast.Ident)
+				constraintFuncOn, ok := constraintFunc.X.(*ast.Ident)
 				if !ok {
-					continue // TODO: Invalid config.
+					// If the function call was a selector, but wasn't on an ident (i.e. we're
+					// assuming it should be a package name / alias.
+					continue
 				}
 
-				imp, ok := findImportByName(file.Imports, ident.Name)
+				constraintFuncPkg, ok := findImportByName(file.Imports, constraintFuncOn.Name)
 				if !ok {
-					continue // TODO: Invalid config, couldn't find import for constraint.
+					// If the function call was on an ident, but it wasn't a package that was
+					// imported (or if the package name is different to the alias, or the end of the
+					// import path).
+					continue
 				}
 
 				config.Constraints = append(config.Constraints, ConstraintConfig{
-					Name: fmt.Sprintf("%s.%s", imp.Path, selectorExpr.Sel.Name),
-					Opts: callExpr.Args,
+					Name: fmt.Sprintf("%s.%s", constraintFuncPkg.Path, constraintFunc.Sel.Name),
+					Opts: constraintCall.Args,
 					Pos:  expr.Pos(),
 				})
 			}
 		case "Field":
-			if chain.Next.Next == nil {
-				continue // TODO: Invalid config, no calls attached to Field function.
+			if len(typeMethodCall.Args) != 1 || typeMethod.Next == nil {
+				// No field was passed to Field, one must be given to know which field any
+				// constraints apply to; or nothing was chained off of the call to Field, so just
+				// continue... nothing to configure at this point.
+				continue
 			}
 
-			if len(chain.Next.Call.Args) != 1 {
-				continue // TODO: Field should only have one arg.
-			}
-
-			argSelector, ok := chain.Next.Call.Args[0].(*ast.SelectorExpr)
+			fieldArg, ok := typeMethodCall.Args[0].(*ast.SelectorExpr)
 			if !ok {
-				continue // TODO: Argument to field wasn't a selector, (i.e. selecting a field).
+				// The argument passed to Field must be a selector (i.e. a field on the type).
+				continue
 			}
 
-			parentIdent, ok := argSelector.X.(*ast.Ident)
-			if !ok {
-				continue // TODO: Expected field to exist on an ident.
+			fieldArgOn, ok := fieldArg.X.(*ast.Ident)
+			if !ok || fieldArgOn.Name != method.Receiver {
+				// The argument passed to Field must be on an ident (i.e. the type). Additionally,
+				// the argument passed to Field must be on the receiver for the constraints method.
+				continue
 			}
 
-			if parentIdent.Name != method.Receiver {
-				continue // TODO: Expected field on receiver.
-			}
-
-			config.Fields[argSelector.Sel.Name] = buildFieldConfig(file, chain.Next.Next)
+			config.Fields[fieldArg.Sel.Name] = buildFieldConfig(file, typeMethod.Next)
 		}
 	}
 
