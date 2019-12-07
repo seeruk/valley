@@ -21,8 +21,24 @@ func (e Example) Constraints(t valley.Type) {
 	// Constraints on type as a whole.
 	t.Constraints(constraints.MutuallyExclusive(e.Text, e.Texts, e.TextMap))
 
+	// List of possible constraints to implement:
+	// * MutuallyInclusive: If one is set, all of them must be set.
+	// * Min: Min number
+	// * Max: Max number
+	// * MinLength: Min length of something that can have length calculated on it.
+	// * MaxLength: Max length of something that can have length calculated on it.
+	// * Length: Exactly length of something that can have length calculated on it.
+	// * OneOf: Actual value must be equal to one of the given values (maybe tricky?).
+	// * AnyNRequired: Similar to MutuallyExclusive, but making at least one of the values be required.
+	// * ExactlyNRequired: Similar to MutuallyExclusive, but making exactly one of the values be required.
+	// * TimeBefore: Validates that a time is before another.
+	// * TimeAfter: Validates that a time is after another.
+	// * Pattern: Validates that a string matches the given regular expression.
+	//   * Maybe this should add package-local variables for the patterns or something?
+	// * Predicate: Custom code... as real code maybe?
+
 	// Field constraints.
-	t.Field(e.Text).Constraints(constraints.Required())
+	t.Field(e.Text).Constraints(constraints.Required(), constraints.Predicate(e.Text == "Hello, World!"))
 	t.Field(e.Int).Constraints(constraints.Required())
 	t.Field(e.Ints).Constraints(constraints.Required()).
 		Elements(constraints.Required(), constraints.Min(12))

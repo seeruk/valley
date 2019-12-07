@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/seeruk/valley/example/primary"
-
 	"github.com/seeruk/valley/valley"
 )
 

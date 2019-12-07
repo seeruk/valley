@@ -15,11 +15,11 @@ func main() {
 	example.Int = 1
 	example.Ints = []int{1}
 	example.Text = "text"
-	example.Texts = []string{"text 1", "text 2"}
-
-	example.TextMap = map[string]string{
-		"Hello": "World!",
-	}
+	//example.Texts = []string{"text 1", "text 2"}
+	//
+	//example.TextMap = map[string]string{
+	//	"Hello": "World!",
+	//}
 
 	violations := example.Validate()
 

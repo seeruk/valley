@@ -41,14 +41,16 @@ func mutuallyExclusive(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) 
 	var fields []string
 
 	for _, opt := range opts {
+		pos := ctx.FileSet.Position(opt.Pos())
+
 		selector, ok := opt.(*ast.SelectorExpr)
 		if !ok {
-			return output, fmt.Errorf("value passed to `MutuallyExclusive` is not a field selector")
+			return output, fmt.Errorf("value passed to `MutuallyExclusive` is not a field selector on line %d, col %d", pos.Line, pos.Column)
 		}
 
 		selectorOn, ok := selector.X.(*ast.Ident)
 		if !ok || selectorOn.Name != ctx.Receiver {
-			return output, fmt.Errorf("value passed to `MutuallyExclusive is not a field on receiver type")
+			return output, fmt.Errorf("value passed to `MutuallyExclusive is not a field on receiver type on line %d, col %d", pos.Line, pos.Column)
 		}
 
 		fields = append(fields, selector.Sel.Name)

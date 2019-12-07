@@ -3,6 +3,7 @@ package valley
 import (
 	"fmt"
 	"go/ast"
+	"go/token"
 )
 
 // importPath is the import path that is used to import Valley types.
@@ -29,6 +30,7 @@ type FieldConfig struct {
 type ConstraintConfig struct {
 	Name string     `json:"name"`
 	Opts []ast.Expr `json:"opts"`
+	Pos  token.Pos
 }
 
 // ConfigFromFile builds Config for all types in a given file by picking out each type that has
@@ -111,6 +113,7 @@ func buildTypeConfig(file File, method Method) TypeConfig {
 				config.Constraints = append(config.Constraints, ConstraintConfig{
 					Name: fmt.Sprintf("%s.%s", imp.Path, selectorExpr.Sel.Name),
 					Opts: callExpr.Args,
+					Pos:  expr.Pos(),
 				})
 			}
 		case "Field":
@@ -192,6 +195,7 @@ func buildFieldConfig(file File, fieldMethodNode *callExprNode) FieldConfig {
 		constraintConfig := ConstraintConfig{
 			Name: fmt.Sprintf("%s.%s", argFuncPkg.Path, argFunc.Sel.Name),
 			Opts: argCall.Args,
+			Pos:  argExpr.Pos(),
 		}
 
 		switch fieldMethodFunc.Sel.Name {
