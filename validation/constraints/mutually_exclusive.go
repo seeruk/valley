@@ -8,9 +8,6 @@ import (
 	"github.com/seeruk/valley/valley"
 )
 
-// mutuallyExclusiveFields ...
-type mutuallyExclusiveFields []string
-
 // mutuallyExclusiveFormat ...
 const mutuallyExclusiveFormat = `
 	{
@@ -41,13 +38,21 @@ func MutuallyExclusive(fields ...interface{}) valley.Constraint {
 // mutuallyExclusive ...
 func mutuallyExclusive(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintOutput, error) {
 	var output valley.ConstraintOutput
-	var fields mutuallyExclusiveFields
+	var fields []string
 
-	//err := json.Unmarshal(opts, &fields)
-	//if err != nil {
-	//	// TODO: Wrap.
-	//	return output, err
-	//}
+	for _, opt := range opts {
+		selector, ok := opt.(*ast.SelectorExpr)
+		if !ok {
+			return output, fmt.Errorf("value passed to `MutuallyExclusive` is not a field selector")
+		}
+
+		selectorOn, ok := selector.X.(*ast.Ident)
+		if !ok || selectorOn.Name != ctx.Receiver {
+			return output, fmt.Errorf("value passed to `MutuallyExclusive is not a field on receiver type")
+		}
+
+		fields = append(fields, selector.Sel.Name)
+	}
 
 	structType, ok := fieldType.(*ast.StructType)
 	if !ok {

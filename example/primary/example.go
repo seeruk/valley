@@ -2,8 +2,6 @@
 package primary
 
 import (
-	"fmt"
-
 	"github.com/seeruk/valley/validation/constraints"
 	"github.com/seeruk/valley/valley"
 )
@@ -22,8 +20,6 @@ type Example struct {
 func (e Example) Constraints(t valley.Type) {
 	// Constraints on type as a whole.
 	t.Constraints(constraints.MutuallyExclusive(e.Text, e.Texts, e.TextMap))
-
-	fmt.Println("lolwut")
 
 	// Field constraints.
 	t.Field(e.Text).Constraints(constraints.Required())

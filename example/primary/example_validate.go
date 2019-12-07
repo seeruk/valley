@@ -16,6 +16,18 @@ func (e Example) Validate() []valley.ConstraintViolation {
 		// MutuallyExclusive uses it's own block to lock down nonEmpty's scope.
 		var nonEmpty []string
 
+		if !(len(e.Text) == 0) {
+			nonEmpty = append(nonEmpty, "Text")
+		}
+
+		if !(len(e.Texts) == 0) {
+			nonEmpty = append(nonEmpty, "Texts")
+		}
+
+		if !(len(e.TextMap) == 0) {
+			nonEmpty = append(nonEmpty, "TextMap")
+		}
+
 		if len(nonEmpty) > 1 {
 
 			violations = append(violations, valley.ConstraintViolation{
