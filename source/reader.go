@@ -19,7 +19,6 @@ func Read(srcPath string) (valley.Source, error) {
 
 	f, err := parser.ParseFile(fileSet, srcPath, nil, 0)
 	if err != nil {
-		// TODO: Wrap.
 		return file, err
 	}
 

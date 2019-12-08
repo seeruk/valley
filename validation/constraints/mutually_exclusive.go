@@ -71,7 +71,6 @@ func mutuallyExclusive(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) 
 				if field == name {
 					predicate, err := GenerateEmptinessPredicate(fmt.Sprintf("%s.%s", ctx.VarName, name), structField.Type)
 					if err != nil {
-						// TODO: Wrap.
 						return output, err
 					}
 

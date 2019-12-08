@@ -30,7 +30,6 @@ func required(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.Cons
 
 	predicate, err := GenerateEmptinessPredicate(ctx.VarName, fieldType)
 	if err != nil {
-		// TODO: Wrap.
 		return output, err
 	}
 

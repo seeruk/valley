@@ -25,8 +25,6 @@ type ConstraintViolation struct {
 }
 
 // Context ...
-// TODO: Move to a generator package or something? Generator is maybe a poor name, because it makes
-// a pretty code type name. Using something like `code` feels a bit crap though too.
 type Context struct {
 	FileSet   *token.FileSet
 	TypeName  string

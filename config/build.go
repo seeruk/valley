@@ -25,7 +25,6 @@ func BuildFromSource(src valley.Source) (valley.Config, error) {
 	for typeName, method := range constraintsMethods {
 		typeConfig, err := buildTypeConfig(src, method)
 		if err != nil {
-			// TODO: Wrap?
 			return config, err
 		}
 
@@ -238,7 +237,6 @@ func buildCallExpr(src valley.Source, outer ast.Expr) (*callExprNode, error) {
 
 	next, err := buildCallExpr(src, selectorExpr.X)
 	if err != nil {
-		// TODO: Wrap?
 		return nil, err
 	}
 

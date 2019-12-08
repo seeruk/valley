@@ -44,7 +44,6 @@ func (g *Generator) Generate(config valley.Config, file valley.Source) ([]byte, 
 	for _, typeName := range typeNames {
 		err := g.generateType(config, file, typeName)
 		if err != nil {
-			// TODO: Wrap.
 			return nil, err
 		}
 	}
@@ -82,7 +81,6 @@ func (g *Generator) generateType(config valley.Config, file valley.Source, typeN
 
 	s, ok := file.Structs[typeName]
 	if !ok {
-		// TODO: Is this correct?
 		return nil
 	}
 
@@ -117,7 +115,6 @@ func (g *Generator) generateType(config valley.Config, file valley.Source, typeN
 
 		err := g.generateConstraint(ctx, constraint, value)
 		if err != nil {
-			// TODO: Wrap.
 			return err
 		}
 	}
@@ -146,7 +143,6 @@ func (g *Generator) generateType(config valley.Config, file valley.Source, typeN
 
 		err := g.generateField(ctx, fieldConfig, f)
 		if err != nil {
-			// TODO: Wrap?
 			return err
 		}
 	}
@@ -161,13 +157,11 @@ func (g *Generator) generateType(config valley.Config, file valley.Source, typeN
 func (g *Generator) generateField(ctx valley.Context, fieldConfig valley.FieldConfig, value valley.Value) error {
 	err := g.generateFieldConstraints(ctx, fieldConfig, value)
 	if err != nil {
-		// TODO: Wrap.
 		return err
 	}
 
 	err = g.generateFieldElementsConstraints(ctx, fieldConfig, value)
 	if err != nil {
-		// TODO: Wrap.
 		return err
 	}
 
@@ -183,7 +177,6 @@ func (g *Generator) generateFieldConstraints(ctx valley.Context, fieldConfig val
 	for _, constraintConfig := range fieldConfig.Constraints {
 		err := g.generateConstraint(ctx, constraintConfig, value)
 		if err != nil {
-			// TODO: Wrap.
 			return err
 		}
 	}
@@ -220,7 +213,6 @@ func (g *Generator) generateFieldElementsConstraints(ctx valley.Context, fieldCo
 
 		err := g.generateConstraint(elementValue, constraintConfig, elementField)
 		if err != nil {
-			// TODO: Wrap.
 			return err
 		}
 	}
