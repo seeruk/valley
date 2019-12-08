@@ -23,7 +23,7 @@ func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Com
 	configure := func(def *console.Definition) {
 		def.AddArgument(console.ArgumentDefinition{
 			Value: parameters.NewStringValue(&srcPath),
-			Spec:  "SRC_PATH",
+			Spec:  "SOURCE",
 			Desc:  "The path to a file to generate validation code for.",
 		})
 	}

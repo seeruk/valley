@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"os"
+
+	"github.com/seeruk/valley/valley"
 )
 
 func main() {
@@ -21,7 +23,7 @@ func main() {
 
 	example.Nested = &NestedExample{}
 
-	violations := example.Validate()
+	violations := example.Validate(valley.NewPath())
 
 	encoder := json.NewEncoder(os.Stdout)
 	encoder.SetIndent("", "  ")
