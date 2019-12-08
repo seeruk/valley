@@ -36,6 +36,7 @@ func Read(srcPath string) (valley.File, error) {
 		})
 	}
 
+	file.Name = path.Base(srcPath)
 	file.FileSet = fileSet
 	file.Package = f.Name.Name
 	file.Methods = make(valley.Methods)

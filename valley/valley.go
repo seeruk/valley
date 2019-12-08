@@ -46,6 +46,7 @@ func (c Context) Clone() Context {
 
 // File ...
 type File struct {
+	Name    string
 	FileSet *token.FileSet
 	Package string
 	Imports []Import

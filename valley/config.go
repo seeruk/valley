@@ -59,21 +59,32 @@ func buildTypeConfig(file File, method Method) TypeConfig {
 	}
 
 	for _, stmt := range method.Body.List {
-		callExpr, ok := callExprFromStmt(stmt)
+		exprStmt, ok := stmt.(*ast.ExprStmt)
 		if !ok {
 			continue
 		}
 
+		callExpr, ok := exprStmt.X.(*ast.CallExpr)
+		if !ok {
+			continue
+		}
+
+		// Each call expression in a Go AST function body is right-to-left, so the last method call
+		// is the first thing you see. We want the opposite, because it's easier to verify what the
+		// methods are being called on (i.e. that it's a valley.Type), and then which method is
+		// being called to determine how to behave from that point on.
 		chain := buildCallExpr(callExpr).Reverse()
 
+		// At this point we should know there is only one parameter, and it should be the
+		// valley.Type argument.
 		param := method.Params.List[0]
 		paramName := param.Names[0].Name
 
 		if chain.Ident == nil || chain.Ident.Name != paramName {
-			position := file.FileSet.Position(stmt.Pos())
-
-			// If a call is happening on something that isn't the valley.Type, skip the stmt.
-			fmt.Printf("skipping call that isn't on valley.Type on line %d, col %d\n", position.Line, position.Column)
+			// The call should be happening on the valley.Type. It doesn't have to be called `t`, so
+			// we get the parameter name and compare it to the root identifier of the call chain
+			// (i.e. the identifier all of the calls in the statement are coming off of).
+			errorOn(file, stmt.Pos(), "skipping call that isn't on valley.Type")
 			continue
 		}
 
@@ -92,6 +103,8 @@ func buildTypeConfig(file File, method Method) TypeConfig {
 		}
 
 		// TODO: How much stuff can we trust above to remove some code above?
+		// TODO: This next bit should go elsewhere, and Constraints should return the valley.Type so
+		// we can chain calls, and still handle that.
 
 		switch typeMethodFunc.Sel.Name {
 		case "Constraints":
@@ -282,21 +295,6 @@ func (n *callExprNode) Reverse() *callExprNode {
 	return prev
 }
 
-// callExprFromStmt ...
-func callExprFromStmt(stmt ast.Stmt) (*ast.CallExpr, bool) {
-	exprStmt, ok := stmt.(*ast.ExprStmt)
-	if !ok {
-		return nil, false
-	}
-
-	callExpr, ok := exprStmt.X.(*ast.CallExpr)
-	if !ok {
-		return nil, false
-	}
-
-	return callExpr, true
-}
-
 // collectConstraintsMethod looks through the methods in a given file and extracts the first method
 // that looks like a constraints method. This allows the Constraint method to have any name.
 //
@@ -348,4 +346,17 @@ func findImportByName(imports []Import, alias string) (Import, bool) {
 	}
 
 	return Import{}, false
+}
+
+// errorOn prints a given error message, in the given file, at the given position.
+func errorOn(file File, pos token.Pos, message string, args ...interface{}) {
+	position := file.FileSet.Position(pos)
+
+	args = append(args, position.Line, position.Column, file.Package, file.Name)
+
+	// TODO: I have no doubt this could be more robust and useful. Maybe this could the filename
+	// from the root of the currently module path instead? Would need to get CWD, module path,
+	// figure out where we are, and put it all together to get the path from the root of the module
+	// to the file.
+	fmt.Printf("valley: "+message+" on line %d, col %d in %s/%s\n", args...)
 }
