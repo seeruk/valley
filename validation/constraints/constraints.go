@@ -7,7 +7,7 @@ import (
 	"github.com/seeruk/valley/valley"
 )
 
-// BuiltIn is a slice of all of the built-in validation constraints provided by Valley. This is
+// BuiltIn is a map of all of the built-in validation constraints provided by Valley. This is
 // exposed so that custom code generators can build on the set of built-in rules, and also use the
 // logic exposed. It's tricky to otherwise make Valley extensible.
 var BuiltIn = map[string]valley.ConstraintGenerator{
