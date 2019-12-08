@@ -12,8 +12,8 @@ import (
 
 // Read attempts to read a Go file, and based on it's contents return the package name, along
 // with an extract of information about the methods and structs in that file.
-func Read(srcPath string) (valley.File, error) {
-	var file valley.File
+func Read(srcPath string) (valley.Source, error) {
+	var file valley.Source
 
 	fileSet := token.NewFileSet()
 
@@ -36,7 +36,7 @@ func Read(srcPath string) (valley.File, error) {
 		})
 	}
 
-	file.Name = path.Base(srcPath)
+	file.FileName = path.Base(srcPath)
 	file.FileSet = fileSet
 	file.Package = f.Name.Name
 	file.Methods = make(valley.Methods)
@@ -57,8 +57,8 @@ func Read(srcPath string) (valley.File, error) {
 }
 
 // readFuncDecl reads a Go function declaration and adds contents that are relevant to the given
-// valley File.
-func readFuncDecl(d *ast.FuncDecl, file *valley.File) {
+// valley Source.
+func readFuncDecl(d *ast.FuncDecl, file *valley.Source) {
 	if d.Recv == nil {
 		return
 	}
@@ -85,8 +85,8 @@ func readFuncDecl(d *ast.FuncDecl, file *valley.File) {
 }
 
 // readGenDecl reads a Go generic declaration and adds contents that are relevant to the given
-// valley File.
-func readGenDecl(d *ast.GenDecl, file *valley.File) {
+// valley Source.
+func readGenDecl(d *ast.GenDecl, file *valley.Source) {
 	if d.Tok != token.TYPE {
 		return
 	}

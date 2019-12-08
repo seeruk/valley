@@ -5,10 +5,10 @@ import (
 	"go/format"
 	"os"
 
+	"github.com/seeruk/valley/config"
 	"github.com/seeruk/valley/source"
 	"github.com/seeruk/valley/validation"
 	"github.com/seeruk/valley/validation/constraints"
-	"github.com/seeruk/valley/valley"
 )
 
 func main() {
@@ -22,32 +22,32 @@ func main() {
 	}
 
 	if srcPath == "" {
-		fatalf("valley: a package path, and a config file path must be given\n")
+		fatalf("valley: a package path, and a cfg src path must be given\n")
 	}
 
-	file, err := source.Read(srcPath)
+	src, err := source.Read(srcPath)
 	if err != nil {
 		fatalf("valley: failed to read structs in: %q: %v\n", srcPath, err)
 	}
 
-	config, err := valley.ConfigFromFile(file)
+	cfg, err := config.FromFile(src)
 	if err != nil {
-		fatalf("valley: failed to generate config from file: %v\n", err)
+		fatalf("valley: failed to generate cfg from src: %v\n", err)
 	}
 
 	generator := validation.NewGenerator(constraints.BuiltIn)
 
-	bs, err := generator.Generate(config, file)
+	bs, err := generator.Generate(cfg, src)
 	if err != nil {
 		fatalf("valley: failed to generate code: %v\n", err)
 	}
 
-	// TODO: Work this out from the input file name.
+	// TODO: Work this out from the input src name.
 	destPath := "./example_validate.go"
 
 	destFile, err := os.Create(destPath)
 	if err != nil {
-		fatalf("valley: failed to open destination file for writing: %s: %q\n", destPath, err)
+		fatalf("valley: failed to open destination src for writing: %s: %q\n", destPath, err)
 	}
 
 	defer destFile.Close()
@@ -59,7 +59,7 @@ func main() {
 
 	_, err = destFile.Write(formatted)
 	if err != nil {
-		fatalf("valley: failed to write generated source to file: %v\n", err)
+		fatalf("valley: failed to write generated source to src: %v\n", err)
 	}
 }
 

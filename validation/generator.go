@@ -32,7 +32,7 @@ func NewGenerator(constraints map[string]valley.ConstraintGenerator) *Generator 
 
 // Generate attempts to generate the code (returned as bytes) to validate code in the given package,
 // using the given configuration.
-func (g *Generator) Generate(config valley.Config, file valley.File) ([]byte, error) {
+func (g *Generator) Generate(config valley.Config, file valley.Source) ([]byte, error) {
 	typeNames := make([]string, 0, len(config.Types))
 	for typeName := range config.Types {
 		typeNames = append(typeNames, typeName)
@@ -77,7 +77,7 @@ func (g *Generator) Generate(config valley.Config, file valley.File) ([]byte, er
 
 // generateType generates the entire Validate method for a particular type (found in the given
 // package with the given type name.
-func (g *Generator) generateType(config valley.Config, file valley.File, typeName string) error {
+func (g *Generator) generateType(config valley.Config, file valley.Source, typeName string) error {
 	typ := config.Types[typeName]
 
 	s, ok := file.Structs[typeName]

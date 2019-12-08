@@ -44,14 +44,14 @@ func (c Context) Clone() Context {
 	return c
 }
 
-// File ...
-type File struct {
-	Name    string
-	FileSet *token.FileSet
-	Package string
-	Imports []Import
-	Methods Methods
-	Structs Structs
+// Source ...
+type Source struct {
+	FileName string
+	FileSet  *token.FileSet
+	Package  string
+	Imports  []Import
+	Methods  Methods
+	Structs  Structs
 }
 
 // Import represents information about a Go import that Valley uses to generate code.
