@@ -3,8 +3,6 @@ package primary
 //go:generate valley ./example.go
 
 import (
-	"fmt"
-
 	"github.com/seeruk/valley/validation/constraints"
 	"github.com/seeruk/valley/valley"
 )
@@ -42,8 +40,6 @@ func (e Example) Constraints(t valley.Type) {
 
 	// Example of Predicate constraint.
 	//t.Field(e.Text).Constraints(constraints.Predicate(e.Text == "Hello, World!"))
-
-	fmt.Println("Hello")
 
 	// Field constraints.
 	t.Field(e.Text).Constraints(constraints.Required())

@@ -4,7 +4,9 @@ package valley
 type Type struct{}
 
 // Constraints ...
-func (t Type) Constraints(_ ...Constraint) {}
+func (t Type) Constraints(_ ...Constraint) Type {
+	return t
+}
 
 // Field ...
 func (t Type) Field(_ interface{}) Field {

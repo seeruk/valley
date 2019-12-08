@@ -1,6 +1,7 @@
 package valley
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"go/token"
@@ -41,10 +42,16 @@ func ConfigFromFile(file File) (Config, error) {
 		Types: make(map[string]TypeConfig),
 	}
 
-	constraintsMethods := collectConstraintsMethod(file)
+	constraintsMethods := collectConstraintsMethods(file)
 
 	for typeName, method := range constraintsMethods {
-		config.Types[typeName] = buildTypeConfig(file, method)
+		typeConfig, err := buildTypeConfig(file, method)
+		if err != nil {
+			// TODO: Wrap?
+			return config, err
+		}
+
+		config.Types[typeName] = typeConfig
 	}
 
 	return config, nil
@@ -53,7 +60,7 @@ func ConfigFromFile(file File) (Config, error) {
 // buildTypeConfig builds TypeConfig based on the body of a constraints method in the given file.
 // It does this by reading the Go AST for the file, and picking out calls that match the expected
 // usage for Valley.
-func buildTypeConfig(file File, method Method) TypeConfig {
+func buildTypeConfig(file File, method Method) (TypeConfig, error) {
 	config := TypeConfig{
 		Fields: make(map[string]FieldConfig),
 	}
@@ -61,11 +68,14 @@ func buildTypeConfig(file File, method Method) TypeConfig {
 	for _, stmt := range method.Body.List {
 		exprStmt, ok := stmt.(*ast.ExprStmt)
 		if !ok {
+			warnOn(file, stmt.Pos(), "skipping line that is not a statement")
 			continue
 		}
 
 		callExpr, ok := exprStmt.X.(*ast.CallExpr)
 		if !ok {
+			// This also protects us later, chain.Next should never be nil after this check.
+			warnOn(file, stmt.Pos(), "skipping line that is not a call expression")
 			continue
 		}
 
@@ -73,7 +83,13 @@ func buildTypeConfig(file File, method Method) TypeConfig {
 		// is the first thing you see. We want the opposite, because it's easier to verify what the
 		// methods are being called on (i.e. that it's a valley.Type), and then which method is
 		// being called to determine how to behave from that point on.
-		chain := buildCallExpr(callExpr).Reverse()
+		chain, err := buildCallExpr(callExpr)
+		if err != nil {
+			warnOn(file, stmt.Pos(), "skipping line with unexpected structure: %v", err)
+			continue
+		}
+
+		chain = chain.Reverse()
 
 		// At this point we should know there is only one parameter, and it should be the
 		// valley.Type argument.
@@ -84,145 +100,120 @@ func buildTypeConfig(file File, method Method) TypeConfig {
 			// The call should be happening on the valley.Type. It doesn't have to be called `t`, so
 			// we get the parameter name and compare it to the root identifier of the call chain
 			// (i.e. the identifier all of the calls in the statement are coming off of).
-			errorOn(file, stmt.Pos(), "skipping call that isn't on valley.Type")
-			continue
-		}
-
-		if chain.Next == nil || chain.Next.Call == nil {
-			// No call after ident, i.e. a lone reference to the valley.Type? Can this happen?
+			warnOn(file, stmt.Pos(), "skipping call that isn't on valley.Type")
 			continue
 		}
 
 		typeMethod := chain.Next
-		typeMethodCall := typeMethod.Call
-		typeMethodFunc, ok := typeMethodCall.Fun.(*ast.SelectorExpr)
-		if !ok {
-			// This should probably never happen given we know we're calling a method on valley.Type
-			// at this point. It should always have a selector, and it should always be the Type.
-			continue
-		}
 
-		// TODO: How much stuff can we trust above to remove some code above?
-		// TODO: This next bit should go elsewhere, and Constraints should return the valley.Type so
-		// we can chain calls, and still handle that.
-
-		switch typeMethodFunc.Sel.Name {
-		case "Constraints":
-			for _, expr := range chain.Next.Call.Args {
-				constraintCall, ok := expr.(*ast.CallExpr)
-				if !ok {
-					// If the argument to the Constraints call wasn't a function call, it's invalid.
-					continue
-				}
-
-				constraintFunc, ok := constraintCall.Fun.(*ast.SelectorExpr)
-				if !ok {
-					// If the function call wasn't on a selector (i.e. a function in a package is
-					// what we're looking for). This could still pass if we're calling a method
-					// returned by a function that returns another type, so continue...
-					continue
-				}
-
-				constraintFuncOn, ok := constraintFunc.X.(*ast.Ident)
-				if !ok {
-					// If the function call was a selector, but wasn't on an ident (i.e. we're
-					// assuming it should be a package name / alias.
-					continue
-				}
-
-				constraintFuncPkg, ok := findImportByName(file.Imports, constraintFuncOn.Name)
-				if !ok {
-					// If the function call was on an ident, but it wasn't a package that was
-					// imported (or if the package name is different to the alias, or the end of the
-					// import path).
-					continue
-				}
-
-				config.Constraints = append(config.Constraints, ConstraintConfig{
-					Name: fmt.Sprintf("%s.%s", constraintFuncPkg.Path, constraintFunc.Sel.Name),
-					Opts: constraintCall.Args,
-					Pos:  expr.Pos(),
-				})
-			}
-		case "Field":
-			if len(typeMethodCall.Args) != 1 || typeMethod.Next == nil {
-				// No field was passed to Field, one must be given to know which field any
-				// constraints apply to; or nothing was chained off of the call to Field, so just
-				// continue... nothing to configure at this point.
-				continue
-			}
-
-			fieldArg, ok := typeMethodCall.Args[0].(*ast.SelectorExpr)
+		for typeMethod != nil {
+			typeMethodCall := typeMethod.Call
+			typeMethodFunc, ok := typeMethodCall.Fun.(*ast.SelectorExpr)
 			if !ok {
-				// The argument passed to Field must be a selector (i.e. a field on the type).
+				// This should probably never happen given we know we're calling a method on valley.Type
+				// at this point. It should always have a selector, and it should always be the Type.
 				continue
 			}
 
-			fieldArgOn, ok := fieldArg.X.(*ast.Ident)
-			if !ok || fieldArgOn.Name != method.Receiver {
-				// The argument passed to Field must be on an ident (i.e. the type). Additionally,
-				// the argument passed to Field must be on the receiver for the constraints method.
-				continue
-			}
+			// Handle the different possible methods chained off of the Type type.
+			switch typeMethodFunc.Sel.Name {
+			case "Constraints":
+				constraints, err := buildConstraintsCall(file, typeMethod)
+				if err != nil {
+					// TODO: Wrap, with context?
+					return config, err
+				}
 
-			config.Fields[fieldArg.Sel.Name] = buildFieldConfig(file, typeMethod.Next)
+				// Merge the result, as multiple separate calls to Constraints could be made.
+				config.Constraints = append(config.Constraints, constraints...)
+
+				// Set up the next call, if there is one.
+				typeMethod = typeMethod.Next
+			case "Field":
+				fieldName, fieldConfig, err := buildFieldsCall(file, method, typeMethod)
+				if err != nil {
+					// TODO: Wrap, with context?
+					return config, err
+				}
+
+				// Merge the new configuration with any existing configuration.
+				existingConfig := config.Fields[fieldName]
+				existingConfig.Constraints = append(existingConfig.Constraints, fieldConfig.Constraints...)
+				existingConfig.Elements = append(existingConfig.Elements, fieldConfig.Elements...)
+				config.Fields[fieldName] = existingConfig
+
+				// Field doesn't return Type, so there can be no further method calls.
+				typeMethod = nil
+			}
 		}
 	}
 
-	return config
+	return config, nil
+}
+
+// buildConstraintsCall ...
+func buildConstraintsCall(file File, typeMethod *callExprNode) ([]ConstraintConfig, error) {
+	var configs []ConstraintConfig
+
+	for _, expr := range typeMethod.Call.Args {
+		constraintConfig, err := buildConstraintConfig(file, expr)
+		if err != nil {
+			return nil, err
+		}
+
+		configs = append(configs, constraintConfig)
+	}
+
+	return configs, nil
+}
+
+// buildFieldsCall ...
+func buildFieldsCall(file File, method Method, typeMethod *callExprNode) (string, FieldConfig, error) {
+	var config FieldConfig
+
+	if len(typeMethod.Call.Args) != 1 || typeMethod.Next == nil {
+		// No field was passed to Field, one must be given to know which field any
+		// constraints apply to; or nothing was chained off of the call to Field, so just
+		// continue... nothing to configure at this point.
+		return "", config, errors.New("TODO")
+	}
+
+	fieldArg, ok := typeMethod.Call.Args[0].(*ast.SelectorExpr)
+	if !ok {
+		// The argument passed to Field must be a selector (i.e. a field on the type).
+		return "", config, errors.New("TODO")
+	}
+
+	fieldArgOn, ok := fieldArg.X.(*ast.Ident)
+	if !ok || fieldArgOn.Name != method.Receiver {
+		// The argument passed to Field must be on an ident (i.e. the type). Additionally,
+		// the argument passed to Field must be on the receiver for the constraints method.
+		return "", config, errors.New("TODO")
+	}
+
+	fieldConfig, err := buildFieldConfig(file, typeMethod.Next)
+	if err != nil {
+		return "", config, err
+	}
+
+	return fieldArg.Sel.Name, fieldConfig, nil
 }
 
 // buildFieldConfig ...
-func buildFieldConfig(file File, fieldMethodNode *callExprNode) FieldConfig {
+func buildFieldConfig(file File, fieldMethodNode *callExprNode) (FieldConfig, error) {
 	var config FieldConfig
 
-	for _, argExpr := range fieldMethodNode.Call.Args {
-		// The "arg" here is the argument being passed to a method on the valley.Field type, in
-		// other words, we expect each of these arguments to be a constraint, so we verify that.
-
-		argCall, ok := argExpr.(*ast.CallExpr)
-		if !ok {
-			// Argument was not a function call, all constraints are, so this is not a constraint.
-			continue
-		}
-
-		argFunc, ok := argCall.Fun.(*ast.SelectorExpr)
-		if !ok {
-			// Argument was a function call, but the function call was not a selector (e.g. this
-			// will be false if the function call was from the same package, a local function).
-			// Currently because of the way the constraints are registered, they must all be in a
-			// separate package.
-			continue
-		}
-
-		// This assumes everything is a function in a package?
-		argFuncOn, ok := argFunc.X.(*ast.Ident)
-		if !ok {
-			// If the function was chained off of anything other than an ident (e.g. the result of
-			// another function), then it's not currently supported.
-			continue
-		}
-
-		argFuncPkg, ok := findImportByName(file.Imports, argFuncOn.Name)
-		if !ok {
-			// If the function was chained off of anything other than an import that exists in the
-			// file (where the package name matches the end of the import path, or the import
-			// alias), for example a package-local variable, then it's currently not supported.
-			continue
+	for _, expr := range fieldMethodNode.Call.Args {
+		// The "expr" here is the argument being passed to a method on the valley.Field type, in
+		// other words, we expect each of these arguments to be a constraint.
+		constraintConfig, err := buildConstraintConfig(file, expr)
+		if err != nil {
+			return config, err
 		}
 
 		// This should be one of the methods on the valley.Field type.
-		fieldMethodFunc, ok := fieldMethodNode.Call.Fun.(*ast.SelectorExpr)
-		if !ok {
-			// TODO: Node itself is not a function call (i.e. the thing args are being passed into.
-			continue
-		}
-
-		constraintConfig := ConstraintConfig{
-			Name: fmt.Sprintf("%s.%s", argFuncPkg.Path, argFunc.Sel.Name),
-			Opts: argCall.Args,
-			Pos:  argExpr.Pos(),
-		}
+		// NOTE: This shouldn't fail, we verify this when building the callExprNode chain.
+		fieldMethodFunc, _ := fieldMethodNode.Call.Fun.(*ast.SelectorExpr)
 
 		switch fieldMethodFunc.Sel.Name {
 		case "Constraints":
@@ -233,42 +224,89 @@ func buildFieldConfig(file File, fieldMethodNode *callExprNode) FieldConfig {
 	}
 
 	if fieldMethodNode.Next != nil {
-		nextConfig := buildFieldConfig(file, fieldMethodNode.Next)
+		nextConfig, err := buildFieldConfig(file, fieldMethodNode.Next)
+		if err != nil {
+			return config, err
+		}
 
 		config.Constraints = append(config.Constraints, nextConfig.Constraints...)
 		config.Elements = append(config.Elements, nextConfig.Elements...)
 	}
 
-	return config
+	return config, nil
 }
 
 // buildCallExpr converts the chain of Go AST expressions for a field call statement into a linked
 // list of each node. This can later be reversed to get the calls in left-to-right order which is
 // easier to validate (i.e. check if the call is on the valley.Type).
-func buildCallExpr(outer ast.Expr) *callExprNode {
-	node := &callExprNode{}
-
+//
+// TODO: This might not be robust enough?
+func buildCallExpr(outer ast.Expr) (*callExprNode, error) {
 	if ident, ok := outer.(*ast.Ident); ok {
-		node.Ident = ident
-	}
-
-	if callExpr, ok := outer.(*ast.CallExpr); ok {
-		node.Call = callExpr
+		return &callExprNode{
+			Ident: ident,
+		}, nil
 	}
 
 	callExpr, ok := outer.(*ast.CallExpr)
 	if !ok {
-		return node
+		return nil, fmt.Errorf("")
 	}
 
 	selectorExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
 	if !ok {
-		return node
+		return nil, fmt.Errorf("")
 	}
 
-	node.Next = buildCallExpr(selectorExpr.X)
+	next, err := buildCallExpr(selectorExpr.X)
+	if err != nil {
+		// TODO: Wrap?
+		return nil, err
+	}
 
-	return node
+	return &callExprNode{
+		Call: callExpr,
+		Next: next,
+	}, nil
+}
+
+// buildConstraintConfig ...
+func buildConstraintConfig(file File, expr ast.Expr) (ConstraintConfig, error) {
+	var config ConstraintConfig
+
+	constraintCall, ok := expr.(*ast.CallExpr)
+	if !ok {
+		// If the argument to the Constraints call wasn't a function call, it's invalid.
+		return config, errorOn(file, expr.Pos(), "constraint must be a function call")
+	}
+
+	constraintFunc, ok := constraintCall.Fun.(*ast.SelectorExpr)
+	if !ok {
+		// If the function call wasn't on a selector (i.e. a function in a package is what we're
+		// looking for), then maybe it's a local constraint. We don't support that yet.
+		// TODO: Is this limitation necessary? It might complicate this code a bit.
+		return config, errorOn(file, expr.Pos(), "constraint must be from a different package")
+	}
+
+	constraintFuncOn, ok := constraintFunc.X.(*ast.Ident)
+	if !ok {
+		// If the function call was a selector, but wasn't on an ident (i.e. we're assuming it
+		// should be a package name / alias).
+		return config, errorOn(file, expr.Pos(), "constraints must be exported functions in a package")
+	}
+
+	constraintFuncPkg, ok := findImportByName(file.Imports, constraintFuncOn.Name)
+	if !ok {
+		// If the function call was on an ident, but it wasn't a package that was imported (or if
+		// the package name is different to the alias, or the end of the import path).
+		return config, errorOn(file, expr.Pos(), "constraint must be defined in an imported package")
+	}
+
+	config.Name = fmt.Sprintf("%s.%s", constraintFuncPkg.Path, constraintFunc.Sel.Name)
+	config.Opts = constraintCall.Args
+	config.Pos = expr.Pos()
+
+	return config, nil
 }
 
 // callExprNode is a linked list node for the components that make up a Go AST statement expression
@@ -295,12 +333,12 @@ func (n *callExprNode) Reverse() *callExprNode {
 	return prev
 }
 
-// collectConstraintsMethod looks through the methods in a given file and extracts the first method
+// collectConstraintsMethods looks through the methods in a given file and extracts the first method
 // that looks like a constraints method. This allows the Constraint method to have any name.
 //
 // TODO: Having any name is not very useful, it's only useful if you can define more than one, and
 // have each constraints method generate a different validation function at the end.
-func collectConstraintsMethod(file File) map[string]Method {
+func collectConstraintsMethods(file File) map[string]Method {
 	constraintsMethods := make(map[string]Method)
 
 	for typeName, methods := range file.Methods {
@@ -338,9 +376,9 @@ func collectConstraintsMethod(file File) map[string]Method {
 }
 
 // findImportByName looks for an import with the given name (or alias) in the given set of imports.
-func findImportByName(imports []Import, alias string) (Import, bool) {
+func findImportByName(imports []Import, name string) (Import, bool) {
 	for _, imp := range imports {
-		if imp.Alias == alias {
+		if imp.Alias == name {
 			return imp, true
 		}
 	}
@@ -348,8 +386,18 @@ func findImportByName(imports []Import, alias string) (Import, bool) {
 	return Import{}, false
 }
 
-// errorOn prints a given error message, in the given file, at the given position.
-func errorOn(file File, pos token.Pos, message string, args ...interface{}) {
+// errorOn returns an error with the given message, in the given file, at the given position.
+func errorOn(file File, pos token.Pos, message string, args ...interface{}) error {
+	return errors.New(messageOn(file, pos, message, args...))
+}
+
+// warnOn prints a given warning message, in the given file, at the given position.
+func warnOn(file File, pos token.Pos, message string, args ...interface{}) {
+	fmt.Printf("valley: %s\n", messageOn(file, pos, message, args...))
+}
+
+// messageOn returns a formatted message, in the given file, at the given position.
+func messageOn(file File, pos token.Pos, message string, args ...interface{}) string {
 	position := file.FileSet.Position(pos)
 
 	args = append(args, position.Line, position.Column, file.Package, file.Name)
@@ -358,5 +406,5 @@ func errorOn(file File, pos token.Pos, message string, args ...interface{}) {
 	// from the root of the currently module path instead? Would need to get CWD, module path,
 	// figure out where we are, and put it all together to get the path from the root of the module
 	// to the file.
-	fmt.Printf("valley: "+message+" on line %d, col %d in %s/%s\n", args...)
+	return fmt.Sprintf(message+" on line %d, col %d in '%s/%s'", args...)
 }

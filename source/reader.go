@@ -44,7 +44,6 @@ func Read(srcPath string) (valley.File, error) {
 
 	if len(f.Decls) > 0 {
 		for _, decl := range f.Decls {
-			// TODO: Split into multiple methods.
 			switch d := decl.(type) {
 			case *ast.FuncDecl:
 				readFuncDecl(d, &file)

@@ -42,6 +42,7 @@ func main() {
 		fatalf("valley: failed to generate code: %v\n", err)
 	}
 
+	// TODO: Work this out from the input file name.
 	destPath := "./example_validate.go"
 
 	destFile, err := os.Create(destPath)

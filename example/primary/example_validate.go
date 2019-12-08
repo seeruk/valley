@@ -72,15 +72,6 @@ func (e Example) Validate() []valley.ConstraintViolation {
 
 	}
 
-	if len(e.Text) == 0 {
-		size := path.Write("Text")
-		violations = append(violations, valley.ConstraintViolation{
-			Field:   path.String(),
-			Message: "a value is required",
-		})
-		path.TruncateRight(size)
-	}
-
 	return violations
 }
 
