@@ -11,7 +11,7 @@ func NewApplication(constraints map[string]valley.ConstraintGenerator) *console.
 	// TODO: This would be much nicer if it could just be a single-command, at the root level. How
 	// can we refactor go-console to make that work?
 	application := console.NewApplication("valley", "SNAPSHOT")
-	application.AddCommand(generateCommand(constraints))
+	application.SetRootCommand(RootCommand(constraints))
 
 	return application
 }

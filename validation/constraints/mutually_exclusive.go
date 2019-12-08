@@ -8,10 +8,15 @@ import (
 	"github.com/seeruk/valley/valley"
 )
 
+// MutuallyExclusive ...
+func MutuallyExclusive(fields ...interface{}) valley.Constraint {
+	return valley.Constraint{}
+}
+
 // mutuallyExclusiveFormat ...
 const mutuallyExclusiveFormat = `
 	{
-		// MutuallyExclusive uses it's own block to lock down nonEmpty's scope.  
+		// MutuallyExclusive uses it's own block to lock down nonEmpty's scope.
 		var nonEmpty []string
 
 		%s
@@ -29,11 +34,6 @@ const mutuallyExclusiveFormat = `
 		}
 	}
 `
-
-// MutuallyExclusive ...
-func MutuallyExclusive(fields ...interface{}) valley.Constraint {
-	return valley.Constraint{}
-}
 
 // mutuallyExclusive ...
 func mutuallyExclusive(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintOutput, error) {
@@ -75,8 +75,8 @@ func mutuallyExclusive(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) 
 						return output, err
 					}
 
-					predicates = append(predicates, fmt.Sprintf(`if !(%s) { 
-						nonEmpty = append(nonEmpty, "%s") 
+					predicates = append(predicates, fmt.Sprintf(`if !(%s) {
+						nonEmpty = append(nonEmpty, "%s")
 					}`, predicate, name))
 				}
 			}

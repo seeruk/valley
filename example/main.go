@@ -19,6 +19,8 @@ func main() {
 	//	"Hello": "World!",
 	//}
 
+	example.Nested = &NestedExample{}
+
 	violations := example.Validate()
 
 	encoder := json.NewEncoder(os.Stdout)

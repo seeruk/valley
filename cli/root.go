@@ -14,10 +14,10 @@ import (
 	"github.com/seeruk/valley/valley"
 )
 
-// generateCommand returns the "generate" console command. This contains the logic to orchestrate
-// reading a Go file, building configuration up from that Go file, generating a set of validation
-// source code, formatting that source code, and then writing that to a destination file.
-func generateCommand(constraints map[string]valley.ConstraintGenerator) *console.Command {
+// RootCommand returns the root console command used when valley is run. This contains the logic to
+// orchestrate reading a Go file, building configuration up from that Go file, generating a set of
+// validation source code, formatting that source code, and then writing that to a destination file.
+func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Command {
 	var srcPath string
 
 	configure := func(def *console.Definition) {
@@ -74,8 +74,6 @@ func generateCommand(constraints map[string]valley.ConstraintGenerator) *console
 	}
 
 	return &console.Command{
-		Name:        "generate",
-		Alias:       "g",
 		Description: "Generates validation code by reading a Go file",
 		Configure:   configure,
 		Execute:     execute,

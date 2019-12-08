@@ -72,6 +72,19 @@ func (e Example) Validate() []valley.ConstraintViolation {
 
 	}
 
+	if e.Nested == nil {
+		size := path.Write("Nested")
+		violations = append(violations, valley.ConstraintViolation{
+			Field:   path.String(),
+			Message: "a value is required",
+		})
+		path.TruncateRight(size)
+	}
+
+	if e.Nested != nil {
+		violations = append(violations, e.Nested.Validate()...)
+	}
+
 	if len(e.Text) == 0 {
 		size := path.Write("Text")
 		violations = append(violations, valley.ConstraintViolation{

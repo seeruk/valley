@@ -7,6 +7,11 @@ import (
 	"github.com/seeruk/valley/valley"
 )
 
+// Required ...
+func Required() valley.Constraint {
+	return valley.Constraint{}
+}
+
 // requiredFormat is the format used for rendering a `required` constraint.
 const requiredFormat = `
 	if %s {
@@ -18,11 +23,6 @@ const requiredFormat = `
 		%s
 	}
 `
-
-// Required ...
-func Required() valley.Constraint {
-	return valley.Constraint{}
-}
 
 // required ...
 func required(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.ConstraintOutput, error) {

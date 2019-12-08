@@ -14,7 +14,7 @@ type Example struct {
 	TextMap map[string]string `json:"text_map"`
 	Int     int               `json:"int"`
 	Ints    []int             `json:"ints"`
-	Nested  NestedExample     `json:"nested"`
+	Nested  *NestedExample    `json:"nested"`
 }
 
 // Constraints ...
@@ -48,7 +48,7 @@ func (e Example) Constraints(t valley.Type) {
 		Elements(constraints.Required(), constraints.Min(12))
 
 	// Nested constraints to be called.
-	t.Field(e.Nested).Constraints(constraints.Valid())
+	t.Field(e.Nested).Constraints(constraints.Required(), constraints.Valid())
 }
 
 // NestedExample ...
