@@ -3,12 +3,10 @@ package main
 import (
 	"encoding/json"
 	"os"
-
-	"github.com/seeruk/valley/example/primary"
 )
 
 func main() {
-	var example primary.Example
+	var example Example
 
 	//example.Ints = []int{0, 1, 2, 3, 0, 5}
 

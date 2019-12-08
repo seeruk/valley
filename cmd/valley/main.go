@@ -30,7 +30,7 @@ func main() {
 		fatalf("valley: failed to read structs in: %q: %v\n", srcPath, err)
 	}
 
-	cfg, err := config.FromFile(src)
+	cfg, err := config.BuildFromSource(src)
 	if err != nil {
 		fatalf("valley: failed to generate cfg from src: %v\n", err)
 	}

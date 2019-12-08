@@ -1,9 +1,8 @@
-package primary_test
+package main
 
 import (
 	"testing"
 
-	"github.com/seeruk/valley/example/primary"
 	"github.com/seeruk/valley/valley"
 )
 
@@ -28,7 +27,7 @@ func BenchmarkRequired(b *testing.B) {
 }
 
 func BenchmarkExample_ValidateHappy(b *testing.B) {
-	var example primary.Example
+	var example Example
 	var violations []valley.ConstraintViolation
 
 	example.Text = "Hello"
@@ -36,7 +35,7 @@ func BenchmarkExample_ValidateHappy(b *testing.B) {
 	//example.TextMap = map[string]string{"hello": "world"}
 	example.Int = 999
 	example.Ints = []int{1}
-	example.Nested = primary.NestedExample{Text: "Hello, World!"}
+	example.Nested = NestedExample{Text: "Hello, World!"}
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -51,7 +50,7 @@ func BenchmarkExample_ValidateHappy(b *testing.B) {
 }
 
 func BenchmarkExample_ValidateUnhappy(b *testing.B) {
-	var example primary.Example
+	var example Example
 	var violations []valley.ConstraintViolation
 
 	b.ReportAllocs()

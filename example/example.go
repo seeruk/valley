@@ -1,4 +1,4 @@
-package primary
+package main
 
 //go:generate valley ./example.go
 
