@@ -83,7 +83,7 @@ func buildTypeConfig(file File, method Method) (TypeConfig, error) {
 		// is the first thing you see. We want the opposite, because it's easier to verify what the
 		// methods are being called on (i.e. that it's a valley.Type), and then which method is
 		// being called to determine how to behave from that point on.
-		chain, err := buildCallExpr(callExpr)
+		chain, err := buildCallExpr(file, callExpr)
 		if err != nil {
 			warnOn(file, stmt.Pos(), "skipping line with unexpected structure: %v", err)
 			continue
@@ -120,7 +120,6 @@ func buildTypeConfig(file File, method Method) (TypeConfig, error) {
 			case "Constraints":
 				constraints, err := buildConstraintsCall(file, typeMethod)
 				if err != nil {
-					// TODO: Wrap, with context?
 					return config, err
 				}
 
@@ -132,7 +131,6 @@ func buildTypeConfig(file File, method Method) (TypeConfig, error) {
 			case "Field":
 				fieldName, fieldConfig, err := buildFieldsCall(file, method, typeMethod)
 				if err != nil {
-					// TODO: Wrap, with context?
 					return config, err
 				}
 
@@ -171,24 +169,28 @@ func buildConstraintsCall(file File, typeMethod *callExprNode) ([]ConstraintConf
 func buildFieldsCall(file File, method Method, typeMethod *callExprNode) (string, FieldConfig, error) {
 	var config FieldConfig
 
-	if len(typeMethod.Call.Args) != 1 || typeMethod.Next == nil {
+	if len(typeMethod.Call.Args) != 1 {
 		// No field was passed to Field, one must be given to know which field any
 		// constraints apply to; or nothing was chained off of the call to Field, so just
 		// continue... nothing to configure at this point.
-		return "", config, errors.New("TODO")
+		return "", config, errorOn(file, typeMethod.Call.Pos(), "exactly one argument should be passed to Field")
+	}
+
+	if typeMethod.Next == nil {
+		return "", config, errorOn(file, typeMethod.Call.Pos(), "a method should be called on Field")
 	}
 
 	fieldArg, ok := typeMethod.Call.Args[0].(*ast.SelectorExpr)
 	if !ok {
 		// The argument passed to Field must be a selector (i.e. a field on the type).
-		return "", config, errors.New("TODO")
+		return "", config, errorOn(file, fieldArg.Pos(), "value passed to Field should selector")
 	}
 
 	fieldArgOn, ok := fieldArg.X.(*ast.Ident)
 	if !ok || fieldArgOn.Name != method.Receiver {
 		// The argument passed to Field must be on an ident (i.e. the type). Additionally,
 		// the argument passed to Field must be on the receiver for the constraints method.
-		return "", config, errors.New("TODO")
+		return "", config, errorOn(file, fieldArg.Pos(), "value passed to Field should field on the receiver's type")
 	}
 
 	fieldConfig, err := buildFieldConfig(file, typeMethod.Next)
@@ -239,9 +241,7 @@ func buildFieldConfig(file File, fieldMethodNode *callExprNode) (FieldConfig, er
 // buildCallExpr converts the chain of Go AST expressions for a field call statement into a linked
 // list of each node. This can later be reversed to get the calls in left-to-right order which is
 // easier to validate (i.e. check if the call is on the valley.Type).
-//
-// TODO: This might not be robust enough?
-func buildCallExpr(outer ast.Expr) (*callExprNode, error) {
+func buildCallExpr(file File, outer ast.Expr) (*callExprNode, error) {
 	if ident, ok := outer.(*ast.Ident); ok {
 		return &callExprNode{
 			Ident: ident,
@@ -250,15 +250,15 @@ func buildCallExpr(outer ast.Expr) (*callExprNode, error) {
 
 	callExpr, ok := outer.(*ast.CallExpr)
 	if !ok {
-		return nil, fmt.Errorf("")
+		return nil, errorOn(file, outer.Pos(), "statement expression must be a call")
 	}
 
 	selectorExpr, ok := callExpr.Fun.(*ast.SelectorExpr)
 	if !ok {
-		return nil, fmt.Errorf("")
+		return nil, errorOn(file, outer.Pos(), "statement expression must be a method call")
 	}
 
-	next, err := buildCallExpr(selectorExpr.X)
+	next, err := buildCallExpr(file, selectorExpr.X)
 	if err != nil {
 		// TODO: Wrap?
 		return nil, err
