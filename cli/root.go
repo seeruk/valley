@@ -30,7 +30,7 @@ func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Com
 
 	execute := func(int *console.Input, output *console.Output) error {
 		if srcPath == "" {
-			return errors.New("valley: a package path, and a cfg src path must be given")
+			return errors.New("valley: a path to a Go source file must be given")
 		}
 
 		src, err := source.Read(srcPath)
@@ -40,14 +40,14 @@ func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Com
 
 		cfg, err := config.BuildFromSource(src)
 		if err != nil {
-			return fmt.Errorf("valley: failed to generate cfg from src: %v", err)
+			return fmt.Errorf("valley: failed to generate config from source: %v", err)
 		}
 
 		generator := validation.NewGenerator(constraints)
 
 		bs, err := generator.Generate(cfg, src)
 		if err != nil {
-			return fmt.Errorf("valley: failed to generate code: %v", err)
+			return fmt.Errorf("valley: failed to generate validation code: %v", err)
 		}
 
 		// TODO: Work this out from the input src name.
@@ -55,7 +55,7 @@ func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Com
 
 		destFile, err := os.Create(destPath)
 		if err != nil {
-			return fmt.Errorf("valley: failed to open destination src for writing: %s: %q", destPath, err)
+			return fmt.Errorf("valley: failed to open destination source for writing: %s: %q", destPath, err)
 		}
 
 		defer destFile.Close()
@@ -67,7 +67,7 @@ func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Com
 
 		_, err = destFile.Write(formatted)
 		if err != nil {
-			return fmt.Errorf("valley: failed to write generated source to src: %v", err)
+			return fmt.Errorf("valley: failed to write generated source to source: %v", err)
 		}
 
 		return nil
