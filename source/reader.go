@@ -13,13 +13,13 @@ import (
 // Read attempts to read a Go file, and based on it's contents return the package name, along
 // with an extract of information about the methods and structs in that file.
 func Read(srcPath string) (valley.Source, error) {
-	var file valley.Source
+	var source valley.Source
 
 	fileSet := token.NewFileSet()
 
 	f, err := parser.ParseFile(fileSet, srcPath, nil, 0)
 	if err != nil {
-		return file, err
+		return source, err
 	}
 
 	for _, imp := range f.Imports {
@@ -29,30 +29,30 @@ func Read(srcPath string) (valley.Source, error) {
 			impName = imp.Name.Name
 		}
 
-		file.Imports = append(file.Imports, valley.Import{
+		source.Imports = append(source.Imports, valley.Import{
 			Alias: impName,
 			Path:  impPath,
 		})
 	}
 
-	file.FileName = path.Base(srcPath)
-	file.FileSet = fileSet
-	file.Package = f.Name.Name
-	file.Methods = make(valley.Methods)
-	file.Structs = make(valley.Structs)
+	source.FileName = path.Base(srcPath)
+	source.FileSet = fileSet
+	source.Package = f.Name.Name
+	source.Methods = make(valley.Methods)
+	source.Structs = make(valley.Structs)
 
 	if len(f.Decls) > 0 {
 		for _, decl := range f.Decls {
 			switch d := decl.(type) {
 			case *ast.FuncDecl:
-				readFuncDecl(d, &file)
+				readFuncDecl(d, &source)
 			case *ast.GenDecl:
-				readGenDecl(d, &file)
+				readGenDecl(d, &source)
 			}
 		}
 	}
 
-	return file, nil
+	return source, nil
 }
 
 // readFuncDecl reads a Go function declaration and adds contents that are relevant to the given
