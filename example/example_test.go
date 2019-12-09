@@ -32,20 +32,21 @@ func BenchmarkExample_ValidateHappy(b *testing.B) {
 
 	example.Text = "Hello"
 	//example.Texts = []string{"Hello", "World!"}
-	//example.TextMap = map[string]string{"hello": "world"}
+	example.TextMap = map[string]string{"hello": "world"}
 	example.Int = 999
 	example.Ints = []int{1}
-	example.Nested = NestedExample{Text: "Hello, World!"}
+	example.Nested = &NestedExample{Text: "Hello, World!"}
 
 	b.ReportAllocs()
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		violations = example.Validate()
+		violations = example.Validate(valley.NewPath())
 	}
 
 	if len(violations) > 0 {
 		b.Error("expected no violations")
+		b.Log(violations)
 	}
 }
 
@@ -57,7 +58,7 @@ func BenchmarkExample_ValidateUnhappy(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		violations = example.Validate()
+		violations = example.Validate(valley.NewPath())
 	}
 
 	if len(violations) == 0 {

@@ -17,11 +17,14 @@ func main() {
 	example.Text = "text"
 	//example.Texts = []string{"text 1", "text 2"}
 	//
-	//example.TextMap = map[string]string{
-	//	"Hello": "World!",
-	//}
+	example.TextMap = map[string]string{
+		"hello": "",
+	}
 
 	example.Nested = &NestedExample{}
+	example.Nesteds = []*NestedExample{
+		{Text: ""},
+	}
 
 	violations := example.Validate(valley.NewPath())
 

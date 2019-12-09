@@ -15,12 +15,13 @@ type Example struct {
 	Int     int               `json:"int"`
 	Ints    []int             `json:"ints"`
 	Nested  *NestedExample    `json:"nested"`
+	Nesteds []*NestedExample  `json:"nesteds"`
 }
 
 // Constraints ...
 func (e Example) Constraints(t valley.Type) {
 	// Constraints on type as a whole.
-	t.Constraints(constraints.MutuallyExclusive(e.Text, e.Texts, e.TextMap))
+	t.Constraints(constraints.MutuallyExclusive(e.Text, e.Texts))
 
 	// List of possible constraints to implement:
 	// * MutuallyInclusive: If one is set, all of them must be set.
@@ -43,12 +44,15 @@ func (e Example) Constraints(t valley.Type) {
 
 	// Field constraints.
 	t.Field(e.Text).Constraints(constraints.Required())
+	t.Field(e.TextMap).Constraints(constraints.Required()).
+		Elements(constraints.Required())
 	t.Field(e.Int).Constraints(constraints.Required())
 	t.Field(e.Ints).Constraints(constraints.Required()).
 		Elements(constraints.Required(), constraints.Min(12))
 
 	// Nested constraints to be called.
 	t.Field(e.Nested).Constraints(constraints.Required(), constraints.Valid())
+	t.Field(e.Nesteds).Elements(constraints.Valid())
 }
 
 // NestedExample ...
