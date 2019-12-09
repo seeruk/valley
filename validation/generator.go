@@ -98,7 +98,7 @@ func (g *Generator) generateType(config valley.Config, file valley.Source, typeN
 	g.wc("func (%s %s) Validate(path *valley.Path) []valley.ConstraintViolation {\n", receiver, typeName)
 	g.wc("	var violations []valley.ConstraintViolation\n")
 	g.wc("\n")
-	g.wc("	path.Write(\".\")\n\n")
+	g.wc("	path.FormatAndWrite(\".\")\n\n")
 
 	ctx := valley.Context{
 		FileSet:  file.FileSet,
@@ -138,7 +138,7 @@ func (g *Generator) generateType(config valley.Config, file valley.Source, typeN
 		ctx.FieldName = fieldName
 		ctx.VarName = fmt.Sprintf("%s.%s", receiver, fieldName)
 		ctx.Path = fmt.Sprintf("\"%s\"", fieldName)
-		ctx.BeforeViolation = fmt.Sprintf("size := path.Write(%s)", ctx.Path)
+		ctx.BeforeViolation = fmt.Sprintf("size := path.FormatAndWrite(%s)", ctx.Path)
 		ctx.AfterViolation = "path.TruncateRight(size)"
 
 		err := g.generateField(ctx, fieldConfig, f)
@@ -189,7 +189,7 @@ func (g *Generator) generateFieldConstraints(ctx valley.Context, fieldConfig val
 // TODO: Only works with array/slice currently, need more info on Context to handle maps?
 func (g *Generator) generateFieldElementsConstraints(ctx valley.Context, fieldConfig valley.FieldConfig, value valley.Value) error {
 	ctx.Path = fmt.Sprintf("\"%s.[\" + strconv.Itoa(i) + \"]\"", ctx.FieldName)
-	ctx.BeforeViolation = fmt.Sprintf("size := path.Write(%s)", ctx.Path)
+	ctx.BeforeViolation = fmt.Sprintf("size := path.FormatAndWrite(%s)", ctx.Path)
 
 	if len(fieldConfig.Elements) == 0 {
 		return nil

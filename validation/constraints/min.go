@@ -12,6 +12,6 @@ func Min(min float64) valley.Constraint {
 }
 
 // min ...
-func min(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.ConstraintOutput, error) {
-	return valley.ConstraintOutput{}, nil
+func min(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
+	return valley.ConstraintGeneratorOutput{}, nil
 }

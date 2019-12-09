@@ -16,15 +16,16 @@ func NewPath() *Path {
 	}
 }
 
-// Write ...
+// Write appends the given string to the end of the internal buffer.
 func (r *Path) Write(in string) int {
 	r.buf = append(r.buf, in...)
 	return len(in)
 }
 
-// TruncateRight ...
-func (r *Path) TruncateRight(amount int) {
-	r.buf = r.buf[:len(r.buf)-amount]
+// TruncateRight cuts n bytes off of the end of the buffer. The backing array for the buffer does
+// not shrink, meaning we can re-use that memory if we need to.
+func (r *Path) TruncateRight(n int) {
+	r.buf = r.buf[:len(r.buf)-n]
 }
 
 // String renders this path as a string, to be sent to the frontend.

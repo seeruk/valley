@@ -14,7 +14,7 @@ func Valid() valley.Constraint {
 }
 
 // valid ...
-func valid(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.ConstraintOutput, error) {
+func valid(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	buf := &bytes.Buffer{}
 
 	_, isPointer := fieldType.(*ast.StarExpr)
@@ -33,7 +33,7 @@ func valid(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.Constra
 		fmt.Fprintf(buf, "}\n")
 	}
 
-	return valley.ConstraintOutput{
+	return valley.ConstraintGeneratorOutput{
 		Code: buf.String(),
 	}, nil
 }

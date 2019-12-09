@@ -1,10 +1,7 @@
 package cli
 
 import (
-	"errors"
 	"fmt"
-	"go/format"
-	"os"
 
 	"github.com/seeruk/go-console"
 	"github.com/seeruk/go-console/parameters"
@@ -19,8 +16,15 @@ import (
 // validation source code, formatting that source code, and then writing that to a destination file.
 func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Command {
 	var srcPath string
+	var destPath string
 
 	configure := func(def *console.Definition) {
+		def.AddOption(console.OptionDefinition{
+			Value: parameters.NewStringValue(&destPath),
+			Spec:  "-o,--output=DEST",
+			Desc:  "Write output to DEST instead of the default '_validate.go'",
+		})
+
 		def.AddArgument(console.ArgumentDefinition{
 			Value: parameters.NewStringValue(&srcPath),
 			Spec:  "SOURCE",
@@ -29,10 +33,6 @@ func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Com
 	}
 
 	execute := func(int *console.Input, output *console.Output) error {
-		if srcPath == "" {
-			return errors.New("a path to a Go source file must be given")
-		}
-
 		src, err := source.Read(srcPath)
 		if err != nil {
 			return fmt.Errorf("failed to read structs in: %q: %v", srcPath, err)
@@ -50,24 +50,16 @@ func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Com
 			return fmt.Errorf("failed to generate validation code: %v", err)
 		}
 
-		// TODO: Work this out from the input src name.
-		destPath := "./example_validate.go"
-
-		destFile, err := os.Create(destPath)
-		if err != nil {
-			return fmt.Errorf("failed to open destination source for writing: %s: %q", destPath, err)
+		if destPath == "" {
+			destPath, err = validation.FindDestination(srcPath)
+			if err != nil {
+				return err
+			}
 		}
 
-		defer destFile.Close()
-
-		formatted, err := format.Source(bs)
+		err = validation.FormatAndWrite(bs, destPath)
 		if err != nil {
-			return fmt.Errorf("failed to format generated source: %v", err)
-		}
-
-		_, err = destFile.Write(formatted)
-		if err != nil {
-			return fmt.Errorf("failed to write generated source to source: %v", err)
+			return fmt.Errorf("failed to write generated code to destination file: %v", err)
 		}
 
 		return nil

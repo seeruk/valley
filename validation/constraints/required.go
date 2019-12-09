@@ -25,8 +25,8 @@ const requiredFormat = `
 `
 
 // required ...
-func required(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.ConstraintOutput, error) {
-	var output valley.ConstraintOutput
+func required(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
+	var output valley.ConstraintGeneratorOutput
 
 	predicate, err := GenerateEmptinessPredicate(ctx.VarName, fieldType)
 	if err != nil {

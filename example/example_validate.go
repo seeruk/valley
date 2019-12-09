@@ -9,7 +9,7 @@ import "github.com/seeruk/valley/valley"
 func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	var violations []valley.ConstraintViolation
 
-	path.Write(".")
+	path.FormatAndWrite(".")
 
 	{
 		// MutuallyExclusive uses it's own block to lock down nonEmpty's scope.
@@ -41,7 +41,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Int == 0 {
-		size := path.Write("Int")
+		size := path.FormatAndWrite("Int")
 		violations = append(violations, valley.ConstraintViolation{
 			Field:   path.String(),
 			Message: "a value is required",
@@ -50,7 +50,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if len(e.Ints) == 0 {
-		size := path.Write("Ints")
+		size := path.FormatAndWrite("Ints")
 		violations = append(violations, valley.ConstraintViolation{
 			Field:   path.String(),
 			Message: "a value is required",
@@ -61,7 +61,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	for i, element := range e.Ints {
 
 		if element == 0 {
-			size := path.Write("Ints.[" + strconv.Itoa(i) + "]")
+			size := path.FormatAndWrite("Ints.[" + strconv.Itoa(i) + "]")
 			violations = append(violations, valley.ConstraintViolation{
 				Field:   path.String(),
 				Message: "a value is required",
@@ -72,7 +72,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Nested == nil {
-		size := path.Write("Nested")
+		size := path.FormatAndWrite("Nested")
 		violations = append(violations, valley.ConstraintViolation{
 			Field:   path.String(),
 			Message: "a value is required",
@@ -81,13 +81,13 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Nested != nil {
-		size := path.Write("Nested")
+		size := path.FormatAndWrite("Nested")
 		violations = append(violations, e.Nested.Validate(path)...)
 		path.TruncateRight(size)
 	}
 
 	if len(e.Text) == 0 {
-		size := path.Write("Text")
+		size := path.FormatAndWrite("Text")
 		violations = append(violations, valley.ConstraintViolation{
 			Field:   path.String(),
 			Message: "a value is required",
@@ -103,10 +103,10 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 func (n NestedExample) Validate(path *valley.Path) []valley.ConstraintViolation {
 	var violations []valley.ConstraintViolation
 
-	path.Write(".")
+	path.FormatAndWrite(".")
 
 	if len(n.Text) == 0 {
-		size := path.Write("Text")
+		size := path.FormatAndWrite("Text")
 		violations = append(violations, valley.ConstraintViolation{
 			Field:   path.String(),
 			Message: "a value is required",

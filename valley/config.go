@@ -5,24 +5,26 @@ import (
 	"go/token"
 )
 
-// Config ...
+// Config represents the configuration for generating an entire set of validation code.
 type Config struct {
 	Types map[string]TypeConfig `json:"types"`
 }
 
-// TypeConfig ...
+// TypeConfig represents the configuration needed to generate validation code for a specific type.
 type TypeConfig struct {
 	Constraints []ConstraintConfig     `json:"constraints"`
 	Fields      map[string]FieldConfig `json:"fields"`
 }
 
-// FieldConfig ...
+// FieldConfig represents the configuration needed to generate validation code for a specific field
+// on a specific type.
 type FieldConfig struct {
 	Constraints []ConstraintConfig `json:"constraints"`
 	Elements    []ConstraintConfig `json:"elements"`
 }
 
-// ConstraintConfig ...
+// ConstraintConfig represents the configuration passed to a ConstraintGenerator to generate some
+// code. It's used throughout the configuration structure.
 type ConstraintConfig struct {
 	Name string     `json:"name"`
 	Opts []ast.Expr `json:"opts"`

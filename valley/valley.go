@@ -5,26 +5,29 @@ import (
 	"go/token"
 )
 
-// Constraint ...
+// Constraint is used to identify constraints to generate code for in a Go AST.
 type Constraint struct{}
 
-// ConstraintGenerator ...
-type ConstraintGenerator func(value Context, fieldType ast.Expr, opts []ast.Expr) (ConstraintOutput, error)
+// ConstraintGenerator is a function that can generate constraint code.
+type ConstraintGenerator func(value Context, fieldType ast.Expr, opts []ast.Expr) (ConstraintGeneratorOutput, error)
 
-// ConstraintOutput ...
-type ConstraintOutput struct {
+// ConstraintGeneratorOutput represents the information needed to write some code segments to a new
+// Go file. They can't be written to whilst we're generating code because each constraint could need
+// code to be in different parts of the resulting file (e.g. imports).
+type ConstraintGeneratorOutput struct {
 	Imports []Import
 	Code    string
 }
 
-// ConstraintViolation ...
+// ConstraintViolation is the result of a validation failure.
 type ConstraintViolation struct {
 	Field   string                 `json:"field"`
 	Message string                 `json:"message"`
 	Details map[string]interface{} `json:"details"`
 }
 
-// Context ...
+// Context is used to inform a ConstraintGenerator about it's environment, mainly to do with which
+// part of a type is being validated, and giving important identifiers to ConstraintGenerators.
 type Context struct {
 	FileSet   *token.FileSet
 	TypeName  string
@@ -42,7 +45,7 @@ func (c Context) Clone() Context {
 	return c
 }
 
-// Source ...
+// Source represents the information Valley needs about a particular source file.
 type Source struct {
 	FileName string
 	FileSet  *token.FileSet
