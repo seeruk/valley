@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"path/filepath"
 
 	"github.com/seeruk/valley/valley"
 )
@@ -376,11 +377,12 @@ func warnOn(src valley.Source, pos token.Pos, message string, args ...interface{
 func messageOn(src valley.Source, pos token.Pos, message string, args ...interface{}) string {
 	position := src.FileSet.Position(pos)
 
-	args = append(args, position.Line, position.Column, src.Package, src.FileName)
+	srcPath, err := filepath.Abs(src.FileName)
+	if err != nil {
+		srcPath = src.FileName
+	}
 
-	// TODO: I have no doubt this could be more robust and useful. Maybe this could the filename
-	// from the root of the currently module path instead? Would need to get CWD, module path,
-	// figure out where we are, and put it all together to get the path from the root of the module
-	// to the src.
-	return fmt.Sprintf(message+" on line %d, col %d in '%s/%s'", args...)
+	args = append(args, position.Line, position.Column, srcPath)
+
+	return fmt.Sprintf(message+" on line %d, col %d in '%s'", args...)
 }

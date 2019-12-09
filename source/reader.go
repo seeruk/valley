@@ -57,7 +57,7 @@ func Read(srcPath string) (valley.Source, error) {
 
 // readFuncDecl reads a Go function declaration and adds contents that are relevant to the given
 // valley Source.
-func readFuncDecl(d *ast.FuncDecl, file *valley.Source) {
+func readFuncDecl(d *ast.FuncDecl, source *valley.Source) {
 	if d.Recv == nil {
 		return
 	}
@@ -73,7 +73,7 @@ func readFuncDecl(d *ast.FuncDecl, file *valley.Source) {
 
 	switch t := receiverType.(type) {
 	case *ast.Ident:
-		file.Methods[t.Name] = append(file.Methods[t.Name], valley.Method{
+		source.Methods[t.Name] = append(source.Methods[t.Name], valley.Method{
 			Receiver: receiverName,
 			Name:     d.Name.Name,
 			Params:   d.Type.Params,
@@ -85,7 +85,7 @@ func readFuncDecl(d *ast.FuncDecl, file *valley.Source) {
 
 // readGenDecl reads a Go generic declaration and adds contents that are relevant to the given
 // valley Source.
-func readGenDecl(d *ast.GenDecl, file *valley.Source) {
+func readGenDecl(d *ast.GenDecl, source *valley.Source) {
 	if d.Tok != token.TYPE {
 		return
 	}
@@ -103,7 +103,7 @@ func readGenDecl(d *ast.GenDecl, file *valley.Source) {
 
 		// At this point, we definitely have a struct.
 		structName := typeSpec.Name.Name
-		file.Structs[structName] = valley.Struct{
+		source.Structs[structName] = valley.Struct{
 			Name:   structName,
 			Node:   structType,
 			Fields: readStructFields(structType),
