@@ -61,6 +61,14 @@ func minMaxLength(kind minMaxLengthKind) valley.ConstraintGenerator {
 			return output, fmt.Errorf("failed to render expression: %v", err)
 		}
 
+		// Verify that we're applying the constraint to a type that it will might work on.
+		// TODO: Removing this might make this constraint more flexible. The compiler will still
+		// catch issues with the application of this constraint. Maybe this should just show a
+		// warning instead?
+		if !isAllowedMinMaxLengthType(fieldType) {
+			return output, fmt.Errorf("expected a type you can use len() on, or a pointer to one")
+		}
+
 		// Check if the field is a pointer, if so, we'll add a nil check and dereference from there.
 		_, isPointer := fieldType.(*ast.StarExpr)
 
@@ -94,4 +102,27 @@ func minMaxLength(kind minMaxLengthKind) valley.ConstraintGenerator {
 
 		return output, nil
 	}
+}
+
+// isAllowedMinMaxType ...
+func isAllowedMinMaxLengthType(expr ast.Expr) bool {
+	// This is everything that's supported by reflect.Value.Len() too. The difference here is that
+	// this doesn't support custom types that are really any of these allowed types underneath (at
+	// least not yet...)
+	switch e := expr.(type) {
+	case *ast.StarExpr:
+		return isAllowedMinMaxType(e.X)
+	case *ast.ArrayType:
+		return true
+	case *ast.ChanType:
+		return true
+	case *ast.MapType:
+		return true
+	case *ast.Ident:
+		if e.Name == "string" {
+			return true
+		}
+	}
+
+	return false
 }

@@ -11,6 +11,7 @@ import (
 
 // Example ...
 type Example struct {
+	Chan     <-chan string     `json:"chan"`
 	Text     string            `json:"text"`
 	Texts    []string          `json:"texts"`
 	TextMap  map[string]string `json:"text_map"`
@@ -44,20 +45,16 @@ func (e Example) Constraints(t valley.Type) {
 	//t.Field(e.Text).Constraints(constraints.Predicate(e.Text == "Hello, World!"))
 
 	// Field constraints.
-	t.Field(e.Text).
-		Constraints(constraints.Required())
-	t.Field(e.TextMap).
-		Constraints(constraints.Required()).
+	t.Field(e.Chan).Constraints(constraints.MaxLength(12))
+	t.Field(e.Text).Constraints(constraints.Required())
+	t.Field(e.Text).Constraints(constraints.MaxLength(12))
+	t.Field(e.TextMap).Constraints(constraints.Required()).
 		Elements(constraints.Required())
-	t.Field(e.Int).
-		Constraints(constraints.Required())
-	t.Field(e.Int2).
-		Constraints(constraints.Required(), constraints.Min(0))
-	t.Field(e.Ints).
-		Constraints(constraints.Required(), constraints.MaxLength(3)).
+	t.Field(e.Int).Constraints(constraints.Required())
+	t.Field(e.Int2).Constraints(constraints.Required(), constraints.Min(0))
+	t.Field(e.Ints).Constraints(constraints.Required(), constraints.MaxLength(3)).
 		Elements(constraints.Required(), constraints.Min(0))
-	t.Field(e.Adults).
-		Constraints(constraints.Min(1), constraints.Max(9))
+	t.Field(e.Adults).Constraints(constraints.Min(1), constraints.Max(9))
 	t.Field(e.Children).Constraints(constraints.Min(0)).
 		Constraints(constraints.Max(int(math.Max(float64(8-(e.Adults-1)), 0))))
 

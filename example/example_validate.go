@@ -66,6 +66,18 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		path.TruncateRight(size)
 	}
 
+	if len(e.Chan) > 12 {
+		size := path.Write("Chan")
+		violations = append(violations, valley.ConstraintViolation{
+			Field:   path.String(),
+			Message: "maximum length exceeded",
+			Details: map[string]interface{}{
+				"maximum": 12,
+			},
+		})
+		path.TruncateRight(size)
+	}
+
 	if e.Children < 0 {
 		size := path.Write("Children")
 		violations = append(violations, valley.ConstraintViolation{
@@ -195,6 +207,18 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		violations = append(violations, valley.ConstraintViolation{
 			Field:   path.String(),
 			Message: "a value is required",
+		})
+		path.TruncateRight(size)
+	}
+
+	if len(e.Text) > 12 {
+		size := path.Write("Text")
+		violations = append(violations, valley.ConstraintViolation{
+			Field:   path.String(),
+			Message: "maximum length exceeded",
+			Details: map[string]interface{}{
+				"maximum": 12,
+			},
 		})
 		path.TruncateRight(size)
 	}

@@ -63,9 +63,10 @@ func minMax(kind minMaxKind) valley.ConstraintGenerator {
 
 		// Verify that we're applying the constraint to a type that it will might work on.
 		// TODO: Removing this might make this constraint more flexible. The compiler will still
-		// catch issues with the application of this constraint.
+		// catch issues with the application of this constraint. Maybe this should just show a
+		// warning instead?
 		if !isAllowedMinMaxType(fieldType) {
-			return output, fmt.Errorf("expected a number type, or pointer to a number type")
+			return output, fmt.Errorf("expected a number type, or a pointer to one")
 		}
 
 		// Check if the field is a pointer, if so, we'll add a nil check and dereference from there.
