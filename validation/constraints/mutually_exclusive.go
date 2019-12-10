@@ -69,10 +69,8 @@ func mutuallyExclusive(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) 
 			name := structFieldName.Name
 			for _, field := range fields {
 				if field == name {
-					predicate, err := GenerateEmptinessPredicate(fmt.Sprintf("%s.%s", ctx.VarName, name), structField.Type)
-					if err != nil {
-						return output, err
-					}
+					predicate, imports := GenerateEmptinessPredicate(fmt.Sprintf("%s.%s", ctx.VarName, name), structField.Type)
+					output.Imports = append(output.Imports, imports...)
 
 					predicates = append(predicates, fmt.Sprintf(`if !(%s) {
 						nonEmpty = append(nonEmpty, "%s")

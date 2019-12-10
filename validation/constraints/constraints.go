@@ -24,28 +24,25 @@ var BuiltIn = map[string]valley.ConstraintGenerator{
 }
 
 // GenerateEmptinessPredicate ...
-func GenerateEmptinessPredicate(varName string, fieldType ast.Expr) (string, error) {
-	var predicate string
-
+func GenerateEmptinessPredicate(varName string, fieldType ast.Expr) (string, []valley.Import) {
 	switch expr := fieldType.(type) {
 	case *ast.StarExpr:
-		predicate = fmt.Sprintf("%s == nil", varName)
+		return fmt.Sprintf("%s == nil", varName), nil
 	case *ast.ArrayType, *ast.MapType:
-		predicate = fmt.Sprintf("len(%s) == 0", varName)
+		return fmt.Sprintf("len(%s) == 0", varName), nil
 	case *ast.Ident:
 		switch expr.Name {
 		case "string":
 			return fmt.Sprintf("len(%s) == 0", varName), nil
 		case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "float32", "float64":
-			predicate = fmt.Sprintf("%s == 0", varName)
-		default:
-			return "", fmt.Errorf("valley: can't generate emptiness predicate for %T (%s)", fieldType, expr.Name)
+			return fmt.Sprintf("%s == 0", varName), nil
 		}
-	default:
-		return "", fmt.Errorf("valley: can't generate emptiness predicate for %T", fieldType)
 	}
 
-	return predicate, nil
+	// If we can't tell what the type is by reading the source, fall back to reflection in this
+	// case. There are more efficient things that a consumer of Valley can do, but this is easy, and
+	// also powers MutuallyExclusive, etc.
+	return fmt.Sprintf("reflect.ValueOf(%s).IsZero()", varName), []valley.Import{{Path: "reflect"}}
 }
 
 // CollectExprImports looks for things that appear to be imports in the given expression, and

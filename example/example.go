@@ -29,6 +29,22 @@ func (e Example) Constraints(t valley.Type) {
 	// Constraints on type as a whole.
 	t.Constraints(constraints.MutuallyExclusive(e.Text, e.Texts))
 
+	// More permissive type-checking in constraints would allow you to use custom types, and Valley
+	// wouldn't need to definitely know about them to generate code. Doing this would mean we need
+	// some new, more specific constraints:
+	// * NotNil: Would specifically work on things like pointers - this one is less of an issue.
+	//   * Also, interfaces - which is a more difficult one to read some a source file.
+	//   * Also, channels, functions, maps, pointers, slices, and unsafe pointers apparently.
+	// * NotEquals: Accepts interface{}, just use whatever is passed, and do a != on the value.
+	// * Equals: Accepts interface{}, probably more handy for things like booleans I guess.
+	// * Min: Covers numbers really...
+	// * MinLength: Covers things that can have a length (including strings).
+	// * True: Would cover boolean... but might be better to use Equals(true) / NotEquals(false)
+	//
+	// These are actually a lot more explicit and obvious compared to Required which is actually a
+	// little ambiguous from the outside, and requires more knowledge about the types than we might
+	// be able to get from reading the code.
+
 	// List of possible constraints to implement:
 	// * MutuallyInclusive: If one is set, all of them must be set.
 	// * Length: Exactly length of something that can have length calculated on it.

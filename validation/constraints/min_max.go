@@ -61,14 +61,6 @@ func minMax(kind minMaxKind) valley.ConstraintGenerator {
 			return output, fmt.Errorf("failed to render expression: %v", err)
 		}
 
-		// Verify that we're applying the constraint to a type that it will might work on.
-		// TODO: Removing this might make this constraint more flexible. The compiler will still
-		// catch issues with the application of this constraint. Maybe this should just show a
-		// warning instead?
-		if !isAllowedMinMaxType(fieldType) {
-			return output, fmt.Errorf("expected a number type, or a pointer to one")
-		}
-
 		// Check if the field is a pointer, if so, we'll add a nil check and dereference from there.
 		_, isPointer := fieldType.(*ast.StarExpr)
 
@@ -98,22 +90,23 @@ func minMax(kind minMaxKind) valley.ConstraintGenerator {
 			ctx.AfterViolation,
 		)
 
-		return output, nil
+		return output, minMaxTypeCheck(fieldType)
 	}
 }
 
-// isAllowedMinMaxType ...
-func isAllowedMinMaxType(expr ast.Expr) bool {
+// minMaxTypeCheck ...
+func minMaxTypeCheck(expr ast.Expr) error {
 	switch e := expr.(type) {
 	case *ast.StarExpr:
-		return isAllowedMinMaxType(e.X)
+		return minMaxTypeCheck(e.X)
 	case *ast.Ident:
 		switch e.Name {
-		// TODO: What about... rune, and other built-in types that alias int?
+		// TODO: What about... rune, and other built-in types that alias int? For not they'll show
+		// a warning I suppose.
 		case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "float32", "float64":
-			return true
+			return nil
 		}
 	}
 
-	return false
+	return ErrTypeWarning
 }

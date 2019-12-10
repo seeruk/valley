@@ -10,6 +10,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/seeruk/valley/validation/constraints"
+
 	"github.com/seeruk/valley/valley"
 )
 
@@ -249,15 +251,20 @@ func (g *Generator) generateConstraint(ctx valley.Context, constraintConfig vall
 		return fmt.Errorf("unknown validation constraint: %q", constraintConfig.Name)
 	}
 
+	selector := ctx.TypeName
+	if ctx.FieldName != "" {
+		selector += "." + ctx.FieldName
+	}
+
+	pos := ctx.Source.FileSet.Position(constraintConfig.Pos)
+
 	output, err := constraint(ctx, value.Type, constraintConfig.Opts)
-	if err != nil {
-		selector := ctx.TypeName
-		if ctx.FieldName != "" {
-			selector += "." + ctx.FieldName
-		}
-
-		pos := ctx.Source.FileSet.Position(constraintConfig.Pos)
-
+	switch {
+	case errors.Is(err, constraints.ErrTypeWarning):
+		// TODO: Need a better way of logging things than this...
+		fmt.Printf("valley: warning generating code for %s's %q constraint on line %d, col %d: %v\n",
+			selector, constraintConfig.Name, pos.Line, pos.Column, err)
+	case err != nil:
 		return fmt.Errorf("failed to generate code for %s's %q constraint on line %d, col %d: %v",
 			selector, constraintConfig.Name, pos.Line, pos.Column, err)
 	}

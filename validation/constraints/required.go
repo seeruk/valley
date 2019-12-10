@@ -26,18 +26,13 @@ const requiredFormat = `
 
 // required ...
 func required(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
-	var output valley.ConstraintGeneratorOutput
-
-	predicate, err := GenerateEmptinessPredicate(ctx.VarName, fieldType)
-	if err != nil {
-		return output, err
-	}
-
-	output.Code = fmt.Sprintf(requiredFormat,
-		predicate,
-		ctx.BeforeViolation,
-		ctx.AfterViolation,
-	)
-
-	return output, nil
+	predicate, imports := GenerateEmptinessPredicate(ctx.VarName, fieldType)
+	return valley.ConstraintGeneratorOutput{
+		Imports: imports,
+		Code: fmt.Sprintf(requiredFormat,
+			predicate,
+			ctx.BeforeViolation,
+			ctx.AfterViolation,
+		),
+	}, nil
 }

@@ -15,8 +15,10 @@ func main() {
 	example.Adults = 3
 	example.Children = 8
 
+	int2 := 12
+
 	example.Int = 5
-	example.Int2 = 12
+	example.Int2 = &int2
 	example.Ints = []int{1, 2, 3, 4}
 	example.Text = "text"
 	//example.Texts = []string{"text 1", "text 2"}

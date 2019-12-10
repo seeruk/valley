@@ -23,7 +23,7 @@ type ConstraintGeneratorOutput struct {
 type ConstraintViolation struct {
 	Field   string                 `json:"field"`
 	Message string                 `json:"message"`
-	Details map[string]interface{} `json:"details"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Context is used to inform a ConstraintGenerator about it's environment, mainly to do with which
