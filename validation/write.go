@@ -20,6 +20,7 @@ func FormatAndWrite(bs []byte, destPath string) error {
 
 	formatted, err := format.Source(bs)
 	if err != nil {
+		fmt.Println(string(bs))
 		return fmt.Errorf("failed to format generated source: %v", err)
 	}
 

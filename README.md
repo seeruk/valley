@@ -25,8 +25,8 @@ don't - as well as Valley.
 
 ## TODO
 
-* Multiple constraints functions, that generate different validate functions.
-    * The `Valid` constraint would need an option to override which method is called.
+* The ability to attach multiple constraints methods to a type, that generate different validate
+functions (the `Valid` constraint would need an option to override which method is called).
 * You might want to validate map keys too, so maybe a `Keys` method on `Field`?
 
 ## License

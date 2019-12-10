@@ -29,7 +29,7 @@ type ConstraintViolation struct {
 // Context is used to inform a ConstraintGenerator about it's environment, mainly to do with which
 // part of a type is being validated, and giving important identifiers to ConstraintGenerators.
 type Context struct {
-	FileSet   *token.FileSet
+	Source    Source
 	TypeName  string
 	Receiver  string
 	FieldName string

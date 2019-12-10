@@ -41,7 +41,7 @@ func mutuallyExclusive(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) 
 	var fields []string
 
 	for _, opt := range opts {
-		pos := ctx.FileSet.Position(opt.Pos())
+		pos := ctx.Source.FileSet.Position(opt.Pos())
 
 		selector, ok := opt.(*ast.SelectorExpr)
 		if !ok {

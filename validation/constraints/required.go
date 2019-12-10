@@ -12,7 +12,7 @@ func Required() valley.Constraint {
 	return valley.Constraint{}
 }
 
-// requiredFormat is the format used for rendering a `required` constraint.
+// requiredFormat is the format used for rendering a `Required` constraint.
 const requiredFormat = `
 	if %s {
 		%s
