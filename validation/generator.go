@@ -11,7 +11,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/seeruk/valley/validation/constraints"
-
 	"github.com/seeruk/valley/valley"
 )
 
