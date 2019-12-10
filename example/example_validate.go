@@ -99,6 +99,27 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		path.TruncateRight(size)
 	}
 
+	if e.Int2 == nil {
+		size := path.Write("Int2")
+		violations = append(violations, valley.ConstraintViolation{
+			Field:   path.String(),
+			Message: "a value is required",
+		})
+		path.TruncateRight(size)
+	}
+
+	if e.Int2 != nil && *e.Int2 < 0 {
+		size := path.Write("Int2")
+		violations = append(violations, valley.ConstraintViolation{
+			Field:   path.String(),
+			Message: "minimum value not met",
+			Details: map[string]interface{}{
+				"minimum": 0,
+			},
+		})
+		path.TruncateRight(size)
+	}
+
 	if len(e.Ints) == 0 {
 		size := path.Write("Ints")
 		violations = append(violations, valley.ConstraintViolation{

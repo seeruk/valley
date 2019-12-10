@@ -17,7 +17,7 @@ type Example struct {
 	Adults   int               `json:"adults"`
 	Children int               `json:"children"`
 	Int      int               `json:"int"`
-	Int2     int               `json:"int2"`
+	Int2     *int              `json:"int2"`
 	Ints     []int             `json:"ints"`
 	Nested   *NestedExample    `json:"nested"`
 	Nesteds  []*NestedExample  `json:"nesteds"`
@@ -44,20 +44,28 @@ func (e Example) Constraints(t valley.Type) {
 	//t.Field(e.Text).Constraints(constraints.Predicate(e.Text == "Hello, World!"))
 
 	// Field constraints.
-	t.Field(e.Text).Constraints(constraints.Required())
-	t.Field(e.TextMap).Constraints(constraints.Required()).
+	t.Field(e.Text).
+		Constraints(constraints.Required())
+	t.Field(e.TextMap).
+		Constraints(constraints.Required()).
 		Elements(constraints.Required())
-	t.Field(e.Int).Constraints(constraints.Required())
-	t.Field(e.Ints).Constraints(constraints.Required(), constraints.MaxLength(3)).
+	t.Field(e.Int).
+		Constraints(constraints.Required())
+	t.Field(e.Int2).
+		Constraints(constraints.Required(), constraints.Min(0))
+	t.Field(e.Ints).
+		Constraints(constraints.Required(), constraints.MaxLength(3)).
 		Elements(constraints.Required(), constraints.Min(0))
-
-	t.Field(e.Adults).Constraints(constraints.Min(1), constraints.Max(9))
+	t.Field(e.Adults).
+		Constraints(constraints.Min(1), constraints.Max(9))
 	t.Field(e.Children).Constraints(constraints.Min(0)).
 		Constraints(constraints.Max(int(math.Max(float64(8-(e.Adults-1)), 0))))
 
 	// Nested constraints to be called.
-	t.Field(e.Nested).Constraints(constraints.Required(), constraints.Valid())
-	t.Field(e.Nesteds).Elements(constraints.Valid())
+	t.Field(e.Nested).
+		Constraints(constraints.Required(), constraints.Valid())
+	t.Field(e.Nesteds).
+		Elements(constraints.Valid())
 }
 
 // NestedExample ...
