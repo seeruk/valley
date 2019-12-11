@@ -138,6 +138,18 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		path.TruncateRight(size)
 	}
 
+	if e.Float != math.Pi {
+		size := path.Write("Float")
+		violations = append(violations, valley.ConstraintViolation{
+			Field:   path.String(),
+			Message: "values must be equal",
+			Details: map[string]interface{}{
+				"equal_to": math.Pi,
+			},
+		})
+		path.TruncateRight(size)
+	}
+
 	if e.Int == 0 {
 		size := path.Write("Int")
 		violations = append(violations, valley.ConstraintViolation{

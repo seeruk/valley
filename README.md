@@ -8,16 +8,88 @@ Valley is tool for generating plain Go validation code based on your Go code.
 
 ## Built-In Constraints
 
-* Equals
-* Max
-* MaxLength
-* Min
-* MinLength
-* MutuallyExclusive
-* NotEquals
-* NotNil
-* Required
-* Valid
+The built-in constraints may be used in your code by importing:
+
+```go
+import "github.com/seeruk/valley/validation/constraints"
+```
+
+(Note: You can alias the import, and Valley should still successfully generate your validation code)
+
+---
+
+**Equals**
+
+_Applicable to_: Fields
+
+_Description_: Values must be equal.
+
+_Usage_:
+
+```go
+t.Field(e.String).Constraints(constraints.Equals("hello"))
+t.Field(e.Int).Constraints(constraints.Equals(12))
+t.Field(e.Int).Constraints(constraints.Equals(len(e.FloatSlice)*2))
+t.Field(e.FloatSlice).Elements(constraints.Equals(math.Pi))
+```
+
+
+**Max**
+
+_Description_: Maximum value must not be exceeded.
+
+**MaxLength**
+
+_Description_: Maximum length must not be exceeded.
+
+**Min**
+
+_Description_: Minimum value must be met.
+
+**MinLength**
+
+_Description_: Minimum length must be met.
+
+**MutuallyExclusive**
+
+_Description_: Only one of the given fields must be set.
+
+**NotEquals**
+
+_Description_: Values must not be equal.
+
+**NotNil**
+
+_Description_: Value must not be nil.
+
+**Required**
+
+_Description_: Value is required, behaves like (and sometimes uses) `reflect.Value.IsZero()`.
+
+**Valid**
+
+_Applicable to_: Fields
+
+_Description_: Calls `Validate()` on the value, used to validate nested structures.
+
+_Usage_:
+
+```go
+t.Field(e.Nested).Constraints(constraints.Valid())
+t.Field(e.NestedSlice).Elements(constraints.Valid())
+```
+
+### Upcoming Constraints
+
+* AnyNRequired
+* ExactlyNRequired
+* Length
+* MutuallyInclusive: If one is set, all must be set
+* OneOf
+* Pattern
+* Predicate
+* TimeAfter
+* TimeBefore
 
 ## Motivation
 

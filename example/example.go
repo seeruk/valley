@@ -21,6 +21,7 @@ type Example struct {
 	Int      int               `json:"int"`
 	Int2     *int              `json:"int2"`
 	Ints     []int             `json:"ints"`
+	Float    float64           `json:"float"`
 	Nested   *NestedExample    `json:"nested"`
 	Nesteds  []*NestedExample  `json:"nesteds"`
 }
@@ -56,6 +57,7 @@ func (e Example) Constraints(t valley.Type) {
 	t.Field(e.Int2).Constraints(constraints.Required(), constraints.NotNil(), constraints.Min(0))
 	t.Field(e.Ints).Constraints(constraints.Required(), constraints.MaxLength(3)).
 		Elements(constraints.Required(), constraints.Min(0))
+	t.Field(e.Float).Constraints(constraints.Equals(math.Pi))
 	t.Field(e.Adults).Constraints(constraints.Min(1), constraints.Max(9))
 	t.Field(e.Children).Constraints(constraints.Min(0), constraints.Equals(e.Adults+2)).
 		Constraints(constraints.Max(int(math.Max(float64(8-(e.Adults-1)), 0))))
