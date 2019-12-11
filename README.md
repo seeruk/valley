@@ -6,6 +6,19 @@ Valley is tool for generating plain Go validation code based on your Go code.
 
 ...
 
+## Built-In Constraints
+
+* Equals
+* Max
+* MaxLength
+* Min
+* MinLength
+* MutuallyExclusive
+* NotEquals
+* NotNil
+* Required
+* Valid
+
 ## Motivation
 
 Previously I've implemented validation in Go using reflection, and while reflection isn't actually

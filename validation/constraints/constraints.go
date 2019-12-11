@@ -14,12 +14,14 @@ import (
 // exposed so that custom code generators can build on the set of built-in rules, and also use the
 // logic exposed. It's tricky to otherwise make Valley extensible.
 var BuiltIn = map[string]valley.ConstraintGenerator{
-	"github.com/seeruk/valley/validation/constraints.NotNil":            notNil,
+	"github.com/seeruk/valley/validation/constraints.Equals":            equals,
 	"github.com/seeruk/valley/validation/constraints.Max":               minMax(max),
-	"github.com/seeruk/valley/validation/constraints.Min":               minMax(min),
 	"github.com/seeruk/valley/validation/constraints.MaxLength":         minMaxLength(maxLength),
+	"github.com/seeruk/valley/validation/constraints.Min":               minMax(min),
 	"github.com/seeruk/valley/validation/constraints.MinLength":         minMaxLength(minLength),
 	"github.com/seeruk/valley/validation/constraints.MutuallyExclusive": mutuallyExclusive,
+	"github.com/seeruk/valley/validation/constraints.NotEquals":         notEquals,
+	"github.com/seeruk/valley/validation/constraints.NotNil":            notNil,
 	"github.com/seeruk/valley/validation/constraints.Required":          required,
 	"github.com/seeruk/valley/validation/constraints.Valid":             valid,
 }

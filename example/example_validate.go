@@ -66,6 +66,30 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		path.TruncateRight(size)
 	}
 
+	if e.Bool == false {
+		size := path.Write("Bool")
+		violations = append(violations, valley.ConstraintViolation{
+			Field:   path.String(),
+			Message: "values must not be equal",
+			Details: map[string]interface{}{
+				"equal_to": false,
+			},
+		})
+		path.TruncateRight(size)
+	}
+
+	if e.Bool != true {
+		size := path.Write("Bool")
+		violations = append(violations, valley.ConstraintViolation{
+			Field:   path.String(),
+			Message: "values must be equal",
+			Details: map[string]interface{}{
+				"equal_to": true,
+			},
+		})
+		path.TruncateRight(size)
+	}
+
 	if len(e.Chan) > 12 {
 		size := path.Write("Chan")
 		violations = append(violations, valley.ConstraintViolation{
@@ -85,6 +109,18 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 			Message: "minimum value not met",
 			Details: map[string]interface{}{
 				"minimum": 0,
+			},
+		})
+		path.TruncateRight(size)
+	}
+
+	if e.Children != e.Adults+2 {
+		size := path.Write("Children")
+		violations = append(violations, valley.ConstraintViolation{
+			Field:   path.String(),
+			Message: "values must be equal",
+			Details: map[string]interface{}{
+				"equal_to": e.Adults + 2,
 			},
 		})
 		path.TruncateRight(size)
