@@ -120,6 +120,15 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		path.TruncateRight(size)
 	}
 
+	if e.Int2 == nil {
+		size := path.Write("Int2")
+		violations = append(violations, valley.ConstraintViolation{
+			Field:   path.String(),
+			Message: "value must not be nil",
+		})
+		path.TruncateRight(size)
+	}
+
 	if e.Int2 != nil && *e.Int2 < 0 {
 		size := path.Write("Int2")
 		violations = append(violations, valley.ConstraintViolation{

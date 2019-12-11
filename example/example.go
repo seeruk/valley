@@ -67,7 +67,7 @@ func (e Example) Constraints(t valley.Type) {
 	t.Field(e.TextMap).Constraints(constraints.Required()).
 		Elements(constraints.Required())
 	t.Field(e.Int).Constraints(constraints.Required())
-	t.Field(e.Int2).Constraints(constraints.Required(), constraints.Min(0))
+	t.Field(e.Int2).Constraints(constraints.Required(), constraints.NotNil(), constraints.Min(0))
 	t.Field(e.Ints).Constraints(constraints.Required(), constraints.MaxLength(3)).
 		Elements(constraints.Required(), constraints.Min(0))
 	t.Field(e.Adults).Constraints(constraints.Min(1), constraints.Max(9))
@@ -75,10 +75,8 @@ func (e Example) Constraints(t valley.Type) {
 		Constraints(constraints.Max(int(math.Max(float64(8-(e.Adults-1)), 0))))
 
 	// Nested constraints to be called.
-	t.Field(e.Nested).
-		Constraints(constraints.Required(), constraints.Valid())
-	t.Field(e.Nesteds).
-		Elements(constraints.Valid())
+	t.Field(e.Nested).Constraints(constraints.Required(), constraints.Valid())
+	t.Field(e.Nesteds).Elements(constraints.Valid())
 }
 
 // NestedExample ...
