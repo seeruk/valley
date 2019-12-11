@@ -3,10 +3,6 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/seeruk/go-console v0.1.0-alpha.3 h1:oNH1Hk1XRXmGv7eLQ5GUE6bhsbjqrQS/TFxWx0i6cDs=
-github.com/seeruk/go-console v0.1.0-alpha.3/go.mod h1:PZp4oknB6N9bfL0C0Z2IfiOsmhGyerHXB92BqFFtDDg=
-github.com/seeruk/go-console v0.1.0-alpha.4 h1:/6TPVsv0bubsxuKcuu6SWVg5G0FKimhlAgGIY/AS/yc=
-github.com/seeruk/go-console v0.1.0-alpha.4/go.mod h1:PZp4oknB6N9bfL0C0Z2IfiOsmhGyerHXB92BqFFtDDg=
 github.com/seeruk/go-console v0.1.0-alpha.5 h1:wjCtGHlSq121fjKj4Mxv5tzfTzCOobLiGb2WhjNzEOk=
 github.com/seeruk/go-console v0.1.0-alpha.5/go.mod h1:PZp4oknB6N9bfL0C0Z2IfiOsmhGyerHXB92BqFFtDDg=
 github.com/seeruk/go-wordwrap v0.0.0-20191208221741-14ec4aac9550 h1:C3CfUXH/qmWuQFRqnPm3Sx8PFxa+pqACjhV5CaNO8pw=
