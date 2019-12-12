@@ -16,6 +16,10 @@ import "github.com/seeruk/valley/validation/constraints"
 
 (Note: You can alias the import, and Valley should still successfully generate your validation code)
 
+[GoDoc documentation](https://godoc.org/github.com/seeruk/valley/validation/constraints) is
+available for the built-in constraints that should help with understanding how the constraints may
+be used.
+
 ---
 
 **Equals**
