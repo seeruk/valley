@@ -35,8 +35,8 @@ const mutuallyExclusiveFormat = `
 	}
 `
 
-// mutuallyExclusive ...
-func mutuallyExclusive(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
+// mutuallyExclusiveGenerator ...
+func mutuallyExclusiveGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	var output valley.ConstraintGeneratorOutput
 	var fields []string
 

@@ -23,8 +23,8 @@ const notNilFormat = `
 	}
 `
 
-// notNil ...
-func notNil(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
+// notNilGenerator ...
+func notNilGenerator(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	return valley.ConstraintGeneratorOutput{
 		Code: fmt.Sprintf(notNilFormat,
 			ctx.VarName,

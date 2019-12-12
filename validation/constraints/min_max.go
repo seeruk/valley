@@ -42,8 +42,8 @@ const (
 // minMaxKind ...
 type minMaxKind string
 
-// minMax ...
-func minMax(kind minMaxKind) valley.ConstraintGenerator {
+// minMaxGenerator ...
+func minMaxGenerator(kind minMaxKind) valley.ConstraintGenerator {
 	return func(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 		var output valley.ConstraintGeneratorOutput
 		var predicate string
@@ -69,6 +69,8 @@ func minMax(kind minMaxKind) valley.ConstraintGenerator {
 			predicate += fmt.Sprintf("%s != nil && ", varName)
 			varName = "*" + varName
 		}
+
+		fmt.Println(GenerateVariableName(ctx))
 
 		message := "maximum value exceeded"
 		operator := ">"

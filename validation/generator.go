@@ -16,7 +16,8 @@ import (
 
 // Generator is a type used to generate validation code.
 type Generator struct {
-	constraints map[string]valley.ConstraintGenerator
+	constraints   map[string]valley.ConstraintGenerator
+	constraintNum int
 
 	cb   *bytes.Buffer
 	ipts map[valley.Import]struct{}
@@ -71,7 +72,6 @@ func (g *Generator) Generate(config valley.Config, source valley.Source) ([]byte
 	fmt.Fprintln(buf, "// Reference imports to suppress errors if they aren't otherwise used")
 	fmt.Fprintln(buf, "var _ = fmt.Sprintf")
 	fmt.Fprintln(buf, "var _ = strconv.Itoa")
-
 	fmt.Fprintln(buf)
 
 	_, err := io.Copy(buf, g.cb)
@@ -251,12 +251,17 @@ func (g *Generator) generateConstraint(ctx valley.Context, constraintConfig vall
 		return fmt.Errorf("unknown validation constraint: %q", constraintConfig.Name)
 	}
 
+	g.constraintNum++
+
 	selector := ctx.TypeName
 	if ctx.FieldName != "" {
 		selector += "." + ctx.FieldName
 	}
 
 	pos := ctx.Source.FileSet.Position(constraintConfig.Pos)
+
+	ctx.Constraint = constraintConfig.Name
+	ctx.ConstraintNum = g.constraintNum
 
 	output, err := constraint(ctx, value.Type, constraintConfig.Opts)
 	switch {

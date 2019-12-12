@@ -48,8 +48,8 @@ const (
 // lengthKind ...
 type lengthKind string
 
-// length ...
-func length(kind lengthKind) valley.ConstraintGenerator {
+// lengthGenerator ...
+func lengthGenerator(kind lengthKind) valley.ConstraintGenerator {
 	return func(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 		var output valley.ConstraintGeneratorOutput
 		var predicate string

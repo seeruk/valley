@@ -27,8 +27,8 @@ const notEqualsFormat = `
 	}
 `
 
-// notEquals ...
-func notEquals(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
+// notEqualsGenerator ...
+func notEqualsGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	var output valley.ConstraintGeneratorOutput
 
 	if len(opts) != 1 {

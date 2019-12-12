@@ -26,8 +26,8 @@ const equalsFormat = `
 	}
 `
 
-// equals ...
-func equals(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
+// equalsGenerator ...
+func equalsGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	var output valley.ConstraintGeneratorOutput
 
 	value, err := SprintNode(ctx.Source.FileSet, opts[0])

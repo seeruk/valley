@@ -22,6 +22,7 @@ type ConstraintGenerator func(value Context, fieldType ast.Expr, opts []ast.Expr
 // code to be in different parts of the resulting file (e.g. imports).
 type ConstraintGeneratorOutput struct {
 	Imports []Import
+	Vars    []Variable
 	Code    string
 }
 
@@ -42,6 +43,8 @@ type Context struct {
 	VarName   string
 	Path      string
 
+	Constraint      string
+	ConstraintNum   int
 	BeforeViolation string
 	AfterViolation  string
 }
@@ -65,6 +68,12 @@ type Source struct {
 type Import struct {
 	Path  string
 	Alias string
+}
+
+// Variable represents information about a Go variable that Valley uses to generate code.
+type Variable struct {
+	Name  string
+	Value string
 }
 
 // Methods is a map from struct name to Method.

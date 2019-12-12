@@ -6,6 +6,10 @@ import (
 	"go/ast"
 	"go/printer"
 	"go/token"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"unicode"
 
 	"github.com/seeruk/valley"
 )
@@ -14,18 +18,18 @@ import (
 // exposed so that custom code generators can build on the set of built-in rules, and also use the
 // logic exposed. It's tricky to otherwise make Valley extensible.
 var BuiltIn = map[string]valley.ConstraintGenerator{
-	"github.com/seeruk/valley/validation/constraints.Equals":            equals,
-	"github.com/seeruk/valley/validation/constraints.Length":            length(lengthExact),
-	"github.com/seeruk/valley/validation/constraints.Max":               minMax(max),
-	"github.com/seeruk/valley/validation/constraints.MaxLength":         length(lengthMax),
-	"github.com/seeruk/valley/validation/constraints.Min":               minMax(min),
-	"github.com/seeruk/valley/validation/constraints.MinLength":         length(lengthMin),
-	"github.com/seeruk/valley/validation/constraints.MutuallyExclusive": mutuallyExclusive,
-	"github.com/seeruk/valley/validation/constraints.NotEquals":         notEquals,
-	"github.com/seeruk/valley/validation/constraints.NotNil":            notNil,
-	"github.com/seeruk/valley/validation/constraints.Regexp":            regexp,
-	"github.com/seeruk/valley/validation/constraints.Required":          required,
-	"github.com/seeruk/valley/validation/constraints.Valid":             valid,
+	"github.com/seeruk/valley/validation/constraints.Equals":            equalsGenerator,
+	"github.com/seeruk/valley/validation/constraints.Length":            lengthGenerator(lengthExact),
+	"github.com/seeruk/valley/validation/constraints.Max":               minMaxGenerator(max),
+	"github.com/seeruk/valley/validation/constraints.MaxLength":         lengthGenerator(lengthMax),
+	"github.com/seeruk/valley/validation/constraints.Min":               minMaxGenerator(min),
+	"github.com/seeruk/valley/validation/constraints.MinLength":         lengthGenerator(lengthMin),
+	"github.com/seeruk/valley/validation/constraints.MutuallyExclusive": mutuallyExclusiveGenerator,
+	"github.com/seeruk/valley/validation/constraints.NotEquals":         notEqualsGenerator,
+	"github.com/seeruk/valley/validation/constraints.NotNil":            notNilGenerator,
+	"github.com/seeruk/valley/validation/constraints.Regexp":            regexpGenerator,
+	"github.com/seeruk/valley/validation/constraints.Required":          requiredGenerator,
+	"github.com/seeruk/valley/validation/constraints.Valid":             validGenerator,
 }
 
 // GenerateEmptinessPredicate ...
@@ -48,6 +52,17 @@ func GenerateEmptinessPredicate(varName string, fieldType ast.Expr) (string, []v
 	// case. There are more efficient things that a consumer of Valley can do, but this is easy, and
 	// also powers MutuallyExclusive, etc.
 	return fmt.Sprintf("reflect.ValueOf(%s).IsZero()", varName), []valley.Import{{Path: "reflect"}}
+}
+
+// GenerateVariableName ...
+func GenerateVariableName(ctx valley.Context) string {
+	re := regexp.MustCompile(`([^A-z0-9])`)
+
+	return fmt.Sprintf("%s_%s_%d",
+		lcfirst(re.ReplaceAllString(ctx.Constraint, "_")),
+		ucfirst(strings.TrimSuffix(ctx.Source.FileName, filepath.Ext(ctx.Source.FileName))),
+		ctx.ConstraintNum,
+	)
 }
 
 // CollectExprImports looks for things that appear to be imports in the given expression, and
@@ -90,4 +105,20 @@ func SprintNode(fileSet *token.FileSet, node ast.Node) (string, error) {
 	}
 
 	return buf.String(), nil
+}
+
+func lcfirst(str string) string {
+	for _, v := range str {
+		u := string(unicode.ToLower(v))
+		return u + str[len(u):]
+	}
+	return ""
+}
+
+func ucfirst(str string) string {
+	for _, v := range str {
+		u := string(unicode.ToUpper(v))
+		return u + str[len(u):]
+	}
+	return ""
 }

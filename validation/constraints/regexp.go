@@ -4,13 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"go/ast"
-	regex "regexp"
+	"regexp"
 
 	"github.com/seeruk/valley"
 )
 
 // Regexp ...
-func Regexp(regexp *regex.Regexp) valley.Constraint {
+func Regexp(regexp *regexp.Regexp) valley.Constraint {
 	return valley.Constraint{}
 }
 
@@ -28,8 +28,8 @@ const patternFormat = `
 	}
 `
 
-// regexp ...
-func regexp(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
+// regexpGenerator ...
+func regexpGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	var output valley.ConstraintGeneratorOutput
 	var predicate string
 
