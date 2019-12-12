@@ -1,6 +1,7 @@
 package constraints
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 
@@ -29,6 +30,10 @@ const notEqualsFormat = `
 // notEquals ...
 func notEquals(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	var output valley.ConstraintGeneratorOutput
+
+	if len(opts) != 1 {
+		return output, errors.New("expected exactly one option")
+	}
 
 	value, err := SprintNode(ctx.Source.FileSet, opts[0])
 	if err != nil {

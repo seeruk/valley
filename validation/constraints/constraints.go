@@ -22,6 +22,7 @@ var BuiltIn = map[string]valley.ConstraintGenerator{
 	"github.com/seeruk/valley/validation/constraints.MutuallyExclusive": mutuallyExclusive,
 	"github.com/seeruk/valley/validation/constraints.NotEquals":         notEquals,
 	"github.com/seeruk/valley/validation/constraints.NotNil":            notNil,
+	"github.com/seeruk/valley/validation/constraints.Regexp":            regexp,
 	"github.com/seeruk/valley/validation/constraints.Required":          required,
 	"github.com/seeruk/valley/validation/constraints.Valid":             valid,
 }

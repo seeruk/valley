@@ -129,6 +129,18 @@ t.Field(e.SomeSlice).Constraints(constraints.NotNil())
 t.Field(e.SomeInterface).Constraints(constraints.NotNil())
 ```
 
+**Regexp**
+
+_Applicable to_: Fields
+
+_Description_: Value must match the given reference to a compiled *regexp.Regexp instance.
+
+_Usage_:
+
+```go
+t.Field(e.String).Constraints(constraints.Regexp(valley.PatternUUID))
+```
+
 **Required**
 
 _Applicable to_: Fields
@@ -161,7 +173,6 @@ t.Field(e.NestedSlice).Elements(constraints.Valid())
 * Length
 * MutuallyInclusive: If one is set, all must be set
 * OneOf
-* Pattern
 * Predicate
 * TimeAfter
 * TimeBefore
@@ -196,6 +207,8 @@ functions (the `Valid` constraint would need an option to override which method 
 * You might want to validate map keys too, so maybe a `Keys` method on `Field`?
 * Allow overriding field names by using struct tags?
 * The ability to define constraints in a separate file (in the same package).
+* Proper import resolution, using `go list`? We can get the package name to guarantee we import
+something with the correct package name.
 
 ## License
 

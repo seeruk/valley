@@ -67,7 +67,6 @@ func minMax(kind minMaxKind) valley.ConstraintGenerator {
 		varName := ctx.VarName
 		if isPointer {
 			predicate += fmt.Sprintf("%s != nil && ", varName)
-			// Herein we'll be using the de-referenced value.
 			varName = "*" + varName
 		}
 

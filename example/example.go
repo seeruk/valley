@@ -4,10 +4,14 @@ package main
 
 import (
 	"math"
+	"regexp"
 
 	"github.com/seeruk/valley"
 	"github.com/seeruk/valley/validation/constraints"
 )
+
+// patternGreeting is a regular expression to test that a string starts with "Hello".
+var patternGreeting = regexp.MustCompile("^Hello")
 
 // Example ...
 type Example struct {
@@ -39,7 +43,7 @@ func (e Example) Constraints(t valley.Type) {
 	// * ExactlyNRequired: Similar to MutuallyExclusive, but making exactly one of the values be required.
 	// * TimeBefore: Validates that a time is before another.
 	// * TimeAfter: Validates that a time is after another.
-	// * Pattern: Validates that a string matches the given regular expression.
+	// * Regexp: Validates that a string matches the given regular expression.
 	//   * Maybe this should add package-local variables for the patterns or something?
 	// * Predicate: Custom code... as real code.
 
@@ -49,7 +53,7 @@ func (e Example) Constraints(t valley.Type) {
 	// Field constraints.
 	t.Field(e.Bool).Constraints(constraints.NotEquals(false), constraints.Equals(true))
 	t.Field(e.Chan).Constraints(constraints.MaxLength(12))
-	t.Field(e.Text).Constraints(constraints.Required())
+	t.Field(e.Text).Constraints(constraints.Required(), constraints.Regexp(valley.PatternUUID))
 	t.Field(e.Text).Constraints(constraints.MaxLength(12))
 	t.Field(e.TextMap).Constraints(constraints.Required()).
 		Elements(constraints.Required())

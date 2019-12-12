@@ -3,6 +3,12 @@ package valley
 import (
 	"go/ast"
 	"go/token"
+	"regexp"
+)
+
+// Built in regular expression patterns.
+var (
+	PatternUUID = regexp.MustCompile(`^[0-9A-f]{8}-[0-9A-f]{4}-[0-9A-f]{4}-[0-9A-f]{4}-[0-9A-f]{12}$`)
 )
 
 // Constraint is used to identify constraints to generate code for in a Go AST.
