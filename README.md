@@ -1,4 +1,4 @@
-# Valley
+# Valley [![Go Report Card Badge]][Go Report Card] [![GoDoc Badge]][GoDoc]
 
 Valley is tool for generating plain Go validation code based on your Go code.
 
@@ -211,3 +211,9 @@ on fixing it yourself.
 
 [1]: https://github.com/seeruk/valley/pulls
 [2]: https://github.com/seeruk/valley/issues
+
+[GoDoc]: https://godoc.org/github.com/seeruk/valley
+[GoDoc Badge]: https://godoc.org/github.com/seeruk/valley?status.svg
+
+[Go Report Card]: https://goreportcard.com/report/github.com/seeruk/valley
+[Go Report Card Badge]: https://goreportcard.com/badge/github.com/seeruk/valley
