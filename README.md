@@ -33,38 +33,109 @@ t.Field(e.Int).Constraints(constraints.Equals(len(e.FloatSlice)*2))
 t.Field(e.FloatSlice).Elements(constraints.Equals(math.Pi))
 ```
 
-
 **Max**
+
+_Applicable to_: Fields
 
 _Description_: Maximum value must not be exceeded.
 
+_Usage_:
+
+```go
+t.Field(e.SomeInt).Constraints(constraints.Max(12))
+t.Field(e.SomeFloat).Constraints(constraints.Max(8-(e.SomeInt-1)))
+```
+
 **MaxLength**
+
+_Applicable to_: Fields
 
 _Description_: Maximum length must not be exceeded.
 
+_Usage_:
+
+```go
+t.Field(e.SomeSlice).Constraints(constraints.MaxLength(12))
+t.Field(e.SomeString).Constraints(constraints.MaxLength(8-(e.SomeInt-1)))
+```
+
 **Min**
+
+_Applicable to_: Fields
 
 _Description_: Minimum value must be met.
 
+_Usage_:
+
+```go
+t.Field(e.SomeInt).Constraints(constraints.Min(12))
+t.Field(e.SomeFloat).Constraints(constraints.Min(8-(e.SomeInt-1)))
+```
+
 **MinLength**
+
+_Applicable to_: Fields
 
 _Description_: Minimum length must be met.
 
+_Usage_:
+
+```go
+t.Field(e.SomeSlice).Constraints(constraints.MinLength(12))
+t.Field(e.SomeString).Constraints(constraints.MinLength(8-(e.SomeInt-1)))
+```
+
 **MutuallyExclusive**
+
+_Applicable to_: Structs
 
 _Description_: Only one of the given fields must be set.
 
+_Usage_:
+
+```go
+t.Constraints(constraints.MutuallyExclusive(e.Username, e.EmailAddress))
+```
+
 **NotEquals**
+
+_Applicable to_: Fields
 
 _Description_: Values must not be equal.
 
+_Usage_:
+
+```go
+t.Field(e.SomeInt).Constraints(constraints.Equals(12))
+t.Field(e.SomeInt).Constraints(constraints.Equals(e.SomeOtherInt*23))
+t.Field(e.SomeInt).Constraints(constraints.Equals(int(math.Max(e.SomeOtherInt, 23))))
+```
+
 **NotNil**
+
+_Applicable to_: Fields
 
 _Description_: Value must not be nil.
 
+_Usage_:
+
+```go
+t.Field(e.SomePtr).Constraints(constraints.NotNil())
+t.Field(e.SomeSlice).Constraints(constraints.NotNil())
+t.Field(e.SomeInterface).Constraints(constraints.NotNil())
+```
+
 **Required**
 
+_Applicable to_: Fields
+
 _Description_: Value is required, behaves like (and sometimes uses) `reflect.Value.IsZero()`.
+
+_Usage_:
+
+```go
+t.Field(e.Nested).Constraints(constraints.Required())
+```
 
 **Valid**
 
