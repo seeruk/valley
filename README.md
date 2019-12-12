@@ -186,7 +186,6 @@ t.Field(e.NestedSlice).Elements(constraints.Valid())
 
 * AnyNRequired
 * ExactlyNRequired
-* Length
 * MutuallyInclusive: If one is set, all must be set
 * OneOf
 * Predicate
