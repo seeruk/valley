@@ -7,7 +7,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/seeruk/valley/valley"
+	"github.com/seeruk/valley"
 )
 
 // Read attempts to read a Go file, and based on it's contents return the package name, along

@@ -2,7 +2,7 @@ package cli
 
 import (
 	"github.com/seeruk/go-console"
-	"github.com/seeruk/valley/valley"
+	"github.com/seeruk/valley"
 )
 
 // NewApplication returns a new console application. The given constraints are used to produce the

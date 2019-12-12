@@ -7,7 +7,7 @@ import (
 	"go/printer"
 	"go/token"
 
-	"github.com/seeruk/valley/valley"
+	"github.com/seeruk/valley"
 )
 
 // BuiltIn is a map of all of the built-in validation constraints provided by Valley. This is

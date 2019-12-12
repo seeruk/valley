@@ -5,8 +5,8 @@ package main
 import (
 	"math"
 
+	"github.com/seeruk/valley"
 	"github.com/seeruk/valley/validation/constraints"
-	"github.com/seeruk/valley/valley"
 )
 
 // Example ...

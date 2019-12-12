@@ -5,7 +5,7 @@ import (
 	"go/ast"
 	"strings"
 
-	"github.com/seeruk/valley/valley"
+	"github.com/seeruk/valley"
 )
 
 // MutuallyExclusive ...

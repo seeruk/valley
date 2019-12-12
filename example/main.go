@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/seeruk/valley/valley"
+	"github.com/seeruk/valley"
 )
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"go/ast"
 
-	"github.com/seeruk/valley/valley"
+	"github.com/seeruk/valley"
 )
 
 // Valid ...

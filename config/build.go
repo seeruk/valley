@@ -7,11 +7,11 @@ import (
 	"go/token"
 	"path/filepath"
 
-	"github.com/seeruk/valley/valley"
+	"github.com/seeruk/valley"
 )
 
 // importPath is the import path that is used to import Valley types.
-const importPath = "github.com/seeruk/valley/valley"
+const importPath = "github.com/seeruk/valley"
 
 // BuildFromSource builds Config for all types in a given Source by picking out each type that has a
 // constraints method defined (in the same file), and using the body of those methods to produce the

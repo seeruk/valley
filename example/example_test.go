@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/seeruk/valley/valley"
+	"github.com/seeruk/valley"
 )
 
 func BenchmarkRequired(b *testing.B) {

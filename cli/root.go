@@ -5,10 +5,10 @@ import (
 
 	"github.com/seeruk/go-console"
 	"github.com/seeruk/go-console/parameters"
+	"github.com/seeruk/valley"
 	"github.com/seeruk/valley/config"
 	"github.com/seeruk/valley/source"
 	"github.com/seeruk/valley/validation"
-	"github.com/seeruk/valley/valley"
 )
 
 // RootCommand returns the root console command used when valley is run. This contains the logic to

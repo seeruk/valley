@@ -10,8 +10,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/seeruk/valley"
 	"github.com/seeruk/valley/validation/constraints"
-	"github.com/seeruk/valley/valley"
 )
 
 // Generator is a type used to generate validation code.
@@ -56,7 +56,7 @@ func (g *Generator) Generate(config valley.Config, source valley.Source) ([]byte
 	fmt.Fprintln(buf)
 	fmt.Fprintln(buf, "import \"fmt\"")
 	fmt.Fprintln(buf, "import \"strconv\"")
-	fmt.Fprintln(buf, "import \"github.com/seeruk/valley/valley\"")
+	fmt.Fprintln(buf, "import \"github.com/seeruk/valley\"")
 
 	for ipt := range g.ipts {
 		if ipt.Alias != "" {

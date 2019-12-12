@@ -3,7 +3,7 @@ package main
 
 import "fmt"
 import "strconv"
-import "github.com/seeruk/valley/valley"
+import "github.com/seeruk/valley"
 import math "math"
 
 // Reference imports to suppress errors if they aren't otherwise used
