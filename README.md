@@ -37,6 +37,20 @@ t.Field(e.Int).Constraints(constraints.Equals(len(e.FloatSlice)*2))
 t.Field(e.FloatSlice).Elements(constraints.Equals(math.Pi))
 ```
 
+**Length**
+
+_Applicable to_: Fields
+
+_Description_: Exactly length must be met.
+
+_Usage_:
+
+```go
+t.Field(e.SomeSlice).Constraints(constraints.Length(12))
+t.Field(e.SomeString).Constraints(constraints.Length(8-(e.SomeInt-1)))
+t.Field(e.SomeSomeMap).Constraints(constraints.Length(math.MaxInt64))
+```
+
 **Max**
 
 _Applicable to_: Fields
@@ -61,6 +75,7 @@ _Usage_:
 ```go
 t.Field(e.SomeSlice).Constraints(constraints.MaxLength(12))
 t.Field(e.SomeString).Constraints(constraints.MaxLength(8-(e.SomeInt-1)))
+t.Field(e.SomeSomeMap).Constraints(constraints.MaxLength(math.MaxInt64))
 ```
 
 **Min**
@@ -87,6 +102,7 @@ _Usage_:
 ```go
 t.Field(e.SomeSlice).Constraints(constraints.MinLength(12))
 t.Field(e.SomeString).Constraints(constraints.MinLength(8-(e.SomeInt-1)))
+t.Field(e.SomeSomeMap).Constraints(constraints.MinLength(math.MaxInt8))
 ```
 
 **MutuallyExclusive**

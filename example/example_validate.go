@@ -292,6 +292,18 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		path.TruncateRight(size)
 	}
 
+	if len(e.Text) != 5 {
+		size := path.Write("Text")
+		violations = append(violations, valley.ConstraintViolation{
+			Field:   path.String(),
+			Message: "exact length not met",
+			Details: map[string]interface{}{
+				"exactly": 5,
+			},
+		})
+		path.TruncateRight(size)
+	}
+
 	if len(e.TextMap) == 0 {
 		size := path.Write("TextMap")
 		violations = append(violations, valley.ConstraintViolation{

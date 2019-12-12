@@ -8,6 +8,11 @@ import (
 	"github.com/seeruk/valley"
 )
 
+// Length ...
+func Length(length int) valley.Constraint {
+	return valley.Constraint{}
+}
+
 // MaxLength ...
 func MaxLength(max int) valley.Constraint {
 	return valley.Constraint{}
@@ -18,8 +23,8 @@ func MinLength(min int) valley.Constraint {
 	return valley.Constraint{}
 }
 
-// minMaxFormat is the format used for rendering a `Min` constraint.
-const minFormat = `
+// lengthFormat is the format used for rendering a `Min` constraint.
+const lengthFormat = `
 	if %s {
 		%s
 		violations = append(violations, valley.ConstraintViolation{
@@ -33,17 +38,18 @@ const minFormat = `
 	}
 `
 
-// Possible minMaxKind values.
+// Possible lengthKind values.
 const (
-	maxLength minMaxLengthKind = "maximum"
-	minLength minMaxLengthKind = "minimum"
+	lengthExact lengthKind = "exactly"
+	lengthMax   lengthKind = "maximum"
+	lengthMin   lengthKind = "minimum"
 )
 
-// minMaxKind ...
-type minMaxLengthKind string
+// lengthKind ...
+type lengthKind string
 
-// minMax ...
-func minMaxLength(kind minMaxLengthKind) valley.ConstraintGenerator {
+// length ...
+func length(kind lengthKind) valley.ConstraintGenerator {
 	return func(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 		var output valley.ConstraintGeneratorOutput
 		var predicate string
@@ -73,17 +79,23 @@ func minMaxLength(kind minMaxLengthKind) valley.ConstraintGenerator {
 			varName = "*" + varName
 		}
 
-		message := "maximum length exceeded"
-		operator := ">"
+		var message, operator string
 
-		if kind == minLength {
+		switch kind {
+		case lengthExact:
+			message = "exact length not met"
+			operator = "!="
+		case lengthMax:
+			message = "maximum length exceeded"
+			operator = ">"
+		case lengthMin:
 			message = "minimum length not met"
 			operator = "<"
 		}
 
 		predicate += fmt.Sprintf("len(%s) %s %s", varName, operator, value)
 
-		output.Code = fmt.Sprintf(minFormat,
+		output.Code = fmt.Sprintf(lengthFormat,
 			predicate,
 			ctx.BeforeViolation,
 			message,
@@ -92,18 +104,18 @@ func minMaxLength(kind minMaxLengthKind) valley.ConstraintGenerator {
 			ctx.AfterViolation,
 		)
 
-		return output, minMaxLengthTypeCheck(fieldType)
+		return output, lengthTypeCheck(fieldType)
 	}
 }
 
-// minMaxLengthTypeCheck ...
-func minMaxLengthTypeCheck(expr ast.Expr) error {
+// lengthTypeCheck ...
+func lengthTypeCheck(expr ast.Expr) error {
 	// This is everything that's supported by reflect.Value.Len() too. The difference here is that
 	// this doesn't support custom types that are really any of these allowed types underneath (at
 	// least not yet...)
 	switch e := expr.(type) {
 	case *ast.StarExpr:
-		return minMaxLengthTypeCheck(e.X)
+		return lengthTypeCheck(e.X)
 	case *ast.ArrayType:
 		return nil
 	case *ast.ChanType:
