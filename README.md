@@ -157,6 +157,19 @@ _Usage_:
 t.Field(e.String).Constraints(constraints.Regexp(valley.PatternUUID))
 ```
 
+**RegexpString**
+
+_Applicable to_: Fields
+
+_Description_: Value must match the given regular expression string. The regular expression string
+will be used to create a package-local variable with a unique name that will compile when imported.
+
+_Usage_:
+
+```go
+t.Field(e.String).Constraints(constraints.RegexpString("^Example$"))
+```
+
 **Required**
 
 _Applicable to_: Fields
@@ -216,14 +229,14 @@ that, the generated code also has to compile, further protecting you from runtim
 
 ## TODO
 
-* Add some benchmarks to the README?
-* The ability to attach multiple constraints methods to a type, that generate different validate
-functions (the `Valid` constraint would need an option to override which method is called).
 * You might want to validate map keys too, so maybe a `Keys` method on `Field`?
-* Allow overriding field names by using struct tags?
-* The ability to define constraints in a separate file (in the same package).
+* Allow overriding field names in path using struct tags?
 * Proper import resolution, using `go list`? We can get the package name to guarantee we import
 something with the correct package name.
+* Add some benchmarks to the README?
+* The ability to define constraints in a separate file (in the same package).
+* The ability to attach multiple constraints methods to a type, that generate different validate
+functions (the `Valid` constraint would need an option to override which method is called).
 
 ## License
 

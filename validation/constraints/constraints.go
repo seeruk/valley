@@ -28,6 +28,7 @@ var BuiltIn = map[string]valley.ConstraintGenerator{
 	"github.com/seeruk/valley/validation/constraints.NotEquals":         notEqualsGenerator,
 	"github.com/seeruk/valley/validation/constraints.NotNil":            notNilGenerator,
 	"github.com/seeruk/valley/validation/constraints.Regexp":            regexpGenerator,
+	"github.com/seeruk/valley/validation/constraints.RegexpString":      regexpStringGenerator,
 	"github.com/seeruk/valley/validation/constraints.Required":          requiredGenerator,
 	"github.com/seeruk/valley/validation/constraints.Valid":             validGenerator,
 }

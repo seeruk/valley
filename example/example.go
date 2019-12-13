@@ -53,7 +53,7 @@ func (e Example) Constraints(t valley.Type) {
 	// Field constraints.
 	t.Field(e.Bool).Constraints(constraints.NotEquals(false), constraints.Equals(true))
 	t.Field(e.Chan).Constraints(constraints.MaxLength(12))
-	t.Field(e.Text).Constraints(constraints.Required(), constraints.Regexp(valley.PatternUUID))
+	t.Field(e.Text).Constraints(constraints.Required(), constraints.RegexpString("^Hello"))
 	t.Field(e.Text).Constraints(constraints.MaxLength(12), constraints.Length(5))
 	t.Field(e.TextMap).Constraints(constraints.Required()).
 		Elements(constraints.Required())
