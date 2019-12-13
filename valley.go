@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/token"
 	"regexp"
+	"time"
 )
 
 // Built in regular expression patterns.
@@ -106,4 +107,12 @@ type Fields map[string]Value
 type Value struct {
 	Name string
 	Type ast.Expr
+}
+
+// TimeMustParse ...
+func TimeMustParse(t time.Time, err error) time.Time {
+	if err != nil {
+		panic(err)
+	}
+	return t
 }

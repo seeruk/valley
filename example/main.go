@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"time"
 
 	"github.com/seeruk/valley"
 )
@@ -30,6 +31,10 @@ func main() {
 	example.Nested = &NestedExample{}
 	example.Nesteds = []*NestedExample{
 		{Text: ""},
+	}
+
+	example.Times = []time.Time{
+		time.Date(2100, time.October, 01, 0, 0, 0, 0, time.UTC),
 	}
 
 	violations := example.Validate(valley.NewPath())

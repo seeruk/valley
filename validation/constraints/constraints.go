@@ -30,8 +30,10 @@ var BuiltIn = map[string]valley.ConstraintGenerator{
 	"github.com/seeruk/valley/validation/constraints.Regexp":            regexpGenerator,
 	"github.com/seeruk/valley/validation/constraints.RegexpString":      regexpStringGenerator,
 	"github.com/seeruk/valley/validation/constraints.Required":          requiredGenerator,
-	"github.com/seeruk/valley/validation/constraints.TimeAfter":         timeGenerator(after),
-	"github.com/seeruk/valley/validation/constraints.TimeBefore":        timeGenerator(before),
+	"github.com/seeruk/valley/validation/constraints.TimeAfter":         timeGenerator(timeAfter),
+	"github.com/seeruk/valley/validation/constraints.TimeBefore":        timeGenerator(timeBefore),
+	"github.com/seeruk/valley/validation/constraints.TimeStringAfter":   timeStringGenerator(timeStringAfter),
+	"github.com/seeruk/valley/validation/constraints.TimeStringBefore":  timeStringGenerator(timeStringBefore),
 	"github.com/seeruk/valley/validation/constraints.Valid":             validGenerator,
 }
 

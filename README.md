@@ -186,8 +186,8 @@ t.Field(e.Nested).Constraints(constraints.Required())
 
 _Applicable to_: Fields
 
-_Description_: Value must be after the given time. The value may either be be an existing `
-time.Time` value, or you can pass in an expression using something like `time.Date`.
+_Description_: Value must be after the given time. The value may either be be an existing
+`time.Time` value, or you can pass in an expression using something like `time.Date`.
 
 _Usage_:
 
@@ -200,7 +200,36 @@ t.Field(e.Time).Constraints(constraints.TimeAfter(timeYosemite))
 
 _Applicable to_: Fields
 
-_Description_: Value must be before the given time. The value must be an existing time.Time value.
+_Description_: Value must be before the given time. The value may either be be an existing
+`time.Time` value, or you can pass in an expression using something like `time.Date`.
+
+_Usage_:
+
+```go
+t.Field(e.Time).Constraints(constraints.TimeBefore(time.Date(1890, time.October, 1, 0, 0, 0, 0, time.UTC)))
+t.Field(e.Time).Constraints(constraints.TimeBefore(timeYosemite))
+```
+
+**TimeStringAfter**
+
+_Applicable to_: Fields
+
+_Description_: Value must be after the given time string. The value can be a string, or a reference
+to a string.
+
+_Usage_:
+
+```go
+t.Field(e.Time).Constraints(constraints.TimeAfter(time.Date(1890, time.October, 1, 0, 0, 0, 0, time.UTC)))
+t.Field(e.Time).Constraints(constraints.TimeAfter(timeYosemite))
+```
+
+**TimeStringBefore**
+
+_Applicable to_: Fields
+
+_Description_: Value must be before the given time string. The value can be a string, or a reference
+to a string.
 
 _Usage_:
 
@@ -226,11 +255,9 @@ t.Field(e.NestedSlice).Elements(constraints.Valid())
 
 * AnyNRequired
 * ExactlyNRequired
-* MutuallyInclusive: If one is set, all must be set
+* MutuallyInclusive
 * OneOf
 * Predicate
-* TimeAfterString
-* TimeBeforeString
 
 ## Motivation
 

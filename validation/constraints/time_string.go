@@ -4,23 +4,23 @@ import (
 	"errors"
 	"fmt"
 	"go/ast"
-	"time"
+	"go/token"
 
 	"github.com/seeruk/valley"
 )
 
 // TimeStringAfter ...
-func TimeAfter(after time.Time) valley.Constraint {
+func TimeStringAfter(after string) valley.Constraint {
 	return valley.Constraint{}
 }
 
 // TimeStringBefore ...
-func TimeBefore(before time.Time) valley.Constraint {
+func TimeStringBefore(before string) valley.Constraint {
 	return valley.Constraint{}
 }
 
 // timeStringFormat is the format used for rendering a `TimeStringAfter` or `TimeStringBefore` constraint.
-const timeFormat = `
+const timeStringFormat = `
 	if %s {
 		%s
 		violations = append(violations, valley.ConstraintViolation{
@@ -36,15 +36,15 @@ const timeFormat = `
 
 // Possible timeStringKind values.
 const (
-	timeAfter  timeKind = "after"
-	timeBefore timeKind = "before"
+	timeStringAfter  timeStringKind = "after"
+	timeStringBefore timeStringKind = "before"
 )
 
 // timeStringKind ...
-type timeKind string
+type timeStringKind string
 
 // timeStringGenerator ...
-func timeGenerator(kind timeKind) valley.ConstraintGenerator {
+func timeStringGenerator(kind timeStringKind) valley.ConstraintGenerator {
 	return func(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 		var output valley.ConstraintGeneratorOutput
 		var message string
@@ -60,9 +60,15 @@ func timeGenerator(kind timeKind) valley.ConstraintGenerator {
 			Alias: "time",
 		})
 
-		timeSelector, err := SprintNode(ctx.Source.FileSet, opts[0])
+		timeString, err := SprintNode(ctx.Source.FileSet, opts[0])
 		if err != nil {
 			return output, fmt.Errorf("failed to render expression: %v", err)
+		}
+
+		timeVarName := GenerateVariableName(ctx)
+
+		output.Vars = []valley.Variable{
+			{Name: timeVarName, Value: fmt.Sprintf("valley.TimeMustParse(time.Parse(time.RFC3339, %s))", timeString)},
 		}
 
 		_, isPointer := fieldType.(*ast.StarExpr)
@@ -74,33 +80,37 @@ func timeGenerator(kind timeKind) valley.ConstraintGenerator {
 		}
 
 		// TODO: These messages aren't great - any way to improve them?
-		if kind == timeAfter {
+		if kind == timeStringAfter {
 			message = "value must be after time"
-			predicate += fmt.Sprintf("!%s.After(%s)", varName, timeSelector)
+			predicate += fmt.Sprintf("!%s.After(%s)", varName, timeVarName)
 		} else {
 			message = "value must be before time"
-			predicate += fmt.Sprintf("!%s.Before(%s)", varName, timeSelector)
+			predicate += fmt.Sprintf("!%s.Before(%s)", varName, timeVarName)
 		}
 
-		output.Code = fmt.Sprintf(timeFormat,
+		output.Code = fmt.Sprintf(timeStringFormat,
 			predicate,
 			ctx.BeforeViolation,
 			message,
-			timeSelector,
+			timeVarName,
 			ctx.AfterViolation,
 		)
 
-		return output, timeTypeCheck(fieldType)
+		return output, timeStringTypeCheck(fieldType)
 	}
 }
 
 // timeStringTypeCheck ...
-func timeTypeCheck(expr ast.Expr) error {
+func timeStringTypeCheck(expr ast.Expr) error {
 	switch e := expr.(type) {
 	case *ast.StarExpr:
-		return timeTypeCheck(e)
+		return timeStringTypeCheck(e)
 	case *ast.SelectorExpr:
 		return nil
+	case *ast.BasicLit:
+		if e.Kind == token.STRING {
+			return nil
+		}
 	}
 
 	return ErrTypeWarning

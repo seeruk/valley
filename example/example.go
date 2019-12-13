@@ -31,6 +31,7 @@ type Example struct {
 	Ints     []int             `json:"ints"`
 	Float    float64           `json:"float"`
 	Time     time.Time         `json:"time"`
+	Times    []time.Time       `json:"times"`
 	Nested   *NestedExample    `json:"nested"`
 	Nesteds  []*NestedExample  `json:"nesteds"`
 }
@@ -46,8 +47,8 @@ func (e Example) Constraints(t valley.Type) {
 	// * OneOf: Actual value must be equal to one of the given values (maybe tricky?).
 	// * AnyNRequired: Similar to MutuallyExclusive, but making at least one of the values be required.
 	// * ExactlyNRequired: Similar to MutuallyExclusive, but making exactly one of the values be required.
-	// * TimeBefore: Validates that a time is before another.
-	// * TimeAfter: Validates that a time is after another.
+	// * TimeStringBefore: Validates that a time is before another.
+	// * TimeStringAfter: Validates that a time is after another.
 	// * Regexp: Validates that a string matches the given regular expression.
 	//   * Maybe this should add package-local variables for the patterns or something?
 	// * Predicate: Custom code... as real code.
@@ -68,6 +69,8 @@ func (e Example) Constraints(t valley.Type) {
 		Elements(constraints.Required(), constraints.Min(0))
 	t.Field(e.Float).Constraints(constraints.Equals(math.Pi))
 	t.Field(e.Time).Constraints(constraints.TimeBefore(timeYosemite))
+	t.Field(e.Times).Constraints(constraints.MinLength(1)).
+		Elements(constraints.TimeBefore(timeYosemite))
 	t.Field(e.Adults).Constraints(constraints.Min(1), constraints.Max(9))
 	t.Field(e.Children).Constraints(constraints.Min(0), constraints.Equals(e.Adults+2)).
 		Constraints(constraints.Max(int(math.Max(float64(8-(e.Adults-1)), 0))))
