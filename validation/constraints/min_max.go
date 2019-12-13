@@ -70,8 +70,6 @@ func minMaxGenerator(kind minMaxKind) valley.ConstraintGenerator {
 			varName = "*" + varName
 		}
 
-		fmt.Println(GenerateVariableName(ctx))
-
 		message := "maximum value exceeded"
 		operator := ">"
 

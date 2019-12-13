@@ -5,6 +5,7 @@ package main
 import (
 	"math"
 	"regexp"
+	"time"
 
 	"github.com/seeruk/valley"
 	"github.com/seeruk/valley/validation/constraints"
@@ -12,6 +13,9 @@ import (
 
 // patternGreeting is a regular expression to test that a string starts with "Hello".
 var patternGreeting = regexp.MustCompile("^Hello")
+
+// timeYosemite is a time that represents when Yosemite National Park was founded.
+var timeYosemite = time.Date(1890, time.October, 1, 0, 0, 0, 0, time.UTC)
 
 // Example ...
 type Example struct {
@@ -26,6 +30,7 @@ type Example struct {
 	Int2     *int              `json:"int2"`
 	Ints     []int             `json:"ints"`
 	Float    float64           `json:"float"`
+	Time     time.Time         `json:"time"`
 	Nested   *NestedExample    `json:"nested"`
 	Nesteds  []*NestedExample  `json:"nesteds"`
 }
@@ -62,6 +67,7 @@ func (e Example) Constraints(t valley.Type) {
 	t.Field(e.Ints).Constraints(constraints.Required(), constraints.MaxLength(3)).
 		Elements(constraints.Required(), constraints.Min(0))
 	t.Field(e.Float).Constraints(constraints.Equals(math.Pi))
+	t.Field(e.Time).Constraints(constraints.TimeBefore(timeYosemite))
 	t.Field(e.Adults).Constraints(constraints.Min(1), constraints.Max(9))
 	t.Field(e.Children).Constraints(constraints.Min(0), constraints.Equals(e.Adults+2)).
 		Constraints(constraints.Max(int(math.Max(float64(8-(e.Adults-1)), 0))))
