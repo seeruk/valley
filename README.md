@@ -229,8 +229,8 @@ t.Field(e.NestedSlice).Elements(constraints.Valid())
 * MutuallyInclusive: If one is set, all must be set
 * OneOf
 * Predicate
-* TimeAfter
-* TimeBefore
+* TimeAfterString
+* TimeBeforeString
 
 ## Motivation
 
