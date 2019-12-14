@@ -164,6 +164,22 @@ t.Field(e.SomeSlice).Constraints(constraints.NotNil())
 t.Field(e.SomeInterface).Constraints(constraints.NotNil())
 ```
 
+**Predicate**
+
+_Applicable to_: Fields
+
+_Description_: Pass a custom predicate that will be rendered as a violation, returning a given
+message as the description of any violation.
+
+_Usage_:
+
+```go
+t.Field(e.String).Constraints(constraints.Predicate(
+    strings.HasPrefix(e.String, "custom") && len(e.String) == 32,
+    "value must be a valid custom ID",
+))
+```
+
 **Regexp**
 
 _Applicable to_: Fields
@@ -276,7 +292,6 @@ t.Field(e.NestedSlice).Elements(constraints.Valid())
 * ExactlyNRequired
 * MutuallyInclusive
 * OneOf
-* Predicate
 
 ## Motivation
 
