@@ -24,6 +24,29 @@ import "github.com/seeruk/valley/validation/constraints"
 available for the built-in constraints that should help with understanding how the constraints may
 be used.
 
+Here's a quick list of all of the built-in constraints (more documentation below):
+
+* DeepEquals
+* Equals
+* Length
+* Max
+* MaxLength
+* Min
+* MinLength
+* MutuallyExclusive
+* MutuallyInclusive
+* NotEquals
+* NotNil
+* Predicate
+* Regexp
+* RegexpString
+* Required
+* TimeAfter
+* TimeBefore
+* TimeStringAfter
+* TimeStringBefore
+* Valid
+
 ---
 
 **DeepEquals**
