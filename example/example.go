@@ -41,6 +41,7 @@ type Example struct {
 func (e Example) Constraints(t valley.Type) {
 	// Constraints on type as a whole.
 	t.Constraints(constraints.MutuallyExclusive(e.Text, e.Texts))
+	t.Constraints(constraints.MutuallyInclusive(e.Int, e.Int2, e.Ints))
 
 	// List of possible constraints to implement:
 	// * MutuallyInclusive: If one is set, all of them must be set.

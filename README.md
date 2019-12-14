@@ -136,6 +136,18 @@ _Usage_:
 t.Constraints(constraints.MutuallyExclusive(e.Username, e.EmailAddress))
 ```
 
+**MutuallyInclusive**
+
+_Applicable to_: Structs
+
+_Description_: If any one of the given fields is set, then all of the given fields must be set.
+
+_Usage_:
+
+```go
+t.Constraints(constraints.MutuallyInclusive(e.ReceiveMarketing, e.EmailAddress))
+```
+
 **NotEquals**
 
 _Applicable to_: Fields
@@ -290,7 +302,6 @@ t.Field(e.NestedSlice).Elements(constraints.Valid())
 
 * AnyNRequired
 * ExactlyNRequired
-* MutuallyInclusive
 * OneOf
 
 ## Motivation

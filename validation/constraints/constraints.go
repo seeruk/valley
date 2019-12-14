@@ -26,6 +26,7 @@ var BuiltIn = map[string]valley.ConstraintGenerator{
 	"github.com/seeruk/valley/validation/constraints.Min":               minMaxGenerator(min),
 	"github.com/seeruk/valley/validation/constraints.MinLength":         lengthGenerator(lengthMin),
 	"github.com/seeruk/valley/validation/constraints.MutuallyExclusive": mutuallyExclusiveGenerator,
+	"github.com/seeruk/valley/validation/constraints.MutuallyInclusive": mutuallyInclusiveGenerator,
 	"github.com/seeruk/valley/validation/constraints.NotEquals":         notEqualsGenerator,
 	"github.com/seeruk/valley/validation/constraints.NotNil":            notNilGenerator,
 	"github.com/seeruk/valley/validation/constraints.Predicate":         predicateGenerator,
