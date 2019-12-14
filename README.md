@@ -6,6 +6,10 @@ Valley is tool for generating plain Go validation code based on your Go code.
 
 ...
 
+## Extending
+
+...
+
 ## Built-In Constraints
 
 The built-in constraints may be used in your code by importing:
