@@ -362,7 +362,7 @@ something with the correct package name.
 * The ability to define constraints in a separate file (in the same package).
 * The ability to attach multiple constraints methods to a type, that generate different validate
 functions (the `Valid` constraint would need an option to override which method is called).
-* Include other code that's unrecognised in the genarated `Validate` method? This would allow you to
+* Include other code that's unrecognised in the generated `Validate` method? This would allow you to
 write your own validation code, raw (but that would mean we'd have to pass `valley.Path` in too?)
 
 ## License
