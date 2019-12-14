@@ -22,6 +22,21 @@ be used.
 
 ---
 
+**DeepEquals**
+
+_Applicable to_: Fields
+
+_Description_: Values must be deeply equal (i.e. `reflect.DeepEqual`)
+
+_Usage_:
+
+```go
+t.Field(e.String).Constraints(constraints.DeepEquals("hello"))
+t.Field(e.Int).Constraints(constraints.DeepEquals(12))
+t.Field(e.Int).Constraints(constraints.DeepEquals(len(e.FloatSlice)*2))
+t.Field(e.FloatSlice).Elements(constraints.DeepEquals(math.Pi))
+```
+
 **Equals**
 
 _Applicable to_: Fields

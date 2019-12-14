@@ -40,6 +40,8 @@ func notEqualsGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr)
 		return output, fmt.Errorf("failed to render expression: %v", err)
 	}
 
+	output.Imports = CollectExprImports(ctx, opts[0])
+
 	output.Code = fmt.Sprintf(notEqualsFormat,
 		ctx.VarName,
 		value,
