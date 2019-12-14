@@ -306,6 +306,7 @@ that, the generated code also has to compile, further protecting you from runtim
 * Allow overriding field names in path using struct tags?
 * Proper import resolution, using `go list`? We can get the package name to guarantee we import
 something with the correct package name.
+* Add some unit tests...
 * Add some benchmarks to the README?
 * The ability to define constraints in a separate file (in the same package).
 * The ability to attach multiple constraints methods to a type, that generate different validate
