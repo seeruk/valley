@@ -41,7 +41,7 @@ func deepEqualsGenerator(ctx valley.Context, _ ast.Expr, opts []ast.Expr) (valle
 		Alias: "reflect",
 	})
 
-	output.Code = fmt.Sprintf(equalsFormat,
+	output.Code = fmt.Sprintf(deepEqualsFormat,
 		ctx.VarName,
 		value,
 		ctx.BeforeViolation,
