@@ -28,7 +28,7 @@ const mutuallyInclusiveFormat = `
 				PathKind: %q,
 				Message: "fields are mutually inclusive",
 				Details: map[string]interface{}{
-					"fields": nonEmpty,
+					"fields": %s,
 				},
 			})
 			%s
@@ -81,11 +81,21 @@ func mutuallyInclusiveGenerator(ctx valley.Context, fieldType ast.Expr, opts []a
 		}
 	}
 
+	quotedFields := make([]string, 0, len(fields))
+	for _, field := range fields {
+		quotedFields = append(quotedFields, fmt.Sprintf("%q", field))
+	}
+
+	fieldDetails := "[]string{"
+	fieldDetails += strings.Join(quotedFields, ", ")
+	fieldDetails += "}"
+
 	output.Code = fmt.Sprintf(mutuallyInclusiveFormat,
 		strings.Join(predicates, "\n\n"),
 		len(opts),
 		ctx.BeforeViolation,
 		ctx.PathKind,
+		fieldDetails,
 		ctx.AfterViolation,
 	)
 

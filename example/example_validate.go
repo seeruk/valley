@@ -73,7 +73,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 				PathKind: "struct",
 				Message:  "fields are mutually inclusive",
 				Details: map[string]interface{}{
-					"fields": nonEmpty,
+					"fields": []string{"Int", "Int2", "Ints"},
 				},
 			})
 
