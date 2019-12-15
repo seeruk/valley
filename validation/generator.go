@@ -62,7 +62,16 @@ func (g *Generator) Generate(config valley.Config, source valley.Source) ([]byte
 	fmt.Fprintf(buf, "package %s\n", source.Package)
 	fmt.Fprintln(buf)
 
+	imports := make([]valley.Import, 0, len(g.ipts))
 	for ipt := range g.ipts {
+		imports = append(imports, ipt)
+	}
+
+	sort.Slice(imports, func(i, j int) bool {
+		return imports[i].Path < imports[j].Path
+	})
+
+	for _, ipt := range imports {
 		if ipt.Alias != "" {
 			fmt.Fprintf(buf, "import %s \"%s\"\n", ipt.Alias, ipt.Path)
 		} else {
