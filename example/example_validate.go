@@ -345,16 +345,6 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		path.TruncateRight(size)
 	}
 
-	if strings.HasPrefix(e.Text, "custom") && len(e.Text) == 32 {
-		size := path.Write("Text")
-		violations = append(violations, valley.ConstraintViolation{
-			Path:     path.String(),
-			PathKind: "field",
-			Message:  "\"value must be a valid custom ID\"",
-		})
-		path.TruncateRight(size)
-	}
-
 	if len(e.Text) > 12 {
 		size := path.Write("Text")
 		violations = append(violations, valley.ConstraintViolation{
@@ -381,6 +371,16 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		path.TruncateRight(size)
 	}
 
+	if strings.HasPrefix(e.Text, "custom") && len(e.Text) == 32 {
+		size := path.Write("Text")
+		violations = append(violations, valley.ConstraintViolation{
+			Path:     path.String(),
+			PathKind: "field",
+			Message:  "\"value must be a valid custom ID\"",
+		})
+		path.TruncateRight(size)
+	}
+
 	if len(e.Text) > 32 {
 
 		if len(e.Text) == 0 {
@@ -401,19 +401,6 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 				Message:  "minimum length not met",
 				Details: map[string]interface{}{
 					"minimum": 64,
-				},
-			})
-			path.TruncateRight(size)
-		}
-
-		if e.Text != "bla" {
-			size := path.Write("Text")
-			violations = append(violations, valley.ConstraintViolation{
-				Path:     path.String(),
-				PathKind: "field",
-				Message:  "values must be equal",
-				Details: map[string]interface{}{
-					"equal_to": "bla",
 				},
 			})
 			path.TruncateRight(size)
