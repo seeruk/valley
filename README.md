@@ -35,6 +35,7 @@ Here's a quick list of all of the built-in constraints (more documentation below
 * MinLength
 * MutuallyExclusive
 * MutuallyInclusive
+* Nil
 * NotEquals
 * NotNil
 * Predicate
@@ -169,6 +170,20 @@ _Usage_:
 
 ```go
 t.Constraints(constraints.MutuallyInclusive(e.ReceiveMarketing, e.EmailAddress))
+```
+
+**Nil**
+
+_Applicable to_: Fields
+
+_Description_: Value must be nil.
+
+_Usage_:
+
+```go
+t.Field(e.SomePtr).Constraints(constraints.Nil())
+t.Field(e.SomeSlice).Constraints(constraints.Nil())
+t.Field(e.SomeInterface).Constraints(constraints.Nil())
 ```
 
 **NotEquals**
