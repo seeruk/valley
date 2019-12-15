@@ -24,7 +24,8 @@ const mutuallyExclusiveFormat = `
 		if len(nonEmpty) > 1 {
 			%s
 			violations = append(violations, valley.ConstraintViolation{
-				Field:   path.String(),
+				Path: path.String(),
+				PathKind: %q,
 				Message: "fields are mutually exclusive",
 				Details: map[string]interface{}{
 					"fields": nonEmpty,
@@ -83,6 +84,7 @@ func mutuallyExclusiveGenerator(ctx valley.Context, fieldType ast.Expr, opts []a
 	output.Code = fmt.Sprintf(mutuallyExclusiveFormat,
 		strings.Join(predicates, "\n\n"),
 		ctx.BeforeViolation,
+		ctx.PathKind,
 		ctx.AfterViolation,
 	)
 

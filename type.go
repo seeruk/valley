@@ -26,3 +26,8 @@ func (f Field) Constraints(_ ...Constraint) Field {
 func (f Field) Elements(_ ...Constraint) Field {
 	return f
 }
+
+// Keys accepts some constraints to generate code for, on the keys of a specific field.
+func (f Field) Keys(_ ...Constraint) Field {
+	return f
+}

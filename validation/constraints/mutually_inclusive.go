@@ -24,7 +24,8 @@ const mutuallyInclusiveFormat = `
 		if len(nonEmpty) > 0 && len(nonEmpty) != %d {
 			%s
 			violations = append(violations, valley.ConstraintViolation{
-				Field:   path.String(),
+				Path: path.String(),
+				PathKind: %q,
 				Message: "fields are mutually inclusive",
 				Details: map[string]interface{}{
 					"fields": nonEmpty,
@@ -84,6 +85,7 @@ func mutuallyInclusiveGenerator(ctx valley.Context, fieldType ast.Expr, opts []a
 		strings.Join(predicates, "\n\n"),
 		len(opts),
 		ctx.BeforeViolation,
+		ctx.PathKind,
 		ctx.AfterViolation,
 	)
 

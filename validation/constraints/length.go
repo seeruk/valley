@@ -23,21 +23,6 @@ func MinLength(min int) valley.Constraint {
 	return valley.Constraint{}
 }
 
-// lengthFormat is the format used for rendering a `Min` constraint.
-const lengthFormat = `
-	if %s {
-		%s
-		violations = append(violations, valley.ConstraintViolation{
-			Field:   path.String(),
-			Message: "%s",
-			Details: map[string]interface{}{
-				"%s": %s,
-			},
-		})
-		%s
-	}
-`
-
 // Possible lengthKind values.
 const (
 	lengthExact lengthKind = "exactly"
@@ -52,13 +37,11 @@ type lengthKind string
 func lengthGenerator(kind lengthKind) valley.ConstraintGenerator {
 	return func(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 		var output valley.ConstraintGeneratorOutput
-		var predicate string
+		var predicate, message, operator string
 
 		if len(opts) != 1 {
 			return output, errors.New("expected exactly one option")
 		}
-
-		output.Imports = CollectExprImports(ctx, opts[0])
 
 		// Render the expression passed as an argument to `Min`. We're relying on the fact that the code
 		// won't compile if this is configured incorrectly here.
@@ -79,8 +62,6 @@ func lengthGenerator(kind lengthKind) valley.ConstraintGenerator {
 			varName = "*" + varName
 		}
 
-		var message, operator string
-
 		switch kind {
 		case lengthExact:
 			message = "exact length not met"
@@ -94,15 +75,12 @@ func lengthGenerator(kind lengthKind) valley.ConstraintGenerator {
 		}
 
 		predicate += fmt.Sprintf("len(%s) %s %s", varName, operator, value)
+		details := map[string]interface{}{
+			string(kind): value,
+		}
 
-		output.Code = fmt.Sprintf(lengthFormat,
-			predicate,
-			ctx.BeforeViolation,
-			message,
-			kind,
-			value,
-			ctx.AfterViolation,
-		)
+		output.Imports = CollectExprImports(ctx, opts[0])
+		output.Code = GenerateStandardConstraint(ctx, predicate, message, details)
 
 		return output, lengthTypeCheck(fieldType)
 	}

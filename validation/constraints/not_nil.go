@@ -12,24 +12,13 @@ func NotNil() valley.Constraint {
 	return valley.Constraint{}
 }
 
-const notNilFormat = `
-	if %s == nil {
-		%s
-		violations = append(violations, valley.ConstraintViolation{
-			Field:   path.String(),
-			Message: "value must not be nil",
-		})
-		%s
-	}
-`
-
 // notNilGenerator ...
 func notNilGenerator(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	return valley.ConstraintGeneratorOutput{
-		Code: fmt.Sprintf(notNilFormat,
-			ctx.VarName,
-			ctx.BeforeViolation,
-			ctx.AfterViolation,
+		Code: GenerateStandardConstraint(ctx,
+			fmt.Sprintf("%s == nil", ctx.VarName),
+			"value must not be nil",
+			nil,
 		),
 	}, notNilTypeCheck(fieldType)
 }

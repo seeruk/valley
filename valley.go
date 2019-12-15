@@ -27,11 +27,23 @@ type ConstraintGeneratorOutput struct {
 	Code    string
 }
 
+// All possible PathKind values.
+const (
+	PathKindStruct  PathKind = "struct"
+	PathKindField   PathKind = "field"
+	PathKindElement PathKind = "element"
+	PathKindKey     PathKind = "key"
+)
+
+// PathKind enumerates possible path kinds that apply to constraint violations.
+type PathKind string
+
 // ConstraintViolation is the result of a validation failure.
 type ConstraintViolation struct {
-	Field   string                 `json:"field"`
-	Message string                 `json:"message"`
-	Details map[string]interface{} `json:"details,omitempty"`
+	Path     string                 `json:"path,omitempty"`
+	PathKind string                 `json:"path_kind"`
+	Message  string                 `json:"message"`
+	Details  map[string]interface{} `json:"details,omitempty"`
 }
 
 // Context is used to inform a ConstraintGenerator about it's environment, mainly to do with which
@@ -43,6 +55,7 @@ type Context struct {
 	FieldName string
 	VarName   string
 	Path      string
+	PathKind  PathKind
 
 	Constraint      string
 	ConstraintNum   int

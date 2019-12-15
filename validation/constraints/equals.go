@@ -13,20 +13,6 @@ func Equals(_ interface{}) valley.Constraint {
 	return valley.Constraint{}
 }
 
-const equalsFormat = `
-	if %[1]s != %[2]s {
-		%[3]s
-		violations = append(violations, valley.ConstraintViolation{
-			Field:   path.String(),
-			Message: "values must be equal",
-			Details: map[string]interface{}{
-				"equal_to": %[2]s,
-			},
-		})
-		%[4]s
-	}
-`
-
 // equalsGenerator ...
 func equalsGenerator(ctx valley.Context, _ ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	var output valley.ConstraintGeneratorOutput
@@ -40,14 +26,14 @@ func equalsGenerator(ctx valley.Context, _ ast.Expr, opts []ast.Expr) (valley.Co
 		return output, fmt.Errorf("failed to render expression: %v", err)
 	}
 
-	output.Imports = CollectExprImports(ctx, opts[0])
+	predicate := fmt.Sprintf("%s != %s", ctx.VarName, value)
+	message := "values must be equal"
+	details := map[string]interface{}{
+		"equal_to": fmt.Sprintf("%v", value),
+	}
 
-	output.Code = fmt.Sprintf(equalsFormat,
-		ctx.VarName,
-		value,
-		ctx.BeforeViolation,
-		ctx.AfterViolation,
-	)
+	output.Imports = CollectExprImports(ctx, opts[0])
+	output.Code = GenerateStandardConstraint(ctx, predicate, message, details)
 
 	return output, nil
 }

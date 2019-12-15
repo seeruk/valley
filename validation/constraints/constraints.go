@@ -2,6 +2,7 @@ package constraints
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"go/ast"
 	"go/printer"
@@ -40,6 +41,14 @@ var BuiltIn = map[string]valley.ConstraintGenerator{
 	"github.com/seeruk/valley/validation/constraints.Valid":             validGenerator,
 }
 
+var (
+	// ErrTypeWarning is an error returned when a constraint might have been used on an unsupported
+	// type. Some constraints may choose to be permissive and continue anyway. This error will only
+	// result in a warning being printed. It's up to the constraint if it halts constraint
+	// generation (i.e. if that constraint will produce no code, but execution will continue...)
+	ErrTypeWarning = errors.New("type used may not produce valid code (is it a custom type?)")
+)
+
 // GenerateEmptinessPredicate ...
 func GenerateEmptinessPredicate(varName string, fieldType ast.Expr) (string, []valley.Import) {
 	switch expr := fieldType.(type) {
@@ -60,6 +69,40 @@ func GenerateEmptinessPredicate(varName string, fieldType ast.Expr) (string, []v
 	// case. There are more efficient things that a consumer of Valley can do, but this is easy, and
 	// also powers MutuallyExclusive, etc.
 	return fmt.Sprintf("reflect.ValueOf(%s).IsZero()", varName), []valley.Import{{Path: "reflect"}}
+}
+
+// GenerateStandardConstraint ...
+func GenerateStandardConstraint(ctx valley.Context, predicate, message string, details map[string]interface{}) string {
+	constraintFormat := `
+		if %s {
+			%s
+			violations = append(violations, valley.ConstraintViolation{
+				Path: path.String(),
+				PathKind: %q,
+				Message: %q,
+				%s
+			})
+			%s
+		}
+	`
+
+	var detailsCode string
+	if len(details) > 0 {
+		detailsCode += "Details: map[string]interface{}{\n"
+		for k, v := range details {
+			detailsCode += fmt.Sprintf("%q: %v,\n", k, v)
+		}
+		detailsCode += "},\n"
+	}
+
+	return fmt.Sprintf(constraintFormat,
+		predicate,
+		ctx.BeforeViolation,
+		ctx.PathKind,
+		message,
+		detailsCode,
+		ctx.AfterViolation,
+	)
 }
 
 // GenerateVariableName ...

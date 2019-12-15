@@ -21,6 +21,7 @@ type TypeConfig struct {
 type FieldConfig struct {
 	Constraints []ConstraintConfig `json:"constraints"`
 	Elements    []ConstraintConfig `json:"elements"`
+	Keys        []ConstraintConfig `json:"keys"`
 }
 
 // ConstraintConfig represents the configuration passed to a ConstraintGenerator to generate some

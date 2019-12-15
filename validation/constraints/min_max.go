@@ -18,21 +18,6 @@ func Min(min int) valley.Constraint {
 	return valley.Constraint{}
 }
 
-// minMaxFormat is the format used for rendering a `Min` or `Max` constraint.
-const minMaxFormat = `
-	if %s {
-		%s
-		violations = append(violations, valley.ConstraintViolation{
-			Field:   path.String(),
-			Message: "%s",
-			Details: map[string]interface{}{
-				"%s": %s,
-			},
-		})
-		%s
-	}
-`
-
 // Possible minMaxKind values.
 const (
 	max minMaxKind = "maximum"
@@ -51,8 +36,6 @@ func minMaxGenerator(kind minMaxKind) valley.ConstraintGenerator {
 		if len(opts) != 1 {
 			return output, errors.New("expected exactly one option")
 		}
-
-		output.Imports = CollectExprImports(ctx, opts[0])
 
 		// Render the expression passed as an argument to `Min`. We're relying on the fact that the code
 		// won't compile if this is configured incorrectly here.
@@ -79,15 +62,12 @@ func minMaxGenerator(kind minMaxKind) valley.ConstraintGenerator {
 		}
 
 		predicate += fmt.Sprintf("%s %s %s", varName, operator, value)
+		details := map[string]interface{}{
+			string(kind): value,
+		}
 
-		output.Code = fmt.Sprintf(minMaxFormat,
-			predicate,
-			ctx.BeforeViolation,
-			message,
-			kind,
-			value,
-			ctx.AfterViolation,
-		)
+		output.Imports = CollectExprImports(ctx, opts[0])
+		output.Code = GenerateStandardConstraint(ctx, predicate, message, details)
 
 		return output, minMaxTypeCheck(fieldType)
 	}

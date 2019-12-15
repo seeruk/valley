@@ -19,21 +19,6 @@ func TimeStringBefore(before string) valley.Constraint {
 	return valley.Constraint{}
 }
 
-// timeStringFormat is the format used for rendering a `TimeStringAfter` or `TimeStringBefore` constraint.
-const timeStringFormat = `
-	if %s {
-		%s
-		violations = append(violations, valley.ConstraintViolation{
-			Field:   path.String(),
-			Message: "%s",
-			Details: map[string]interface{}{
-				"time": %s.Format(time.RFC3339),
-			},
-		})
-		%s
-	}
-`
-
 // Possible timeStringKind values.
 const (
 	timeStringAfter  timeStringKind = "after"
@@ -47,18 +32,11 @@ type timeStringKind string
 func timeStringGenerator(kind timeStringKind) valley.ConstraintGenerator {
 	return func(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 		var output valley.ConstraintGeneratorOutput
-		var message string
-		var predicate string
+		var predicate, message string
 
 		if len(opts) != 1 {
 			return output, errors.New("expected exactly one option")
 		}
-
-		output.Imports = CollectExprImports(ctx, opts[0])
-		output.Imports = append(output.Imports, valley.Import{
-			Path:  "time",
-			Alias: "time",
-		})
 
 		timeString, err := SprintNode(ctx.Source.FileSet, opts[0])
 		if err != nil {
@@ -88,13 +66,17 @@ func timeStringGenerator(kind timeStringKind) valley.ConstraintGenerator {
 			predicate += fmt.Sprintf("!%s.Before(%s)", varName, timeVarName)
 		}
 
-		output.Code = fmt.Sprintf(timeStringFormat,
-			predicate,
-			ctx.BeforeViolation,
-			message,
-			timeVarName,
-			ctx.AfterViolation,
-		)
+		details := map[string]interface{}{
+			"time": fmt.Sprintf("%s.Format(time.RFC3339)", timeVarName),
+		}
+
+		output.Imports = CollectExprImports(ctx, opts[0])
+		output.Imports = append(output.Imports, valley.Import{
+			Path:  "time",
+			Alias: "time",
+		})
+
+		output.Code = GenerateStandardConstraint(ctx, predicate, message, details)
 
 		return output, timeStringTypeCheck(fieldType)
 	}

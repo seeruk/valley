@@ -13,20 +13,6 @@ func RegexpString(regexp string) valley.Constraint {
 	return valley.Constraint{}
 }
 
-const regexpStringFormat = `
-	if %s {
-		%s
-		violations = append(violations, valley.ConstraintViolation{
-			Field:   path.String(),
-			Message: "value must match regular expression",
-			Details: map[string]interface{}{
-				"regexp": %s.String(),
-			},
-		})
-		%s
-	}
-`
-
 // regexpStringGenerator ...
 func regexpStringGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	var output valley.ConstraintGeneratorOutput
@@ -35,12 +21,6 @@ func regexpStringGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Ex
 	if len(opts) != 1 {
 		return output, errors.New("expected exactly one option")
 	}
-
-	output.Imports = CollectExprImports(ctx, opts[0])
-	output.Imports = append(output.Imports, valley.Import{
-		Path:  "regexp",
-		Alias: "regexp",
-	})
 
 	pattern, err := SprintNode(ctx.Source.FileSet, opts[0])
 	if err != nil {
@@ -64,13 +44,18 @@ func regexpStringGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Ex
 	}
 
 	predicate += fmt.Sprintf("!%s.MatchString(%s)", patternVarName, varName)
+	message := "value must match regular expression"
+	details := map[string]interface{}{
+		"regexp": fmt.Sprintf("%s.String()", patternVarName),
+	}
 
-	output.Code = fmt.Sprintf(regexpStringFormat,
-		predicate,
-		ctx.BeforeViolation,
-		patternVarName,
-		ctx.AfterViolation,
-	)
+	output.Imports = CollectExprImports(ctx, opts[0])
+	output.Imports = append(output.Imports, valley.Import{
+		Path:  "regexp",
+		Alias: "regexp",
+	})
+
+	output.Code = GenerateStandardConstraint(ctx, predicate, message, details)
 
 	return output, regexpStringTypeCheck(fieldType)
 }

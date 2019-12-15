@@ -116,6 +116,7 @@ func buildTypeConfig(src valley.Source, method valley.Method) (valley.TypeConfig
 				existingConfig := config.Fields[fieldName]
 				existingConfig.Constraints = append(existingConfig.Constraints, fieldConfig.Constraints...)
 				existingConfig.Elements = append(existingConfig.Elements, fieldConfig.Elements...)
+				existingConfig.Keys = append(existingConfig.Keys, fieldConfig.Keys...)
 				config.Fields[fieldName] = existingConfig
 
 				// Field doesn't return Type, so there can be no further method calls.
@@ -200,6 +201,8 @@ func buildFieldConfig(src valley.Source, fieldMethodNode *callExprNode) (valley.
 			config.Constraints = append(config.Constraints, constraintConfig)
 		case "Elements":
 			config.Elements = append(config.Elements, constraintConfig)
+		case "Keys":
+			config.Keys = append(config.Keys, constraintConfig)
 		}
 	}
 
@@ -211,6 +214,7 @@ func buildFieldConfig(src valley.Source, fieldMethodNode *callExprNode) (valley.
 
 		config.Constraints = append(config.Constraints, nextConfig.Constraints...)
 		config.Elements = append(config.Elements, nextConfig.Elements...)
+		config.Keys = append(config.Keys, nextConfig.Keys...)
 	}
 
 	return config, nil

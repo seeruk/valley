@@ -24,9 +24,9 @@ func validGenerator(ctx valley.Context, fieldType ast.Expr, _ []ast.Expr) (valle
 		fmt.Fprintf(buf, "if %s != nil {\n", ctx.VarName)
 	}
 
-	fmt.Fprintf(buf, "%s\n", ctx.BeforeViolation)
+	fmt.Fprintln(buf, ctx.BeforeViolation)
 	fmt.Fprintf(buf, "violations = append(violations, %s.Validate(path)...)\n", ctx.VarName)
-	fmt.Fprintf(buf, "%s\n", ctx.AfterViolation)
+	fmt.Fprintln(buf, ctx.AfterViolation)
 
 	// If we have a pointer to a struct, unpack it and write an if statement.
 	if isPointer {
