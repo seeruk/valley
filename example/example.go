@@ -68,6 +68,10 @@ func (e Example) Constraints(t valley.Type) {
 	t.Field(e.Children).Constraints(constraints.Min(0), constraints.Equals(e.Adults+2)).
 		Constraints(constraints.Max(int(math.Max(float64(8-(e.Adults-1)), 0))))
 
+	// Conditional constraints.
+	t.When(len(e.Text) > 32).Field(e.Text).
+		Constraints(constraints.Required(), constraints.MinLength(64))
+
 	// Nested constraints to be called.
 	t.Field(e.Nested).Constraints(constraints.Required(), constraints.Valid())
 	t.Field(e.Nesteds).Elements(constraints.Valid())

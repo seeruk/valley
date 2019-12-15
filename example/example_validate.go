@@ -381,6 +381,46 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		path.TruncateRight(size)
 	}
 
+	if len(e.Text) > 32 {
+
+		if len(e.Text) == 0 {
+			size := path.Write("Text")
+			violations = append(violations, valley.ConstraintViolation{
+				Path:     path.String(),
+				PathKind: "field",
+				Message:  "a value is required",
+			})
+			path.TruncateRight(size)
+		}
+
+		if len(e.Text) < 64 {
+			size := path.Write("Text")
+			violations = append(violations, valley.ConstraintViolation{
+				Path:     path.String(),
+				PathKind: "field",
+				Message:  "minimum length not met",
+				Details: map[string]interface{}{
+					"minimum": 64,
+				},
+			})
+			path.TruncateRight(size)
+		}
+
+		if e.Text != "bla" {
+			size := path.Write("Text")
+			violations = append(violations, valley.ConstraintViolation{
+				Path:     path.String(),
+				PathKind: "field",
+				Message:  "values must be equal",
+				Details: map[string]interface{}{
+					"equal_to": "bla",
+				},
+			})
+			path.TruncateRight(size)
+		}
+
+	}
+
 	if len(e.TextMap) == 0 {
 		size := path.Write("TextMap")
 		violations = append(violations, valley.ConstraintViolation{

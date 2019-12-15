@@ -14,6 +14,12 @@ func (t Type) Field(_ interface{}) Field {
 	return Field{}
 }
 
+// When accepts a predicate which will be used to wrap generated code to conditionally apply
+// constraints.
+func (t Type) When(_ bool) Type {
+	return t
+}
+
 // Field represents the options for adding constraints to fields on a type.
 type Field struct{}
 

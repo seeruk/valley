@@ -18,10 +18,11 @@ func main() {
 
 	int2 := 12
 
+	example.Bool = true
 	example.Int = 5
 	example.Int2 = &int2
 	example.Ints = []int{1, 2, 3, 4}
-	example.Text = "text"
+	example.Text = "osdfjso i js"
 	//example.Texts = []string{"text 1", "text 2"}
 	//
 	example.TextMap = map[string]string{

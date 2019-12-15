@@ -131,21 +131,17 @@ func (g *Generator) generateType(config valley.Config, source valley.Source, typ
 		TypeName: typeName,
 		Receiver: receiver,
 		VarName:  receiver,
+		PathKind: valley.PathKindStruct,
 	}
 
-	for _, constraint := range typ.Constraints {
-		value := valley.Value{
-			Name: s.Name,
-			Type: s.Node,
-		}
+	value := valley.Value{
+		Name: s.Name,
+		Type: s.Node,
+	}
 
-		ctx := ctx.Clone()
-		ctx.PathKind = valley.PathKindStruct
-
-		err := g.generateConstraint(ctx, constraint, value)
-		if err != nil {
-			return err
-		}
+	err := g.generateConstraints(ctx, typ.Constraints, value)
+	if err != nil {
+		return err
 	}
 
 	fieldNames := make([]string, 0, len(typ.Fields))
@@ -212,12 +208,9 @@ func (g *Generator) generateFieldConstraints(ctx valley.Context, fieldConfig val
 	ctx = ctx.Clone()
 	ctx.PathKind = valley.PathKindField
 
-	// Generate the constraint code for the field as a whole.
-	for _, constraintConfig := range fieldConfig.Constraints {
-		err := g.generateConstraint(ctx, constraintConfig, value)
-		if err != nil {
-			return err
-		}
+	err := g.generateConstraints(ctx, fieldConfig.Constraints, value)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -233,39 +226,37 @@ func (g *Generator) generateFieldElementsConstraints(ctx valley.Context, fieldCo
 	// TODO: This output might look a bit weird for maps?
 	g.wcf("	for i, element := range %s {\n", ctx.VarName)
 
-	for _, constraintConfig := range fieldConfig.Elements {
-		elementValue := ctx.Clone()
-		elementValue.VarName = "element"
-		elementValue.PathKind = valley.PathKindElement
+	elementCtx := ctx.Clone()
+	elementCtx.VarName = "element"
+	elementCtx.PathKind = valley.PathKindElement
 
-		var elementType ast.Expr
+	var elementType ast.Expr
 
-		// TODO: Can we get rid of this switch... or not return an error in the default statement?
-		// This would allow `Elements` to be used on any type, including ones Valley is unaware of.
-		switch t := value.Type.(type) {
-		case *ast.ArrayType:
-			elementType = t.Elt
-			elementValue.Path = fmt.Sprintf("\"%s.[\" + strconv.Itoa(i) + \"]\"", elementValue.FieldName)
-		case *ast.MapType:
-			elementType = t.Value
-			// TODO: Does this work well for non-string types?
-			elementValue.Path = fmt.Sprintf("\"%s.[\" + fmt.Sprintf(\"%%v\", i) + \"]\"", elementValue.FieldName)
-		default:
-			return errors.New("config for elements applied to non-iterable type")
-		}
+	// TODO: Can we get rid of this switch... or not return an error in the default statement?
+	// This would allow `Elements` to be used on any type, including ones Valley is unaware of.
+	switch t := value.Type.(type) {
+	case *ast.ArrayType:
+		elementType = t.Elt
+		elementCtx.Path = fmt.Sprintf("\"%s.[\" + strconv.Itoa(i) + \"]\"", elementCtx.FieldName)
+	case *ast.MapType:
+		elementType = t.Value
+		// TODO: Does this work well for non-string types?
+		elementCtx.Path = fmt.Sprintf("\"%s.[\" + fmt.Sprintf(\"%%v\", i) + \"]\"", elementCtx.FieldName)
+	default:
+		return errors.New("config for elements applied to non-iterable type")
+	}
 
-		// Set up the path writing, now we have everything we need.
-		elementValue.BeforeViolation = fmt.Sprintf("size := path.Write(%s)", elementValue.Path)
+	// Set up the path writing, now we have everything we need.
+	elementCtx.BeforeViolation = fmt.Sprintf("size := path.Write(%s)", elementCtx.Path)
 
-		elementField := valley.Value{
-			Name: value.Name,
-			Type: elementType,
-		}
+	elementField := valley.Value{
+		Name: value.Name,
+		Type: elementType,
+	}
 
-		err := g.generateConstraint(elementValue, constraintConfig, elementField)
-		if err != nil {
-			return err
-		}
+	err := g.generateConstraints(elementCtx, fieldConfig.Elements, elementField)
+	if err != nil {
+		return err
 	}
 
 	g.wc("	}\n\n")
@@ -283,46 +274,78 @@ func (g *Generator) generateFieldKeysConstraints(ctx valley.Context, fieldConfig
 	// TODO: This output might look a bit weird for maps?
 	g.wcf("	for key := range %s {\n", ctx.VarName)
 
-	for _, constraintConfig := range fieldConfig.Keys {
-		keyValue := ctx.Clone()
-		keyValue.VarName = "key"
-		keyValue.PathKind = valley.PathKindKey
+	keyCtx := ctx.Clone()
+	keyCtx.VarName = "key"
+	keyCtx.PathKind = valley.PathKindKey
 
-		var keyType ast.Expr
+	var keyType ast.Expr
 
-		// TODO: Can we get rid of this switch... or not return an error in the default statement?
-		// This would allow `Keys` to be used on any type, including ones Valley is unaware of.
-		switch t := value.Type.(type) {
-		case *ast.ArrayType:
-			// Attempt to create type for the key...
-			keyType = &ast.Ident{
-				NamePos: t.Lbrack + 1, // TODO: Does this work?
-				Name:    "int",
-			}
-			keyValue.Path = fmt.Sprintf("\"%s.[\" + strconv.Itoa(key) + \"]\"", keyValue.FieldName)
-		case *ast.MapType:
-			keyType = t.Key
-			// TODO: Does this work well for non-string types?
-			keyValue.Path = fmt.Sprintf("\"%s.[\" + fmt.Sprintf(\"%%v\", key) + \"]\"", keyValue.FieldName)
-		default:
-			return errors.New("config for keys applied to non-iterable type")
+	// TODO: Can we get rid of this switch... or not return an error in the default statement?
+	// This would allow `Keys` to be used on any type, including ones Valley is unaware of.
+	switch t := value.Type.(type) {
+	case *ast.ArrayType:
+		// Attempt to create type for the key...
+		keyType = &ast.Ident{
+			NamePos: t.Lbrack + 1, // TODO: Does this work?
+			Name:    "int",
 		}
+		keyCtx.Path = fmt.Sprintf("\"%s.[\" + strconv.Itoa(key) + \"]\"", keyCtx.FieldName)
+	case *ast.MapType:
+		keyType = t.Key
+		// TODO: Does this work well for non-string types?
+		keyCtx.Path = fmt.Sprintf("\"%s.[\" + fmt.Sprintf(\"%%v\", key) + \"]\"", keyCtx.FieldName)
+	default:
+		return errors.New("config for keys applied to non-iterable type")
+	}
 
-		// Set up the path writing, now we have everything we need.
-		keyValue.BeforeViolation = fmt.Sprintf("size := path.Write(%s)", keyValue.Path)
+	// Set up the path writing, now we have everything we need.
+	keyCtx.BeforeViolation = fmt.Sprintf("size := path.Write(%s)", keyCtx.Path)
+	keyField := valley.Value{
+		Name: value.Name,
+		Type: keyType,
+	}
 
-		keyField := valley.Value{
-			Name: value.Name,
-			Type: keyType,
-		}
-
-		err := g.generateConstraint(keyValue, constraintConfig, keyField)
-		if err != nil {
-			return err
-		}
+	err := g.generateConstraints(keyCtx, fieldConfig.Keys, keyField)
+	if err != nil {
+		return err
 	}
 
 	g.wc("	}\n\n")
+
+	return nil
+}
+
+// generateConstraints ...
+func (g *Generator) generateConstraints(ctx valley.Context, constraintConfigs []valley.ConstraintConfig, value valley.Value) error {
+	var predicate ast.Expr
+
+	for i, constraintConfig := range constraintConfigs {
+		if constraintConfig.Predicate != nil && constraintConfig.Predicate != predicate {
+			// If we have a predicate, keep it around so we can re-use the surrounding if statement.
+			predicate = constraintConfig.Predicate
+
+			predicateCode, err := constraints.SprintNode(ctx.Source.FileSet, predicate)
+			if err != nil {
+				return err
+			}
+
+			g.wcf("if %s {\n", predicateCode)
+		} else if constraintConfig.Predicate == nil {
+			// Reset.
+			predicate = nil
+		}
+
+		err := g.generateConstraint(ctx, constraintConfig, value)
+		if err != nil {
+			return err
+		}
+
+		// If we're in a predicate, but we're either the last constraint, or the next constraint has
+		// a different predicate, end this one.
+		if predicate != nil && (i >= len(constraintConfigs)-1 || constraintConfigs[i+1].Predicate != predicate) {
+			g.wc("}\n")
+		}
+	}
 
 	return nil
 }

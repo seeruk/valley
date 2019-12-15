@@ -17,7 +17,7 @@ func BenchmarkRequired(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		if len(ints) == 0 {
 			violations[0] = valley.ConstraintViolation{
-				Field:   "test",
+				Path:    "test",
 				Message: "a value is required",
 			}
 		}

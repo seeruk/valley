@@ -366,8 +366,6 @@ that, the generated code also has to compile, further protecting you from runtim
 
 ## TODO
 
-* Constraints that only apply `When` some predicate is true.
-    * Which then makes some other constraints make a bit more sense, e.g. `Nil`.
 * Allow overriding field names in path using struct tags?
 * Proper import resolution, using `go list`? We can get the package name to guarantee we import
 something with the correct package name.

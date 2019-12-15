@@ -27,7 +27,8 @@ type FieldConfig struct {
 // ConstraintConfig represents the configuration passed to a ConstraintGenerator to generate some
 // code. It's used throughout the configuration structure.
 type ConstraintConfig struct {
-	Name string     `json:"name"`
-	Opts []ast.Expr `json:"opts"`
-	Pos  token.Pos
+	Predicate ast.Expr
+	Name      string     `json:"name"`
+	Opts      []ast.Expr `json:"opts"`
+	Pos       token.Pos
 }

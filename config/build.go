@@ -44,6 +44,8 @@ func buildTypeConfig(src valley.Source, method valley.Method) (valley.TypeConfig
 	}
 
 	for _, stmt := range method.Body.List {
+		var predicate ast.Expr
+
 		exprStmt, ok := stmt.(*ast.ExprStmt)
 		if !ok {
 			warnOn(src, stmt.Pos(), "skipping line that is not a statement")
@@ -96,7 +98,7 @@ func buildTypeConfig(src valley.Source, method valley.Method) (valley.TypeConfig
 			// Handle the different possible methods chained off of the Type type.
 			switch typeMethodFunc.Sel.Name {
 			case "Constraints":
-				constraints, err := buildConstraintsCall(src, typeMethod)
+				constraints, err := buildConstraintsCall(src, predicate, typeMethod)
 				if err != nil {
 					return config, err
 				}
@@ -107,7 +109,7 @@ func buildTypeConfig(src valley.Source, method valley.Method) (valley.TypeConfig
 				// Set up the next call, if there is one.
 				typeMethod = typeMethod.Next
 			case "Field":
-				fieldName, fieldConfig, err := buildFieldsCall(src, method, typeMethod)
+				fieldName, fieldConfig, err := buildFieldsCall(src, method, predicate, typeMethod)
 				if err != nil {
 					return config, err
 				}
@@ -121,6 +123,13 @@ func buildTypeConfig(src valley.Source, method valley.Method) (valley.TypeConfig
 
 				// Field doesn't return Type, so there can be no further method calls.
 				typeMethod = nil
+			case "When":
+				if len(typeMethodCall.Args) != 1 {
+					return config, errorOn(src, typeMethod.Call.Pos(), "exactly one argument should be passed to When")
+				}
+
+				predicate = typeMethodCall.Args[0]
+				typeMethod = typeMethod.Next
 			}
 		}
 	}
@@ -129,11 +138,11 @@ func buildTypeConfig(src valley.Source, method valley.Method) (valley.TypeConfig
 }
 
 // buildConstraintsCall ...
-func buildConstraintsCall(src valley.Source, typeMethod *callExprNode) ([]valley.ConstraintConfig, error) {
+func buildConstraintsCall(src valley.Source, predicate ast.Expr, typeMethod *callExprNode) ([]valley.ConstraintConfig, error) {
 	var configs []valley.ConstraintConfig
 
 	for _, expr := range typeMethod.Call.Args {
-		constraintConfig, err := buildConstraintConfig(src, expr)
+		constraintConfig, err := buildConstraintConfig(src, predicate, expr)
 		if err != nil {
 			return nil, err
 		}
@@ -145,7 +154,7 @@ func buildConstraintsCall(src valley.Source, typeMethod *callExprNode) ([]valley
 }
 
 // buildFieldsCall ...
-func buildFieldsCall(src valley.Source, method valley.Method, typeMethod *callExprNode) (string, valley.FieldConfig, error) {
+func buildFieldsCall(src valley.Source, method valley.Method, predicate ast.Expr, typeMethod *callExprNode) (string, valley.FieldConfig, error) {
 	var config valley.FieldConfig
 
 	if len(typeMethod.Call.Args) != 1 {
@@ -172,7 +181,7 @@ func buildFieldsCall(src valley.Source, method valley.Method, typeMethod *callEx
 		return "", config, errorOn(src, fieldArg.Pos(), "value passed to Field should field on the receiver's type")
 	}
 
-	fieldConfig, err := buildFieldConfig(src, typeMethod.Next)
+	fieldConfig, err := buildFieldConfig(src, predicate, typeMethod.Next)
 	if err != nil {
 		return "", config, err
 	}
@@ -181,13 +190,13 @@ func buildFieldsCall(src valley.Source, method valley.Method, typeMethod *callEx
 }
 
 // buildFieldConfig ...
-func buildFieldConfig(src valley.Source, fieldMethodNode *callExprNode) (valley.FieldConfig, error) {
+func buildFieldConfig(src valley.Source, predicate ast.Expr, fieldMethodNode *callExprNode) (valley.FieldConfig, error) {
 	var config valley.FieldConfig
 
 	for _, expr := range fieldMethodNode.Call.Args {
 		// The "expr" here is the argument being passed to a method on the valley.Field type, in
 		// other words, we expect each of these arguments to be a constraint.
-		constraintConfig, err := buildConstraintConfig(src, expr)
+		constraintConfig, err := buildConstraintConfig(src, predicate, expr)
 		if err != nil {
 			return config, err
 		}
@@ -207,7 +216,7 @@ func buildFieldConfig(src valley.Source, fieldMethodNode *callExprNode) (valley.
 	}
 
 	if fieldMethodNode.Next != nil {
-		nextConfig, err := buildFieldConfig(src, fieldMethodNode.Next)
+		nextConfig, err := buildFieldConfig(src, predicate, fieldMethodNode.Next)
 		if err != nil {
 			return config, err
 		}
@@ -252,8 +261,10 @@ func buildCallExpr(src valley.Source, outer ast.Expr) (*callExprNode, error) {
 }
 
 // buildConstraintConfig ...
-func buildConstraintConfig(src valley.Source, expr ast.Expr) (valley.ConstraintConfig, error) {
+func buildConstraintConfig(src valley.Source, predicate, expr ast.Expr) (valley.ConstraintConfig, error) {
 	var config valley.ConstraintConfig
+
+	config.Predicate = predicate
 
 	constraintCall, ok := expr.(*ast.CallExpr)
 	if !ok {
