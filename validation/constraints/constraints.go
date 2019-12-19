@@ -22,6 +22,7 @@ var BuiltIn = map[string]valley.ConstraintGenerator{
 	"github.com/seeruk/valley/validation/constraints.AnyNRequired":      anyNRequiredGenerator,
 	"github.com/seeruk/valley/validation/constraints.DeepEquals":        deepEqualsGenerator,
 	"github.com/seeruk/valley/validation/constraints.Equals":            equalsGenerator,
+	"github.com/seeruk/valley/validation/constraints.ExactlyNRequired":  exactlyNRequiredGenerator,
 	"github.com/seeruk/valley/validation/constraints.Length":            lengthGenerator(lengthExact),
 	"github.com/seeruk/valley/validation/constraints.Max":               minMaxGenerator(max),
 	"github.com/seeruk/valley/validation/constraints.MaxLength":         lengthGenerator(lengthMax),

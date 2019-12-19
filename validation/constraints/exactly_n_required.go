@@ -9,24 +9,24 @@ import (
 	"github.com/seeruk/valley"
 )
 
-// AnyNRequired ...
-func AnyNRequired(n int, fields ...interface{}) valley.Constraint {
+// ExactlyNRequired ...
+func ExactlyNRequired(n int, fields ...interface{}) valley.Constraint {
 	return valley.Constraint{}
 }
 
-const anyNRequiredFormat = `
+const exactlyNRequiredFormat = `
 	{
-		// AnyNRequired uses it's own block to lock down nonEmpty's scope.
+		// ExactlyNRequired uses it's own block to lock down nonEmpty's scope.
 		var nonEmpty []string
 
 		%s
 
-		if len(nonEmpty) < %s {
+		if len(nonEmpty) != %s {
 			%s
 			violations = append(violations, valley.ConstraintViolation{
 				Path: path.String(),
 				PathKind: %q,
-				Message: "minimum number of required fields not met",
+				Message: "exact number of required fields not met",
 				Details: map[string]interface{}{
 					"num_required": %s,
 					"fields": %s,
@@ -37,8 +37,8 @@ const anyNRequiredFormat = `
 	}
 `
 
-// anyNRequiredGenerator ...
-func anyNRequiredGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
+// exactlyNRequiredGenerator ...
+func exactlyNRequiredGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	var output valley.ConstraintGeneratorOutput
 	var fields []string
 
@@ -48,7 +48,7 @@ func anyNRequiredGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Ex
 
 	structType, ok := fieldType.(*ast.StructType)
 	if !ok {
-		return output, fmt.Errorf("`AnyNRequired` applied to non-struct type")
+		return output, fmt.Errorf("`ExactlyNRequired` applied to non-struct type")
 	}
 
 	numRequiredExpr := opts[0]
@@ -62,12 +62,12 @@ func anyNRequiredGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Ex
 
 		selector, ok := opt.(*ast.SelectorExpr)
 		if !ok {
-			return output, fmt.Errorf("value passed to `AnyNRequired` is not a field selector on line %d, col %d", pos.Line, pos.Column)
+			return output, fmt.Errorf("value passed to `ExactlyNRequired` is not a field selector on line %d, col %d", pos.Line, pos.Column)
 		}
 
 		selectorOn, ok := selector.X.(*ast.Ident)
 		if !ok || selectorOn.Name != ctx.Receiver {
-			return output, fmt.Errorf("value passed to `AnyNRequired is not a field on receiver type on line %d, col %d", pos.Line, pos.Column)
+			return output, fmt.Errorf("value passed to `ExactlyNRequired is not a field on receiver type on line %d, col %d", pos.Line, pos.Column)
 		}
 
 		fields = append(fields, selector.Sel.Name)
@@ -101,7 +101,7 @@ func anyNRequiredGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Ex
 	fieldDetails += strings.Join(quotedFields, ", ")
 	fieldDetails += "}"
 
-	output.Code = fmt.Sprintf(anyNRequiredFormat,
+	output.Code = fmt.Sprintf(exactlyNRequiredFormat,
 		strings.Join(predicates, "\n\n"),
 		numRequired,
 		ctx.BeforeViolation,

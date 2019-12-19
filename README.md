@@ -29,6 +29,7 @@ Here's a quick list of all of the built-in constraints (more documentation below
 * AnyNRequired
 * DeepEquals
 * Equals
+* ExactlyNRequired
 * Length
 * Max
 * MaxLength
@@ -92,6 +93,19 @@ t.Field(e.String).Constraints(constraints.Equals("hello"))
 t.Field(e.Int).Constraints(constraints.Equals(12))
 t.Field(e.Int).Constraints(constraints.Equals(len(e.FloatSlice)*2))
 t.Field(e.FloatSlice).Elements(constraints.Equals(math.Pi))
+```
+
+**ExactlyNRequired**
+
+_Applicable to_: Structs
+
+_Description_: Exactly `n` of the given fields must not be empty (uses the same logic as the
+`Required` constraint).
+
+_Usage_:
+
+```go
+t.Constraints(constraints.ExactlyNRequired(1, v.HomePhone, v.MobilePhone, v.WorkPhone))
 ```
 
 **Length**
@@ -388,7 +402,6 @@ write your own validation code, raw (but that would mean we'd have to pass `vall
 
 ### Upcoming Constraints
 
-* ExactlyNRequired
 * OneOf
 
 ## License
