@@ -17,6 +17,7 @@ func main() {
 	example.Children = 8
 
 	int2 := 12
+	_ = int2
 
 	example.Bool = true
 	example.Int = 5

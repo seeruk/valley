@@ -43,6 +43,7 @@ func (e Example) Constraints(t valley.Type) {
 	// Constraints on type as a whole.
 	t.Constraints(constraints.MutuallyExclusive(e.Text, e.Texts))
 	t.Constraints(constraints.MutuallyInclusive(e.Int, e.Int2, e.Ints))
+	t.Constraints(constraints.AnyNRequired(3, e.Text, e.Int, e.Int2, e.Ints))
 
 	// Field constraints.
 	t.Field(e.Bool).

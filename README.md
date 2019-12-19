@@ -26,6 +26,7 @@ be used.
 
 Here's a quick list of all of the built-in constraints (more documentation below):
 
+* AnyNRequired
 * DeepEquals
 * Equals
 * Length
@@ -49,6 +50,19 @@ Here's a quick list of all of the built-in constraints (more documentation below
 * Valid
 
 ---
+
+**AnyNRequired**:
+
+_Applicable to_: Structs
+
+_Description_: At least `n` of the given fields must not be empty (uses the same logic as the
+`Required` constraint).
+
+_Usage_:
+
+```go
+t.Constraints(constraints.AnyNRequired(1, v.HomePhone, v.MobilePhone, v.WorkPhone))
+```
 
 **DeepEquals**
 
@@ -374,7 +388,6 @@ write your own validation code, raw (but that would mean we'd have to pass `vall
 
 ### Upcoming Constraints
 
-* AnyNRequired
 * ExactlyNRequired
 * OneOf
 

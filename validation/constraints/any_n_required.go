@@ -9,27 +9,27 @@ import (
 	"github.com/seeruk/valley"
 )
 
-// MutuallyExclusive ...
-func MutuallyExclusive(fields ...interface{}) valley.Constraint {
+// AnyNRequired ...
+func AnyNRequired(n int, fields ...interface{}) valley.Constraint {
 	return valley.Constraint{}
 }
 
-// mutuallyExclusiveFormat ...
-const mutuallyExclusiveFormat = `
+const anyNRequiredFormat = `
 	{
-		// MutuallyExclusive uses it's own block to lock down nonEmpty's scope.
+		// AnyNRequired uses it's own block to lock down nonEmpty's scope.
 		var nonEmpty []string
 
 		%s
 
-		if len(nonEmpty) > 1 {
+		if len(nonEmpty) < %s {
 			%s
 			violations = append(violations, valley.ConstraintViolation{
 				Path: path.String(),
 				PathKind: %q,
-				Message: "fields are mutually exclusive",
+				Message: "minimum number of required fields not met",
 				Details: map[string]interface{}{
-					"fields": nonEmpty,
+					"num_required": %s,
+					"fields": %s,
 				},
 			})
 			%s
@@ -37,13 +37,13 @@ const mutuallyExclusiveFormat = `
 	}
 `
 
-// mutuallyExclusiveGenerator ...
-func mutuallyExclusiveGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
+// anyNRequiredGenerator ...
+func anyNRequiredGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	var output valley.ConstraintGeneratorOutput
 	var fields []string
 
-	if len(opts) < 2 {
-		return output, errors.New("expected at least two options")
+	if len(opts) < 3 {
+		return output, errors.New("expected at least three options")
 	}
 
 	structType, ok := fieldType.(*ast.StructType)
@@ -51,7 +51,13 @@ func mutuallyExclusiveGenerator(ctx valley.Context, fieldType ast.Expr, opts []a
 		return output, fmt.Errorf("`MutuallyExclusive` applied to non-struct type")
 	}
 
-	for _, opt := range opts {
+	numRequiredExpr := opts[0]
+	numRequired, err := SprintNode(ctx.Source.FileSet, numRequiredExpr)
+	if err != nil {
+		return output, fmt.Errorf("failed to render expression: %v", err)
+	}
+
+	for _, opt := range opts[1:] {
 		pos := ctx.Source.FileSet.Position(opt.Pos())
 
 		selector, ok := opt.(*ast.SelectorExpr)
@@ -86,10 +92,22 @@ func mutuallyExclusiveGenerator(ctx valley.Context, fieldType ast.Expr, opts []a
 		}
 	}
 
-	output.Code = fmt.Sprintf(mutuallyExclusiveFormat,
+	quotedFields := make([]string, 0, len(fields))
+	for _, field := range fields {
+		quotedFields = append(quotedFields, fmt.Sprintf("%q", field))
+	}
+
+	fieldDetails := "[]string{"
+	fieldDetails += strings.Join(quotedFields, ", ")
+	fieldDetails += "}"
+
+	output.Code = fmt.Sprintf(anyNRequiredFormat,
 		strings.Join(predicates, "\n\n"),
+		numRequired,
 		ctx.BeforeViolation,
 		ctx.PathKind,
+		numRequired,
+		fieldDetails,
 		ctx.AfterViolation,
 	)
 
