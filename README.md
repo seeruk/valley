@@ -336,12 +336,6 @@ t.Field(e.Nested).Constraints(constraints.Valid())
 t.Field(e.NestedSlice).Elements(constraints.Valid())
 ```
 
-### Upcoming Constraints
-
-* AnyNRequired
-* ExactlyNRequired
-* OneOf
-
 ## Motivation
 
 Previously I've implemented validation in Go using reflection, and while reflection isn't actually
@@ -366,6 +360,7 @@ that, the generated code also has to compile, further protecting you from runtim
 
 ## TODO
 
+* Finish implementing constraints.
 * Allow overriding field names in path using struct tags?
 * Proper import resolution, using `go list`? We can get the package name to guarantee we import
 something with the correct package name.
@@ -376,6 +371,12 @@ something with the correct package name.
 functions (the `Valid` constraint would need an option to override which method is called).
 * Include other code that's unrecognised in the generated `Validate` method? This would allow you to
 write your own validation code, raw (but that would mean we'd have to pass `valley.Path` in too?)
+
+### Upcoming Constraints
+
+* AnyNRequired
+* ExactlyNRequired
+* OneOf
 
 ## License
 

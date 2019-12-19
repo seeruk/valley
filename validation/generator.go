@@ -271,7 +271,6 @@ func (g *Generator) generateFieldKeysConstraints(ctx valley.Context, fieldConfig
 		return nil
 	}
 
-	// TODO: This output might look a bit weird for maps?
 	g.wcf("	for key := range %s {\n", ctx.VarName)
 
 	keyCtx := ctx.Clone()
@@ -292,7 +291,7 @@ func (g *Generator) generateFieldKeysConstraints(ctx valley.Context, fieldConfig
 		keyCtx.Path = fmt.Sprintf("\"%s.[\" + strconv.Itoa(key) + \"]\"", keyCtx.FieldName)
 	case *ast.MapType:
 		keyType = t.Key
-		// TODO: Does this work well for non-string types?
+		// TODO: Does this work well enough for non-string types?
 		keyCtx.Path = fmt.Sprintf("\"%s.[\" + fmt.Sprintf(\"%%v\", key) + \"]\"", keyCtx.FieldName)
 	default:
 		return errors.New("config for keys applied to non-iterable type")
@@ -372,7 +371,6 @@ func (g *Generator) generateConstraint(ctx valley.Context, constraintConfig vall
 	output, err := constraint(ctx, value.Type, constraintConfig.Opts)
 	switch {
 	case errors.Is(err, constraints.ErrTypeWarning):
-		// TODO: Need a better way of logging things than this...
 		fmt.Printf("valley: warning generating code for %s's %q constraint on line %d, col %d: %v\n",
 			selector, constraintConfig.Name, pos.Line, pos.Column, err)
 	case err != nil:
