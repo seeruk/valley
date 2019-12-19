@@ -56,6 +56,7 @@ func (e Example) Constraints(t valley.Type) {
 			constraints.RegexpString("^Hello"),
 			constraints.MaxLength(12),
 			constraints.Length(5),
+			constraints.OneOf("Hello, World!", "Hello, SeerUK!", "Hello, GitHub!"),
 			constraints.Predicate(
 				strings.HasPrefix(e.Text, "custom") && len(e.Text) == 32,
 				"value must be a valid custom ID",

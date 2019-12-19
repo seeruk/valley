@@ -1,6 +1,7 @@
 package constraints
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"strings"
@@ -41,6 +42,15 @@ func mutuallyInclusiveGenerator(ctx valley.Context, fieldType ast.Expr, opts []a
 	var output valley.ConstraintGeneratorOutput
 	var fields []string
 
+	if len(opts) < 2 {
+		return output, errors.New("expected at least two options")
+	}
+
+	structType, ok := fieldType.(*ast.StructType)
+	if !ok {
+		return output, fmt.Errorf("`MutuallyInclusive` applied to non-struct type")
+	}
+
 	for _, opt := range opts {
 		pos := ctx.Source.FileSet.Position(opt.Pos())
 
@@ -55,11 +65,6 @@ func mutuallyInclusiveGenerator(ctx valley.Context, fieldType ast.Expr, opts []a
 		}
 
 		fields = append(fields, selector.Sel.Name)
-	}
-
-	structType, ok := fieldType.(*ast.StructType)
-	if !ok {
-		return output, fmt.Errorf("`MutuallyInclusive` applied to non-struct type")
 	}
 
 	var predicates []string

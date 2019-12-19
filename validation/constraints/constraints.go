@@ -33,6 +33,7 @@ var BuiltIn = map[string]valley.ConstraintGenerator{
 	"github.com/seeruk/valley/validation/constraints.Nil":               nilGenerator,
 	"github.com/seeruk/valley/validation/constraints.NotEquals":         notEqualsGenerator,
 	"github.com/seeruk/valley/validation/constraints.NotNil":            notNilGenerator,
+	"github.com/seeruk/valley/validation/constraints.OneOf":             oneOfGenerator,
 	"github.com/seeruk/valley/validation/constraints.Predicate":         predicateGenerator,
 	"github.com/seeruk/valley/validation/constraints.Regexp":            regexpGenerator,
 	"github.com/seeruk/valley/validation/constraints.RegexpString":      regexpStringGenerator,

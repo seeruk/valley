@@ -100,7 +100,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 			nonEmpty = append(nonEmpty, "Ints")
 		}
 
-		if len(nonEmpty) > 0 && len(nonEmpty) < 3 {
+		if len(nonEmpty) < 3 {
 
 			violations = append(violations, valley.ConstraintViolation{
 				Path:     path.String(),
@@ -402,6 +402,16 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 			Details: map[string]interface{}{
 				"exactly": 5,
 			},
+		})
+		path.TruncateRight(size)
+	}
+
+	if e.Text != "Hello, World!" && e.Text != "Hello, SeerUK!" && e.Text != "Hello, GitHub!" {
+		size := path.Write("Text")
+		violations = append(violations, valley.ConstraintViolation{
+			Path:     path.String(),
+			PathKind: "field",
+			Message:  "value must be one of the allowed values",
 		})
 		path.TruncateRight(size)
 	}
