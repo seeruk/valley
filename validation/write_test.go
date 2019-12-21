@@ -66,6 +66,15 @@ func TestFormatAndWrite(t *testing.T) {
 	})
 }
 
+func TestFindDestination(t *testing.T) {
+	t.Run("should add a suffix to the input source path", func(t *testing.T) {
+		expected := "/foo/bar/baz_validate.go"
+		actual := FindDestination("/foo/bar/baz.go")
+
+		assert.Equal(t, expected, actual)
+	})
+}
+
 func TestCreateFile(t *testing.T) {
 	// Frustratingly, this test is really only here to make sure we don't accidentally break
 	// createFile and call another function, but if that function still creates a file this will

@@ -2,7 +2,6 @@ package source
 
 import (
 	"go/ast"
-	"go/parser"
 	"go/token"
 	"path"
 	"sort"
@@ -14,17 +13,10 @@ import (
 
 // Read attempts to read a Go file, and based on it's contents return the package name, along
 // with an extract of information about the methods and structs in that file.
-func Read(srcPath string) (valley.Source, error) {
+func Read(fileSet *token.FileSet, file *ast.File, srcPath string) valley.Source {
 	var source valley.Source
 
-	fileSet := token.NewFileSet()
-
-	f, err := parser.ParseFile(fileSet, srcPath, nil, 0)
-	if err != nil {
-		return source, err
-	}
-
-	for _, imp := range f.Imports {
+	for _, imp := range file.Imports {
 		impPath := strings.Trim(imp.Path.Value, "\"")
 		impName := path.Base(impPath)
 		if imp.Name != nil {
@@ -39,12 +31,12 @@ func Read(srcPath string) (valley.Source, error) {
 
 	source.FileName = path.Base(srcPath)
 	source.FileSet = fileSet
-	source.Package = f.Name.Name
+	source.Package = file.Name.Name
 	source.Methods = make(valley.Methods)
 	source.Structs = make(valley.Structs)
 
-	if len(f.Decls) > 0 {
-		for _, decl := range f.Decls {
+	if len(file.Decls) > 0 {
+		for _, decl := range file.Decls {
 			switch d := decl.(type) {
 			case *ast.FuncDecl:
 				readFuncDecl(d, &source)
@@ -63,18 +55,13 @@ func Read(srcPath string) (valley.Source, error) {
 
 	source.StructNames = structNames
 
-	return source, nil
+	return source
 }
 
 // readFuncDecl reads a Go function declaration and adds contents that are relevant to the given
 // valley Source.
 func readFuncDecl(d *ast.FuncDecl, source *valley.Source) {
 	if d.Recv == nil {
-		return
-	}
-
-	// This should probably never happen.
-	if len(d.Recv.List) != 1 {
 		return
 	}
 
@@ -102,10 +89,8 @@ func readGenDecl(d *ast.GenDecl, source *valley.Source) {
 	}
 
 	for _, spec := range d.Specs {
-		typeSpec, ok := spec.(*ast.TypeSpec)
-		if !ok {
-			continue
-		}
+		// NOTE: Assumed to always succeed because of the token.TYPE check above.
+		typeSpec := spec.(*ast.TypeSpec)
 
 		structType, ok := typeSpec.Type.(*ast.StructType)
 		if !ok {
@@ -159,16 +144,13 @@ func readStructFields(structType *ast.StructType) valley.Fields {
 }
 
 // unpackStarExpr ...
+// NOTE: This is purposefully _not_ recursive, as it's invalid for a method receiver to be a pointer
+// to a pointer to a type, as that would be an unnamed type.
 func unpackStarExpr(expr ast.Expr) ast.Expr {
 	se, ok := expr.(*ast.StarExpr)
 	if !ok {
 		return expr
 	}
 
-	result := se.X
-	if se, ok = result.(*ast.StarExpr); ok {
-		return unpackStarExpr(se)
-	}
-
-	return result
+	return se.X
 }

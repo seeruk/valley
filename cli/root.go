@@ -2,6 +2,8 @@ package cli
 
 import (
 	"fmt"
+	"go/parser"
+	"go/token"
 
 	"github.com/seeruk/go-console"
 	"github.com/seeruk/go-console/parameters"
@@ -41,10 +43,14 @@ func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Com
 	}
 
 	execute := func(int *console.Input, output *console.Output) error {
-		src, err := source.Read(srcPath)
+		fileSet := token.NewFileSet()
+
+		file, err := parser.ParseFile(fileSet, srcPath, nil, 0)
 		if err != nil {
-			return fmt.Errorf("failed to read structs in: %q: %v", srcPath, err)
+			return fmt.Errorf("failed to parse source: %v", err)
 		}
+
+		src := source.Read(fileSet, file, srcPath)
 
 		cfg, err := config.BuildFromSource(src)
 		if err != nil {
@@ -59,10 +65,7 @@ func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Com
 		}
 
 		if destPath == "" {
-			destPath, err = validation.FindDestination(srcPath)
-			if err != nil {
-				return err
-			}
+			destPath = validation.FindDestination(srcPath)
 		}
 
 		err = validation.FormatAndWrite(bs, destPath)

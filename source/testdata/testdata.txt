@@ -1,0 +1,603 @@
+(valley.Source) {
+ FileName: (string) (len=11) "testdata.go",
+ FileSet: (*token.FileSet)({
+  mutex: (sync.RWMutex) {
+   w: (sync.Mutex) {
+    state: (int32) 0,
+    sema: (uint32) 0
+   },
+   writerSem: (uint32) 0,
+   readerSem: (uint32) 0,
+   readerCount: (int32) 0,
+   readerWait: (int32) 0
+  },
+  base: (int) 1739,
+  files: ([]*token.File) (len=1 cap=1) {
+   (*token.File)({
+    set: (*token.FileSet)(<already shown>),
+    name: (string) (len=22) "./testdata/testdata.go",
+    base: (int) 1,
+    size: (int) 1737,
+    mutex: (sync.Mutex) {
+     state: (int32) 0,
+     sema: (uint32) 0
+    },
+    lines: ([]int) (len=52 cap=64) {
+     (int) 0,
+     (int) 17,
+     (int) 18,
+     (int) 27,
+     (int) 55,
+     (int) 56,
+     (int) 115,
+     (int) 168,
+     (int) 170,
+     (int) 171,
+     (int) 239,
+     (int) 261,
+     (int) 299,
+     (int) 337,
+     (int) 374,
+     (int) 376,
+     (int) 377,
+     (int) 470,
+     (int) 516,
+     (int) 563,
+     (int) 612,
+     (int) 656,
+     (int) 658,
+     (int) 659,
+     (int) 736,
+     (int) 767,
+     (int) 784,
+     (int) 799,
+     (int) 827,
+     (int) 829,
+     (int) 830,
+     (int) 923,
+     (int) 979,
+     (int) 1026,
+     (int) 1075,
+     (int) 1119,
+     (int) 1121,
+     (int) 1122,
+     (int) 1213,
+     (int) 1297,
+     (int) 1315,
+     (int) 1316,
+     (int) 1417,
+     (int) 1469,
+     (int) 1500,
+     (int) 1516,
+     (int) 1518,
+     (int) 1519,
+     (int) 1618,
+     (int) 1702,
+     (int) 1724,
+     (int) 1735
+    },
+    infos: ([]token.lineInfo) <nil>
+   })
+  },
+  last: (*token.File)({
+   set: (*token.FileSet)(<already shown>),
+   name: (string) (len=22) "./testdata/testdata.go",
+   base: (int) 1,
+   size: (int) 1737,
+   mutex: (sync.Mutex) {
+    state: (int32) 0,
+    sema: (uint32) 0
+   },
+   lines: ([]int) (len=52 cap=64) {
+    (int) 0,
+    (int) 17,
+    (int) 18,
+    (int) 27,
+    (int) 55,
+    (int) 56,
+    (int) 115,
+    (int) 168,
+    (int) 170,
+    (int) 171,
+    (int) 239,
+    (int) 261,
+    (int) 299,
+    (int) 337,
+    (int) 374,
+    (int) 376,
+    (int) 377,
+    (int) 470,
+    (int) 516,
+    (int) 563,
+    (int) 612,
+    (int) 656,
+    (int) 658,
+    (int) 659,
+    (int) 736,
+    (int) 767,
+    (int) 784,
+    (int) 799,
+    (int) 827,
+    (int) 829,
+    (int) 830,
+    (int) 923,
+    (int) 979,
+    (int) 1026,
+    (int) 1075,
+    (int) 1119,
+    (int) 1121,
+    (int) 1122,
+    (int) 1213,
+    (int) 1297,
+    (int) 1315,
+    (int) 1316,
+    (int) 1417,
+    (int) 1469,
+    (int) 1500,
+    (int) 1516,
+    (int) 1518,
+    (int) 1519,
+    (int) 1618,
+    (int) 1702,
+    (int) 1724,
+    (int) 1735
+   },
+   infos: ([]token.lineInfo) <nil>
+  })
+ }),
+ Package: (string) (len=8) "testdata",
+ Imports: ([]valley.Import) (len=2 cap=2) {
+  (valley.Import) {
+   Path: (string) (len=24) "github.com/seeruk/valley",
+   Alias: (string) (len=6) "valley"
+  },
+  (valley.Import) {
+   Path: (string) (len=47) "github.com/seeruk/valley/validation/constraints",
+   Alias: (string) (len=1) "c"
+  }
+ },
+ Methods: (valley.Methods) (len=2) {
+  (string) (len=16) "SecondarySubject": ([]valley.Method) (len=1 cap=1) {
+   (valley.Method) {
+    Receiver: (string) (len=1) "s",
+    Name: (string) (len=11) "Constraints",
+    Params: (*ast.FieldList)({
+     Opening: (token.Pos) 962,
+     List: ([]*ast.Field) (len=1 cap=1) {
+      (*ast.Field)({
+       Doc: (*ast.CommentGroup)(<nil>),
+       Names: ([]*ast.Ident) (len=1 cap=1) {
+        (*ast.Ident)(t)
+       },
+       Type: (*ast.SelectorExpr)({
+        X: (*ast.Ident)(valley),
+        Sel: (*ast.Ident)(Type)
+       }),
+       Tag: (*ast.BasicLit)(<nil>),
+       Comment: (*ast.CommentGroup)(<nil>)
+      })
+     },
+     Closing: (token.Pos) 976
+    }),
+    Results: (*ast.FieldList)(<nil>),
+    Body: (*ast.BlockStmt)({
+     Lbrace: (token.Pos) 978,
+     List: ([]ast.Stmt) (len=3 cap=4) {
+      (*ast.ExprStmt)({
+       X: (*ast.CallExpr)({
+        Fun: (*ast.SelectorExpr)({
+         X: (*ast.CallExpr)({
+          Fun: (*ast.SelectorExpr)({
+           X: (*ast.Ident)(t),
+           Sel: (*ast.Ident)(Field)
+          }),
+          Lparen: (token.Pos) 988,
+          Args: ([]ast.Expr) (len=1 cap=1) {
+           (*ast.SelectorExpr)({
+            X: (*ast.Ident)(s),
+            Sel: (*ast.Ident)(SomeText)
+           })
+          },
+          Ellipsis: (token.Pos) 0,
+          Rparen: (token.Pos) 999
+         }),
+         Sel: (*ast.Ident)(Constraints)
+        }),
+        Lparen: (token.Pos) 1012,
+        Args: ([]ast.Expr) (len=1 cap=1) {
+         (*ast.CallExpr)({
+          Fun: (*ast.SelectorExpr)({
+           X: (*ast.Ident)(c),
+           Sel: (*ast.Ident)(Required)
+          }),
+          Lparen: (token.Pos) 1023,
+          Args: ([]ast.Expr) <nil>,
+          Ellipsis: (token.Pos) 0,
+          Rparen: (token.Pos) 1024
+         })
+        },
+        Ellipsis: (token.Pos) 0,
+        Rparen: (token.Pos) 1025
+       })
+      }),
+      (*ast.ExprStmt)({
+       X: (*ast.CallExpr)({
+        Fun: (*ast.SelectorExpr)({
+         X: (*ast.CallExpr)({
+          Fun: (*ast.SelectorExpr)({
+           X: (*ast.Ident)(t),
+           Sel: (*ast.Ident)(Field)
+          }),
+          Lparen: (token.Pos) 1035,
+          Args: ([]ast.Expr) (len=1 cap=1) {
+           (*ast.SelectorExpr)({
+            X: (*ast.Ident)(s),
+            Sel: (*ast.Ident)(SomeBool)
+           })
+          },
+          Ellipsis: (token.Pos) 0,
+          Rparen: (token.Pos) 1046
+         }),
+         Sel: (*ast.Ident)(Constraints)
+        }),
+        Lparen: (token.Pos) 1059,
+        Args: ([]ast.Expr) (len=1 cap=1) {
+         (*ast.CallExpr)({
+          Fun: (*ast.SelectorExpr)({
+           X: (*ast.Ident)(c),
+           Sel: (*ast.Ident)(Equals)
+          }),
+          Lparen: (token.Pos) 1068,
+          Args: ([]ast.Expr) (len=1 cap=1) {
+           (*ast.Ident)(true)
+          },
+          Ellipsis: (token.Pos) 0,
+          Rparen: (token.Pos) 1073
+         })
+        },
+        Ellipsis: (token.Pos) 0,
+        Rparen: (token.Pos) 1074
+       })
+      }),
+      (*ast.ExprStmt)({
+       X: (*ast.CallExpr)({
+        Fun: (*ast.SelectorExpr)({
+         X: (*ast.CallExpr)({
+          Fun: (*ast.SelectorExpr)({
+           X: (*ast.Ident)(t),
+           Sel: (*ast.Ident)(Field)
+          }),
+          Lparen: (token.Pos) 1084,
+          Args: ([]ast.Expr) (len=1 cap=1) {
+           (*ast.SelectorExpr)({
+            X: (*ast.Ident)(s),
+            Sel: (*ast.Ident)(SomePtr)
+           })
+          },
+          Ellipsis: (token.Pos) 0,
+          Rparen: (token.Pos) 1094
+         }),
+         Sel: (*ast.Ident)(Constraints)
+        }),
+        Lparen: (token.Pos) 1107,
+        Args: ([]ast.Expr) (len=1 cap=1) {
+         (*ast.CallExpr)({
+          Fun: (*ast.SelectorExpr)({
+           X: (*ast.Ident)(c),
+           Sel: (*ast.Ident)(NotNil)
+          }),
+          Lparen: (token.Pos) 1116,
+          Args: ([]ast.Expr) <nil>,
+          Ellipsis: (token.Pos) 0,
+          Rparen: (token.Pos) 1117
+         })
+        },
+        Ellipsis: (token.Pos) 0,
+        Rparen: (token.Pos) 1118
+       })
+      })
+     },
+     Rbrace: (token.Pos) 1120
+    })
+   }
+  },
+  (string) (len=7) "Subject": ([]valley.Method) (len=1 cap=1) {
+   (valley.Method) {
+    Receiver: (string) (len=1) "s",
+    Name: (string) (len=11) "Constraints",
+    Params: (*ast.FieldList)({
+     Opening: (token.Pos) 499,
+     List: ([]*ast.Field) (len=1 cap=1) {
+      (*ast.Field)({
+       Doc: (*ast.CommentGroup)(<nil>),
+       Names: ([]*ast.Ident) (len=1 cap=1) {
+        (*ast.Ident)(t)
+       },
+       Type: (*ast.SelectorExpr)({
+        X: (*ast.Ident)(valley),
+        Sel: (*ast.Ident)(Type)
+       }),
+       Tag: (*ast.BasicLit)(<nil>),
+       Comment: (*ast.CommentGroup)(<nil>)
+      })
+     },
+     Closing: (token.Pos) 513
+    }),
+    Results: (*ast.FieldList)(<nil>),
+    Body: (*ast.BlockStmt)({
+     Lbrace: (token.Pos) 515,
+     List: ([]ast.Stmt) (len=3 cap=4) {
+      (*ast.ExprStmt)({
+       X: (*ast.CallExpr)({
+        Fun: (*ast.SelectorExpr)({
+         X: (*ast.CallExpr)({
+          Fun: (*ast.SelectorExpr)({
+           X: (*ast.Ident)(t),
+           Sel: (*ast.Ident)(Field)
+          }),
+          Lparen: (token.Pos) 525,
+          Args: ([]ast.Expr) (len=1 cap=1) {
+           (*ast.SelectorExpr)({
+            X: (*ast.Ident)(s),
+            Sel: (*ast.Ident)(SomeText)
+           })
+          },
+          Ellipsis: (token.Pos) 0,
+          Rparen: (token.Pos) 536
+         }),
+         Sel: (*ast.Ident)(Constraints)
+        }),
+        Lparen: (token.Pos) 549,
+        Args: ([]ast.Expr) (len=1 cap=1) {
+         (*ast.CallExpr)({
+          Fun: (*ast.SelectorExpr)({
+           X: (*ast.Ident)(c),
+           Sel: (*ast.Ident)(Required)
+          }),
+          Lparen: (token.Pos) 560,
+          Args: ([]ast.Expr) <nil>,
+          Ellipsis: (token.Pos) 0,
+          Rparen: (token.Pos) 561
+         })
+        },
+        Ellipsis: (token.Pos) 0,
+        Rparen: (token.Pos) 562
+       })
+      }),
+      (*ast.ExprStmt)({
+       X: (*ast.CallExpr)({
+        Fun: (*ast.SelectorExpr)({
+         X: (*ast.CallExpr)({
+          Fun: (*ast.SelectorExpr)({
+           X: (*ast.Ident)(t),
+           Sel: (*ast.Ident)(Field)
+          }),
+          Lparen: (token.Pos) 572,
+          Args: ([]ast.Expr) (len=1 cap=1) {
+           (*ast.SelectorExpr)({
+            X: (*ast.Ident)(s),
+            Sel: (*ast.Ident)(SomeBool)
+           })
+          },
+          Ellipsis: (token.Pos) 0,
+          Rparen: (token.Pos) 583
+         }),
+         Sel: (*ast.Ident)(Constraints)
+        }),
+        Lparen: (token.Pos) 596,
+        Args: ([]ast.Expr) (len=1 cap=1) {
+         (*ast.CallExpr)({
+          Fun: (*ast.SelectorExpr)({
+           X: (*ast.Ident)(c),
+           Sel: (*ast.Ident)(Equals)
+          }),
+          Lparen: (token.Pos) 605,
+          Args: ([]ast.Expr) (len=1 cap=1) {
+           (*ast.Ident)(true)
+          },
+          Ellipsis: (token.Pos) 0,
+          Rparen: (token.Pos) 610
+         })
+        },
+        Ellipsis: (token.Pos) 0,
+        Rparen: (token.Pos) 611
+       })
+      }),
+      (*ast.ExprStmt)({
+       X: (*ast.CallExpr)({
+        Fun: (*ast.SelectorExpr)({
+         X: (*ast.CallExpr)({
+          Fun: (*ast.SelectorExpr)({
+           X: (*ast.Ident)(t),
+           Sel: (*ast.Ident)(Field)
+          }),
+          Lparen: (token.Pos) 621,
+          Args: ([]ast.Expr) (len=1 cap=1) {
+           (*ast.SelectorExpr)({
+            X: (*ast.Ident)(s),
+            Sel: (*ast.Ident)(SomePtr)
+           })
+          },
+          Ellipsis: (token.Pos) 0,
+          Rparen: (token.Pos) 631
+         }),
+         Sel: (*ast.Ident)(Constraints)
+        }),
+        Lparen: (token.Pos) 644,
+        Args: ([]ast.Expr) (len=1 cap=1) {
+         (*ast.CallExpr)({
+          Fun: (*ast.SelectorExpr)({
+           X: (*ast.Ident)(c),
+           Sel: (*ast.Ident)(NotNil)
+          }),
+          Lparen: (token.Pos) 653,
+          Args: ([]ast.Expr) <nil>,
+          Ellipsis: (token.Pos) 0,
+          Rparen: (token.Pos) 654
+         })
+        },
+        Ellipsis: (token.Pos) 0,
+        Rparen: (token.Pos) 655
+       })
+      })
+     },
+     Rbrace: (token.Pos) 657
+    })
+   }
+  }
+ },
+ Structs: (valley.Structs) (len=2) {
+  (string) (len=16) "SecondarySubject": (valley.Struct) {
+   Name: (string) (len=16) "SecondarySubject",
+   Node: (*ast.StructType)({
+    Struct: (token.Pos) 759,
+    Fields: (*ast.FieldList)({
+     Opening: (token.Pos) 766,
+     List: ([]*ast.Field) (len=3 cap=4) {
+      (*ast.Field)({
+       Doc: (*ast.CommentGroup)(<nil>),
+       Names: ([]*ast.Ident) (len=1 cap=1) {
+        (*ast.Ident)(SomeText)
+       },
+       Type: (*ast.Ident)(string),
+       Tag: (*ast.BasicLit)(<nil>),
+       Comment: (*ast.CommentGroup)(<nil>)
+      }),
+      (*ast.Field)({
+       Doc: (*ast.CommentGroup)(<nil>),
+       Names: ([]*ast.Ident) (len=1 cap=1) {
+        (*ast.Ident)(SomeBool)
+       },
+       Type: (*ast.Ident)(bool),
+       Tag: (*ast.BasicLit)(<nil>),
+       Comment: (*ast.CommentGroup)(<nil>)
+      }),
+      (*ast.Field)({
+       Doc: (*ast.CommentGroup)(<nil>),
+       Names: ([]*ast.Ident) (len=1 cap=1) {
+        (*ast.Ident)(SomePtr)
+       },
+       Type: (*ast.StarExpr)({
+        Star: (token.Pos) 810,
+        X: (*ast.Ident)(SecondarySubject)
+       }),
+       Tag: (*ast.BasicLit)(<nil>),
+       Comment: (*ast.CommentGroup)(<nil>)
+      })
+     },
+     Closing: (token.Pos) 828
+    }),
+    Incomplete: (bool) false
+   }),
+   Fields: (valley.Fields) (len=3) {
+    (string) (len=8) "SomeBool": (valley.Value) {
+     Name: (string) (len=8) "SomeBool",
+     Type: (*ast.Ident)(bool),
+     Tag: (string) ""
+    },
+    (string) (len=7) "SomePtr": (valley.Value) {
+     Name: (string) (len=7) "SomePtr",
+     Type: (*ast.StarExpr)({
+      Star: (token.Pos) 810,
+      X: (*ast.Ident)(SecondarySubject)
+     }),
+     Tag: (string) ""
+    },
+    (string) (len=8) "SomeText": (valley.Value) {
+     Name: (string) (len=8) "SomeText",
+     Type: (*ast.Ident)(string),
+     Tag: (string) ""
+    }
+   },
+   FieldNames: ([]string) (len=3 cap=3) {
+    (string) (len=8) "SomeBool",
+    (string) (len=7) "SomePtr",
+    (string) (len=8) "SomeText"
+   }
+  },
+  (string) (len=7) "Subject": (valley.Struct) {
+   Name: (string) (len=7) "Subject",
+   Node: (*ast.StructType)({
+    Struct: (token.Pos) 253,
+    Fields: (*ast.FieldList)({
+     Opening: (token.Pos) 260,
+     List: ([]*ast.Field) (len=3 cap=4) {
+      (*ast.Field)({
+       Doc: (*ast.CommentGroup)(<nil>),
+       Names: ([]*ast.Ident) (len=1 cap=1) {
+        (*ast.Ident)(SomeText)
+       },
+       Type: (*ast.Ident)(string),
+       Tag: (*ast.BasicLit)({
+        ValuePos: (token.Pos) 281,
+        Kind: (token.Token) STRING,
+        Value: (string) (len=18) "`json:\"some_text\"`"
+       }),
+       Comment: (*ast.CommentGroup)(<nil>)
+      }),
+      (*ast.Field)({
+       Doc: (*ast.CommentGroup)(<nil>),
+       Names: ([]*ast.Ident) (len=1 cap=1) {
+        (*ast.Ident)(SomeBool)
+       },
+       Type: (*ast.Ident)(bool),
+       Tag: (*ast.BasicLit)({
+        ValuePos: (token.Pos) 319,
+        Kind: (token.Token) STRING,
+        Value: (string) (len=18) "`json:\"some_bool\"`"
+       }),
+       Comment: (*ast.CommentGroup)(<nil>)
+      }),
+      (*ast.Field)({
+       Doc: (*ast.CommentGroup)(<nil>),
+       Names: ([]*ast.Ident) (len=1 cap=1) {
+        (*ast.Ident)(SomePtr)
+       },
+       Type: (*ast.StarExpr)({
+        Star: (token.Pos) 348,
+        X: (*ast.Ident)(Subject)
+       }),
+       Tag: (*ast.BasicLit)({
+        ValuePos: (token.Pos) 357,
+        Kind: (token.Token) STRING,
+        Value: (string) (len=17) "`json:\"some_ptr\"`"
+       }),
+       Comment: (*ast.CommentGroup)(<nil>)
+      })
+     },
+     Closing: (token.Pos) 375
+    }),
+    Incomplete: (bool) false
+   }),
+   Fields: (valley.Fields) (len=3) {
+    (string) (len=8) "SomeBool": (valley.Value) {
+     Name: (string) (len=8) "SomeBool",
+     Type: (*ast.Ident)(bool),
+     Tag: (string) (len=16) "json:\"some_bool\""
+    },
+    (string) (len=7) "SomePtr": (valley.Value) {
+     Name: (string) (len=7) "SomePtr",
+     Type: (*ast.StarExpr)({
+      Star: (token.Pos) 348,
+      X: (*ast.Ident)(Subject)
+     }),
+     Tag: (string) (len=15) "json:\"some_ptr\""
+    },
+    (string) (len=8) "SomeText": (valley.Value) {
+     Name: (string) (len=8) "SomeText",
+     Type: (*ast.Ident)(string),
+     Tag: (string) (len=16) "json:\"some_text\""
+    }
+   },
+   FieldNames: ([]string) (len=3 cap=3) {
+    (string) (len=8) "SomeBool",
+    (string) (len=7) "SomePtr",
+    (string) (len=8) "SomeText"
+   }
+  }
+ },
+ StructNames: ([]string) (len=2 cap=2) {
+  (string) (len=16) "SecondarySubject",
+  (string) (len=7) "Subject"
+ }
+}

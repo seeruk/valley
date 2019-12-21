@@ -5,7 +5,6 @@ import (
 	"go/format"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 )
@@ -34,19 +33,11 @@ func FormatAndWrite(bs []byte, destPath string) error {
 }
 
 // FindDestination attempts to find a sensible destination file path. The file path is absolute.
-func FindDestination(srcPath string) (string, error) {
-	absoluteSrcPath, err := filepath.Abs(srcPath)
-	if err != nil {
-		return "", err
-	}
-
-	directory := filepath.Dir(absoluteSrcPath)
-	fileName := filepath.Base(absoluteSrcPath)
-
-	destName := strings.TrimSuffix(fileName, filepath.Ext(fileName))
+func FindDestination(srcPath string) string {
+	destName := strings.TrimSuffix(srcPath, filepath.Ext(srcPath))
 	destName += "_validate.go"
 
-	return path.Join(directory, destName), nil
+	return destName
 }
 
 // Testing helpers.
