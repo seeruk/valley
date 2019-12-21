@@ -44,45 +44,12 @@ func buildTypeConfig(src valley.Source, method valley.Method) (valley.TypeConfig
 	}
 
 	for _, stmt := range method.Body.List {
+		chain, ok := buildCallChain(src, method, stmt)
+		if !ok {
+			continue
+		}
+
 		var predicate ast.Expr
-
-		exprStmt, ok := stmt.(*ast.ExprStmt)
-		if !ok {
-			warnOn(src, stmt.Pos(), "skipping line that is not a statement")
-			continue
-		}
-
-		callExpr, ok := exprStmt.X.(*ast.CallExpr)
-		if !ok {
-			// This also protects us later, chain.Next should never be nil after this check.
-			warnOn(src, stmt.Pos(), "skipping line that is not a call expression")
-			continue
-		}
-
-		// Each call expression in a Go AST function body is right-to-left, so the last method call
-		// is the first thing you see. We want the opposite, because it's easier to verify what the
-		// methods are being called on (i.e. that it's a valley.Type), and then which method is
-		// being called to determine how to behave from that point on.
-		chain, err := buildCallExpr(src, callExpr)
-		if err != nil {
-			warnOn(src, stmt.Pos(), "skipping line with unexpected structure: %v", err)
-			continue
-		}
-
-		chain = chain.Reverse()
-
-		// At this point we should know there is only one parameter, and it should be the
-		// valley.Type argument.
-		param := method.Params.List[0]
-		paramName := param.Names[0].Name
-
-		if chain.Ident == nil || chain.Ident.Name != paramName {
-			// The call should be happening on the valley.Type. It doesn't have to be called `t`, so
-			// we get the parameter name and compare it to the root identifier of the call chain
-			// (i.e. the identifier all of the calls in the statement are coming off of).
-			warnOn(src, stmt.Pos(), "skipping call that isn't on valley.Type")
-			continue
-		}
 
 		typeMethod := chain.Next
 
@@ -135,6 +102,49 @@ func buildTypeConfig(src valley.Source, method valley.Method) (valley.TypeConfig
 	}
 
 	return config, nil
+}
+
+// buildCallChain ...
+func buildCallChain(src valley.Source, method valley.Method, stmt ast.Stmt) (*callExprNode, bool) {
+	exprStmt, ok := stmt.(*ast.ExprStmt)
+	if !ok {
+		warnOn(src, stmt.Pos(), "skipping line that is not a statement")
+		return nil, false
+	}
+
+	callExpr, ok := exprStmt.X.(*ast.CallExpr)
+	if !ok {
+		// This also protects us later, chain.Next should never be nil after this check.
+		warnOn(src, stmt.Pos(), "skipping line that is not a call expression")
+		return nil, false
+	}
+
+	// Each call expression in a Go AST function body is right-to-left, so the last method call
+	// is the first thing you see. We want the opposite, because it's easier to verify what the
+	// methods are being called on (i.e. that it's a valley.Type), and then which method is
+	// being called to determine how to behave from that point on.
+	chain, err := buildCallExpr(src, callExpr)
+	if err != nil {
+		warnOn(src, stmt.Pos(), "skipping line with unexpected structure: %v", err)
+		return nil, false
+	}
+
+	chain = chain.Reverse()
+
+	// At this point we should know there is only one parameter, and it should be the
+	// valley.Type argument.
+	param := method.Params.List[0]
+	paramName := param.Names[0].Name
+
+	if chain.Ident == nil || chain.Ident.Name != paramName {
+		// The call should be happening on the valley.Type. It doesn't have to be called `t`, so
+		// we get the parameter name and compare it to the root identifier of the call chain
+		// (i.e. the identifier all of the calls in the statement are coming off of).
+		warnOn(src, stmt.Pos(), "skipping call that isn't on valley.Type")
+		return nil, false
+	}
+
+	return chain, true
 }
 
 // buildConstraintsCall ...
