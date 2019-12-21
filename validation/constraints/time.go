@@ -9,12 +9,12 @@ import (
 	"github.com/seeruk/valley"
 )
 
-// TimeStringAfter ...
+// TimeAfter ...
 func TimeAfter(after time.Time) valley.Constraint {
 	return valley.Constraint{}
 }
 
-// TimeStringBefore ...
+// TimeBefore ...
 func TimeBefore(before time.Time) valley.Constraint {
 	return valley.Constraint{}
 }
