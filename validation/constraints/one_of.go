@@ -22,6 +22,7 @@ func oneOfGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (va
 		return output, errors.New("expected at least two options")
 	}
 
+	var allowed []string
 	var predicates []string
 
 	for _, opt := range opts {
@@ -32,13 +33,16 @@ func oneOfGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (va
 			return output, fmt.Errorf("failed to render expression: %v", err)
 		}
 
+		allowed = append(allowed, value)
 		predicates = append(predicates, fmt.Sprintf("%s != %s", ctx.VarName, value))
 	}
 
 	output.Code = GenerateStandardConstraint(ctx,
 		strings.Join(predicates, " && "),
 		"value must be one of the allowed values",
-		nil,
+		map[string]interface{}{
+			"allowed": "[]interface{}{" + strings.Join(allowed, ", ") + "}",
+		},
 	)
 
 	return output, nil

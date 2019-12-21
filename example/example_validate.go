@@ -412,6 +412,9 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 			Path:     path.String(),
 			PathKind: "field",
 			Message:  "value must be one of the allowed values",
+			Details: map[string]interface{}{
+				"allowed": []interface{}{"Hello, World!", "Hello, SeerUK!", "Hello, GitHub!"},
+			},
 		})
 		path.TruncateRight(size)
 	}

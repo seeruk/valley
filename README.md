@@ -40,6 +40,7 @@ Here's a quick list of all of the built-in constraints (more documentation below
 * Nil
 * NotEquals
 * NotNil
+* OneOf
 * Predicate
 * Regexp
 * RegexpString
@@ -242,6 +243,18 @@ t.Field(e.SomeSlice).Constraints(constraints.NotNil())
 t.Field(e.SomeInterface).Constraints(constraints.NotNil())
 ```
 
+**One Of**
+
+_Applicable to_: Fields
+
+_Description_: Value must be one of the given allowed values.
+
+_Usage_:
+
+```go
+t.Field(e.SomeString).Constraints(constraints.OneOf("Hello, World!", "Hello, GitHub!"))
+```
+
 **Predicate**
 
 _Applicable to_: Fields
@@ -388,7 +401,6 @@ that, the generated code also has to compile, further protecting you from runtim
 
 ## TODO
 
-* Finish implementing constraints.
 * Allow overriding field names in path using struct tags?
 * Proper import resolution, using `go list`? We can get the package name to guarantee we import
 something with the correct package name.
@@ -399,10 +411,6 @@ something with the correct package name.
 functions (the `Valid` constraint would need an option to override which method is called).
 * Include other code that's unrecognised in the generated `Validate` method? This would allow you to
 write your own validation code, raw (but that would mean we'd have to pass `valley.Path` in too?)
-
-### Upcoming Constraints
-
-* OneOf
 
 ## License
 
