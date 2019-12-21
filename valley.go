@@ -148,8 +148,8 @@ func GetFieldAliasFromTag(name, tagName, tag string) (string, error) {
 	}
 
 	splitTag := strings.Split(parsedTag.Value(), ",")
-	if len(splitTag) > 0 {
-		return splitTag[0], nil
+	if len(splitTag) > 0 && strings.TrimSpace(splitTag[0]) != "" {
+		return strings.TrimSpace(splitTag[0]), nil
 	}
 
 	return name, nil

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestContext_Clone(t *testing.T) {
@@ -15,6 +16,49 @@ func TestContext_Clone(t *testing.T) {
 		cloned.TypeName = "test"
 
 		assert.NotEqual(t, context, cloned)
+	})
+}
+
+func TestGetFieldAliasFromTag(t *testing.T) {
+	t.Run("should return the field name if the tag is empty", func(t *testing.T) {
+		alias, err := GetFieldAliasFromTag("testField", "valley", "")
+		require.NoError(t, err)
+		assert.Equal(t, "testField", alias)
+	})
+
+	t.Run("should error if the struct tag is invalid", func(t *testing.T) {
+		_, err := GetFieldAliasFromTag("testField", "valley", "this is not a valid tag")
+		assert.Error(t, err)
+	})
+
+	t.Run("should return the field name if there is no matching tag", func(t *testing.T) {
+		alias, err := GetFieldAliasFromTag("testField", "valley", `json:"test"`)
+		require.NoError(t, err)
+		assert.Equal(t, "testField", alias)
+	})
+
+	t.Run("should return the field name if there is an empty matching tag", func(t *testing.T) {
+		alias, err := GetFieldAliasFromTag("testField", "valley", `valley:""`)
+		require.NoError(t, err)
+		assert.Equal(t, "testField", alias)
+	})
+
+	t.Run("should return the alias if there is one", func(t *testing.T) {
+		alias, err := GetFieldAliasFromTag("testField", "valley", `valley:"test_field"`)
+		require.NoError(t, err)
+		assert.Equal(t, "test_field", alias)
+	})
+
+	t.Run("should return only the section of the tag's value preceding the first comma", func(t *testing.T) {
+		alias, err := GetFieldAliasFromTag("testField", "json", `json:"test_field,omitempty"`)
+		require.NoError(t, err)
+		assert.Equal(t, "test_field", alias)
+	})
+
+	t.Run("should remove any excess space from an alias", func(t *testing.T) {
+		alias, err := GetFieldAliasFromTag("testField", "valley", `valley:"  test_field  "`)
+		require.NoError(t, err)
+		assert.Equal(t, "test_field", alias)
 	})
 }
 
