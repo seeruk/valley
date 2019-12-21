@@ -162,6 +162,7 @@ func SprintNode(fileSet *token.FileSet, node ast.Node) (string, error) {
 	return buf.String(), nil
 }
 
+// lcfirst ...
 func lcfirst(str string) string {
 	for _, v := range str {
 		u := string(unicode.ToLower(v))
@@ -170,6 +171,7 @@ func lcfirst(str string) string {
 	return ""
 }
 
+// ucfirst ...
 func ucfirst(str string) string {
 	for _, v := range str {
 		u := string(unicode.ToUpper(v))

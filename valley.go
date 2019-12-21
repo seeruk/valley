@@ -1,10 +1,13 @@
 package valley
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
 	"regexp"
 	"time"
+
+	"github.com/fatih/structtag"
 )
 
 // Built in regular expression patterns.
@@ -49,13 +52,14 @@ type ConstraintViolation struct {
 // Context is used to inform a ConstraintGenerator about it's environment, mainly to do with which
 // part of a type is being validated, and giving important identifiers to ConstraintGenerators.
 type Context struct {
-	Source    Source
-	TypeName  string
-	Receiver  string
-	FieldName string
-	VarName   string
-	Path      string
-	PathKind  PathKind
+	Source     Source
+	TypeName   string
+	Receiver   string
+	FieldName  string
+	FieldAlias string
+	VarName    string
+	Path       string
+	PathKind   PathKind
 
 	Constraint      string
 	ConstraintNum   int
@@ -120,6 +124,26 @@ type Fields map[string]Value
 type Value struct {
 	Name string
 	Type ast.Expr
+	Tag  string
+}
+
+// GetFieldAliasFromTag ...
+func GetFieldAliasFromTag(name, tag string) (string, error) {
+	if tag == "" {
+		return name, nil
+	}
+
+	parsedTags, err := structtag.Parse(tag)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse struct tag: %q: %v", tag, err)
+	}
+
+	parsedTag, err := parsedTags.Get("valley")
+	if err == nil {
+		return parsedTag.Value(), nil
+	}
+
+	return name, nil
 }
 
 // TimeMustParse ...

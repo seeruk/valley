@@ -161,8 +161,13 @@ func (g *Generator) generateType(config valley.Config, source valley.Source, typ
 		}
 
 		ctx.FieldName = fieldName
+		ctx.FieldAlias, err = valley.GetFieldAliasFromTag(fieldName, f.Tag)
+		if err != nil {
+			return fmt.Errorf("failed to get field alias from struct tag: %v", err)
+		}
+
 		ctx.VarName = fmt.Sprintf("%s.%s", receiver, fieldName)
-		ctx.Path = fmt.Sprintf("\"%s\"", fieldName)
+		ctx.Path = fmt.Sprintf("\"%s\"", ctx.FieldAlias)
 		ctx.BeforeViolation = fmt.Sprintf("size := path.Write(%s)", ctx.Path)
 		ctx.AfterViolation = "path.TruncateRight(size)"
 
@@ -237,11 +242,11 @@ func (g *Generator) generateFieldElementsConstraints(ctx valley.Context, fieldCo
 	switch t := value.Type.(type) {
 	case *ast.ArrayType:
 		elementType = t.Elt
-		elementCtx.Path = fmt.Sprintf("\"%s.[\" + strconv.Itoa(i) + \"]\"", elementCtx.FieldName)
+		elementCtx.Path = fmt.Sprintf("\"%s.[\" + strconv.Itoa(i) + \"]\"", elementCtx.FieldAlias)
 	case *ast.MapType:
 		elementType = t.Value
 		// TODO: Does this work well for non-string types?
-		elementCtx.Path = fmt.Sprintf("\"%s.[\" + fmt.Sprintf(\"%%v\", i) + \"]\"", elementCtx.FieldName)
+		elementCtx.Path = fmt.Sprintf("\"%s.[\" + fmt.Sprintf(\"%%v\", i) + \"]\"", elementCtx.FieldAlias)
 	default:
 		return errors.New("config for elements applied to non-iterable type")
 	}
@@ -288,11 +293,11 @@ func (g *Generator) generateFieldKeysConstraints(ctx valley.Context, fieldConfig
 			NamePos: t.Lbrack + 1, // TODO: Does this work?
 			Name:    "int",
 		}
-		keyCtx.Path = fmt.Sprintf("\"%s.[\" + strconv.Itoa(key) + \"]\"", keyCtx.FieldName)
+		keyCtx.Path = fmt.Sprintf("\"%s.[\" + strconv.Itoa(key) + \"]\"", keyCtx.FieldAlias)
 	case *ast.MapType:
 		keyType = t.Key
 		// TODO: Does this work well enough for non-string types?
-		keyCtx.Path = fmt.Sprintf("\"%s.[\" + fmt.Sprintf(\"%%v\", key) + \"]\"", keyCtx.FieldName)
+		keyCtx.Path = fmt.Sprintf("\"%s.[\" + fmt.Sprintf(\"%%v\", key) + \"]\"", keyCtx.FieldAlias)
 	default:
 		return errors.New("config for keys applied to non-iterable type")
 	}

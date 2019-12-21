@@ -46,7 +46,7 @@ func mutuallyInclusiveGenerator(ctx valley.Context, fieldType ast.Expr, opts []a
 		return output, errors.New("expected at least two options")
 	}
 
-	structType, ok := fieldType.(*ast.StructType)
+	_, ok := fieldType.(*ast.StructType)
 	if !ok {
 		return output, fmt.Errorf("`MutuallyInclusive` applied to non-struct type")
 	}
@@ -67,32 +67,42 @@ func mutuallyInclusiveGenerator(ctx valley.Context, fieldType ast.Expr, opts []a
 		fields = append(fields, selector.Sel.Name)
 	}
 
+	var aliases []string
 	var predicates []string
 
-	// TODO: This is a little gross...
-	for _, structField := range structType.Fields.List {
-		for _, structFieldName := range structField.Names {
-			name := structFieldName.Name
-			for _, field := range fields {
-				if field == name {
-					predicate, imports := GenerateEmptinessPredicate(fmt.Sprintf("%s.%s", ctx.VarName, name), structField.Type)
-					output.Imports = append(output.Imports, imports...)
+	// TODO: Can this ever fail?
+	structType := ctx.Source.Structs[ctx.TypeName]
 
-					predicates = append(predicates, fmt.Sprintf(`if !(%s) {
-						nonEmpty = append(nonEmpty, "%s")
-					}`, predicate, name))
-				}
+	// TODO: This is a little gross...
+	for _, structField := range structType.Fields {
+		for _, field := range fields {
+			name := structField.Name
+			if field != name {
+				continue
 			}
+
+			alias, err := valley.GetFieldAliasFromTag(name, structField.Tag)
+			if err != nil {
+				return output, fmt.Errorf("failed to generate output field name: %v", err)
+			}
+
+			predicate, imports := GenerateEmptinessPredicate(fmt.Sprintf("%s.%s", ctx.VarName, name), structField.Type)
+			output.Imports = append(output.Imports, imports...)
+
+			aliases = append(aliases, alias)
+			predicates = append(predicates, fmt.Sprintf(`if !(%s) {
+				nonEmpty = append(nonEmpty, "%s")
+			}`, predicate, alias))
 		}
 	}
 
-	quotedFields := make([]string, 0, len(fields))
-	for _, field := range fields {
-		quotedFields = append(quotedFields, fmt.Sprintf("%q", field))
+	quotedAliases := make([]string, 0, len(aliases))
+	for _, alias := range aliases {
+		quotedAliases = append(quotedAliases, fmt.Sprintf("%q", alias))
 	}
 
 	fieldDetails := "[]string{"
-	fieldDetails += strings.Join(quotedFields, ", ")
+	fieldDetails += strings.Join(quotedAliases, ", ")
 	fieldDetails += "}"
 
 	output.Code = fmt.Sprintf(mutuallyInclusiveFormat,

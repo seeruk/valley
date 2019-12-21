@@ -25,25 +25,25 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	path.Write(".")
 
 	{
-		// MutuallyExclusive uses it's own block to lock down nonEmpty's scope.
+		// MutuallyInclusive uses it's own block to lock down nonEmpty's scope.
 		var nonEmpty []string
 
-		if !(len(e.Text) == 0) {
-			nonEmpty = append(nonEmpty, "Text")
-		}
-
 		if !(len(e.Texts) == 0) {
-			nonEmpty = append(nonEmpty, "Texts")
+			nonEmpty = append(nonEmpty, "texts")
 		}
 
-		if len(nonEmpty) > 1 {
+		if !(len(e.Text) == 0) {
+			nonEmpty = append(nonEmpty, "text")
+		}
+
+		if len(nonEmpty) > 0 && len(nonEmpty) != 2 {
 
 			violations = append(violations, valley.ConstraintViolation{
 				Path:     path.String(),
 				PathKind: "struct",
-				Message:  "fields are mutually exclusive",
+				Message:  "fields are mutually inclusive",
 				Details: map[string]interface{}{
-					"fields": nonEmpty,
+					"fields": []string{"texts", "text"},
 				},
 			})
 
@@ -54,16 +54,16 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		// MutuallyInclusive uses it's own block to lock down nonEmpty's scope.
 		var nonEmpty []string
 
-		if !(e.Int == 0) {
-			nonEmpty = append(nonEmpty, "Int")
+		if !(e.Int2 == nil) {
+			nonEmpty = append(nonEmpty, "int2")
 		}
 
-		if !(e.Int2 == nil) {
-			nonEmpty = append(nonEmpty, "Int2")
+		if !(e.Int == 0) {
+			nonEmpty = append(nonEmpty, "int")
 		}
 
 		if !(len(e.Ints) == 0) {
-			nonEmpty = append(nonEmpty, "Ints")
+			nonEmpty = append(nonEmpty, "ints")
 		}
 
 		if len(nonEmpty) > 0 && len(nonEmpty) != 3 {
@@ -73,7 +73,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 				PathKind: "struct",
 				Message:  "fields are mutually inclusive",
 				Details: map[string]interface{}{
-					"fields": []string{"Int", "Int2", "Ints"},
+					"fields": []string{"int2", "int", "ints"},
 				},
 			})
 
@@ -81,34 +81,34 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	{
-		// AnyNRequired uses it's own block to lock down nonEmpty's scope.
+		// ExactlyNRequired uses it's own block to lock down nonEmpty's scope.
 		var nonEmpty []string
 
 		if !(len(e.Text) == 0) {
-			nonEmpty = append(nonEmpty, "Text")
-		}
-
-		if !(e.Int == 0) {
-			nonEmpty = append(nonEmpty, "Int")
+			nonEmpty = append(nonEmpty, "text")
 		}
 
 		if !(e.Int2 == nil) {
-			nonEmpty = append(nonEmpty, "Int2")
+			nonEmpty = append(nonEmpty, "int2")
+		}
+
+		if !(e.Int == 0) {
+			nonEmpty = append(nonEmpty, "int")
 		}
 
 		if !(len(e.Ints) == 0) {
-			nonEmpty = append(nonEmpty, "Ints")
+			nonEmpty = append(nonEmpty, "ints")
 		}
 
-		if len(nonEmpty) < 3 {
+		if len(nonEmpty) != 3 {
 
 			violations = append(violations, valley.ConstraintViolation{
 				Path:     path.String(),
 				PathKind: "struct",
-				Message:  "minimum number of required fields not met",
+				Message:  "exact number of required fields not met",
 				Details: map[string]interface{}{
 					"num_required": 3,
-					"fields":       []string{"Text", "Int", "Int2", "Ints"},
+					"fields":       []string{"text", "int2", "int", "ints"},
 				},
 			})
 
@@ -116,7 +116,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Adults < 1 {
-		size := path.Write("Adults")
+		size := path.Write("adults")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -129,7 +129,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Adults > 9 {
-		size := path.Write("Adults")
+		size := path.Write("adults")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -142,7 +142,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Bool == false {
-		size := path.Write("Bool")
+		size := path.Write("bool")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -155,7 +155,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if !reflect.DeepEqual(e.Bool, true) {
-		size := path.Write("Bool")
+		size := path.Write("bool")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -168,7 +168,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if len(e.Chan) > 12 {
-		size := path.Write("Chan")
+		size := path.Write("chan")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -181,7 +181,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Children < 0 {
-		size := path.Write("Children")
+		size := path.Write("children")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -194,7 +194,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Children != e.Adults+2 {
-		size := path.Write("Children")
+		size := path.Write("children")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -207,7 +207,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Children > int(math.Max(float64(8-(e.Adults-1)), 0)) {
-		size := path.Write("Children")
+		size := path.Write("children")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -220,7 +220,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Float != math.Pi {
-		size := path.Write("Float")
+		size := path.Write("float")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -233,7 +233,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Int == 0 {
-		size := path.Write("Int")
+		size := path.Write("int")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -243,7 +243,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Int2 == nil {
-		size := path.Write("Int2")
+		size := path.Write("int2")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -253,7 +253,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Int2 == nil {
-		size := path.Write("Int2")
+		size := path.Write("int2")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -263,7 +263,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Int2 != nil && *e.Int2 < 0 {
-		size := path.Write("Int2")
+		size := path.Write("int2")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -276,7 +276,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if len(e.Ints) == 0 {
-		size := path.Write("Ints")
+		size := path.Write("ints")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -286,7 +286,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if len(e.Ints) > 3 {
-		size := path.Write("Ints")
+		size := path.Write("ints")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -301,7 +301,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	for i, element := range e.Ints {
 
 		if element == 0 {
-			size := path.Write("Ints.[" + strconv.Itoa(i) + "]")
+			size := path.Write("ints.[" + strconv.Itoa(i) + "]")
 			violations = append(violations, valley.ConstraintViolation{
 				Path:     path.String(),
 				PathKind: "element",
@@ -311,7 +311,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		}
 
 		if element < 0 {
-			size := path.Write("Ints.[" + strconv.Itoa(i) + "]")
+			size := path.Write("ints.[" + strconv.Itoa(i) + "]")
 			violations = append(violations, valley.ConstraintViolation{
 				Path:     path.String(),
 				PathKind: "element",
@@ -326,7 +326,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Nested == nil {
-		size := path.Write("Nested")
+		size := path.Write("nested")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -336,13 +336,13 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Nested != nil {
-		size := path.Write("Nested")
+		size := path.Write("nested")
 		violations = append(violations, e.Nested.Validate(path)...)
 		path.TruncateRight(size)
 	}
 
 	for key := range e.NestedMap {
-		size := path.Write("NestedMap.[" + fmt.Sprintf("%v", key) + "]")
+		size := path.Write("nested_map.[" + fmt.Sprintf("%v", key) + "]")
 		violations = append(violations, key.Validate(path)...)
 		path.TruncateRight(size)
 
@@ -350,7 +350,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 
 	for i, element := range e.Nesteds {
 		if element != nil {
-			size := path.Write("Nesteds.[" + strconv.Itoa(i) + "]")
+			size := path.Write("nesteds.[" + strconv.Itoa(i) + "]")
 			violations = append(violations, element.Validate(path)...)
 			path.TruncateRight(size)
 		}
@@ -358,7 +358,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if len(e.Text) == 0 {
-		size := path.Write("Text")
+		size := path.Write("text")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -368,7 +368,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if !github_com_seeruk_valley_validation_constraints_RegexpString_Example_26.MatchString(e.Text) {
-		size := path.Write("Text")
+		size := path.Write("text")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -381,7 +381,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if len(e.Text) > 12 {
-		size := path.Write("Text")
+		size := path.Write("text")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -394,7 +394,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if len(e.Text) != 5 {
-		size := path.Write("Text")
+		size := path.Write("text")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -407,7 +407,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if e.Text != "Hello, World!" && e.Text != "Hello, SeerUK!" && e.Text != "Hello, GitHub!" {
-		size := path.Write("Text")
+		size := path.Write("text")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -420,7 +420,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if strings.HasPrefix(e.Text, "custom") && len(e.Text) == 32 {
-		size := path.Write("Text")
+		size := path.Write("text")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -432,7 +432,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	if len(e.Text) > 32 {
 
 		if len(e.Text) == 0 {
-			size := path.Write("Text")
+			size := path.Write("text")
 			violations = append(violations, valley.ConstraintViolation{
 				Path:     path.String(),
 				PathKind: "field",
@@ -442,7 +442,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		}
 
 		if len(e.Text) < 64 {
-			size := path.Write("Text")
+			size := path.Write("text")
 			violations = append(violations, valley.ConstraintViolation{
 				Path:     path.String(),
 				PathKind: "field",
@@ -457,7 +457,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if len(e.TextMap) == 0 {
-		size := path.Write("TextMap")
+		size := path.Write("text_map")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -469,7 +469,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	for i, element := range e.TextMap {
 
 		if len(element) == 0 {
-			size := path.Write("TextMap.[" + fmt.Sprintf("%v", i) + "]")
+			size := path.Write("text_map.[" + fmt.Sprintf("%v", i) + "]")
 			violations = append(violations, valley.ConstraintViolation{
 				Path:     path.String(),
 				PathKind: "element",
@@ -483,7 +483,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	for key := range e.TextMap {
 
 		if len(key) < 10 {
-			size := path.Write("TextMap.[" + fmt.Sprintf("%v", key) + "]")
+			size := path.Write("text_map.[" + fmt.Sprintf("%v", key) + "]")
 			violations = append(violations, valley.ConstraintViolation{
 				Path:     path.String(),
 				PathKind: "key",
@@ -498,7 +498,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if !e.Time.Before(timeYosemite) {
-		size := path.Write("Time")
+		size := path.Write("time")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -511,7 +511,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	}
 
 	if len(e.Times) < 1 {
-		size := path.Write("Times")
+		size := path.Write("times")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
@@ -526,7 +526,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 	for i, element := range e.Times {
 
 		if !element.Before(timeYosemite) {
-			size := path.Write("Times.[" + strconv.Itoa(i) + "]")
+			size := path.Write("times.[" + strconv.Itoa(i) + "]")
 			violations = append(violations, valley.ConstraintViolation{
 				Path:     path.String(),
 				PathKind: "element",

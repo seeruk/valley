@@ -20,30 +20,30 @@ var timeYosemite = time.Date(1890, time.October, 1, 0, 0, 0, 0, time.UTC)
 
 // Example ...
 type Example struct {
-	Bool      bool                       `json:"bool"`
-	Chan      <-chan string              `json:"chan"`
-	Text      string                     `json:"text"`
-	Texts     []string                   `json:"texts"`
-	TextMap   map[string]string          `json:"text_map"`
-	Adults    int                        `json:"adults"`
-	Children  int                        `json:"children"`
-	Int       int                        `json:"int"`
-	Int2      *int                       `json:"int2"`
-	Ints      []int                      `json:"ints"`
-	Float     float64                    `json:"float"`
-	Time      time.Time                  `json:"time"`
-	Times     []time.Time                `json:"times"`
-	Nested    *NestedExample             `json:"nested"`
-	Nesteds   []*NestedExample           `json:"nesteds"`
-	NestedMap map[NestedExample]struct{} `json:"nested_map"`
+	Bool      bool                       `json:"bool,omitempty" valley:"bool"`
+	Chan      <-chan string              `json:"chan" valley:"chan"`
+	Text      string                     `json:"text" valley:"text"`
+	Texts     []string                   `json:"texts" valley:"texts"`
+	TextMap   map[string]string          `json:"text_map" valley:"text_map"`
+	Adults    int                        `json:"adults" valley:"adults"`
+	Children  int                        `json:"children" valley:"children"`
+	Int       int                        `json:"int" valley:"int"`
+	Int2      *int                       `json:"int2" valley:"int2"`
+	Ints      []int                      `json:"ints" valley:"ints"`
+	Float     float64                    `json:"float" valley:"float"`
+	Time      time.Time                  `json:"time" valley:"time"`
+	Times     []time.Time                `json:"times" valley:"times"`
+	Nested    *NestedExample             `json:"nested" valley:"nested"`
+	Nesteds   []*NestedExample           `json:"nesteds" valley:"nesteds"`
+	NestedMap map[NestedExample]struct{} `json:"nested_map" valley:"nested_map"`
 }
 
 // Constraints ...
 func (e Example) Constraints(t valley.Type) {
 	// Constraints on type as a whole.
-	t.Constraints(constraints.MutuallyExclusive(e.Text, e.Texts))
+	t.Constraints(constraints.MutuallyInclusive(e.Text, e.Texts))
 	t.Constraints(constraints.MutuallyInclusive(e.Int, e.Int2, e.Ints))
-	t.Constraints(constraints.AnyNRequired(3, e.Text, e.Int, e.Int2, e.Ints))
+	t.Constraints(constraints.ExactlyNRequired(3, e.Text, e.Int, e.Int2, e.Ints))
 
 	// Field constraints.
 	t.Field(e.Bool).

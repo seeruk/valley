@@ -24,8 +24,8 @@ func main() {
 	example.Int2 = &int2
 	example.Ints = []int{1, 2, 3, 4}
 	example.Text = "Hello, SeerUK!"
-	//example.Texts = []string{"text 1", "text 2"}
-	//
+	example.Texts = []string{"text 1", "text 2"}
+
 	example.TextMap = map[string]string{
 		"hello": "",
 	}

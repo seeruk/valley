@@ -6,6 +6,7 @@ import (
 	"go/token"
 	"path"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/seeruk/valley"
 )
@@ -118,10 +119,19 @@ func readStructFields(structType *ast.StructType) valley.Fields {
 
 	for _, field := range structType.Fields.List {
 		for _, name := range field.Names {
-			fields[name.Name] = valley.Value{
+			valleyField := valley.Value{
 				Name: name.Name,
 				Type: field.Type,
 			}
+
+			if field.Tag != nil {
+				_, fs := utf8.DecodeRuneInString(field.Tag.Value)
+				_, ls := utf8.DecodeLastRuneInString(field.Tag.Value)
+
+				valleyField.Tag = field.Tag.Value[fs : len(field.Tag.Value)-ls]
+			}
+
+			fields[name.Name] = valleyField
 		}
 	}
 

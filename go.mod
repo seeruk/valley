@@ -2,4 +2,7 @@ module github.com/seeruk/valley
 
 go 1.13
 
-require github.com/seeruk/go-console v0.1.0-alpha.5
+require (
+	github.com/fatih/structtag v1.2.0
+	github.com/seeruk/go-console v0.1.0-alpha.5
+)
