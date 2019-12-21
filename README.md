@@ -403,13 +403,13 @@ that, the generated code also has to compile, further protecting you from runtim
 
 * Proper import resolution, using `go list`? We can get the package name to guarantee we import
 something with the correct package name.
+    * This might also allow us to resolve imported types where we currently can't.
 * Add some unit tests...
 * Add some benchmarks to the README?
-* The ability to define constraints in a separate file (in the same package).
+* The ability to define constraints in a separate file (in the same package, i.e. read the whole
+package and generate code for the one file based on the context provided by the whole package).
 * The ability to attach multiple constraints methods to a type, that generate different validate
 functions (the `Valid` constraint would need an option to override which method is called).
-* Include other code that's unrecognised in the generated `Validate` method? This would allow you to
-write your own validation code, raw (but that would mean we'd have to pass `valley.Path` in too?)
 
 ## License
 
