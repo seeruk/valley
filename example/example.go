@@ -53,7 +53,7 @@ func (e Example) Constraints(t valley.Type) {
 	t.Field(e.Text).
 		Constraints(
 			constraints.Required(),
-			constraints.RegexpString("^Hello"),
+			constraints.Regexp(patternGreeting),
 			constraints.MaxLength(12),
 			constraints.Length(5),
 			constraints.OneOf("Hello, World!", "Hello, SeerUK!", "Hello, GitHub!"),
