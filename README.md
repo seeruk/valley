@@ -401,6 +401,8 @@ that, the generated code also has to compile, further protecting you from runtim
 
 ## TODO
 
+* Allow use of a specific struct tag to override field names in output, e.g. re-using the `json`
+struct tag, instead of the current `valley` struct tag.
 * Proper import resolution, using `go list`? We can get the package name to guarantee we import
 something with the correct package name.
 * Add some unit tests...
