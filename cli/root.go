@@ -18,11 +18,19 @@ func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Com
 	var srcPath string
 	var destPath string
 
+	tagName := "valley"
+
 	configure := func(def *console.Definition) {
 		def.AddOption(console.OptionDefinition{
 			Value: parameters.NewStringValue(&destPath),
 			Spec:  "-o,--output=DEST",
 			Desc:  "Write output to DEST instead of the default '_validate.go'",
+		})
+
+		def.AddOption(console.OptionDefinition{
+			Value: parameters.NewStringValue(&tagName),
+			Spec:  "-t,--tag=NAME",
+			Desc:  "Use the given tag name to override field names in generated output (Default: 'valley')",
 		})
 
 		def.AddArgument(console.ArgumentDefinition{
@@ -45,7 +53,7 @@ func RootCommand(constraints map[string]valley.ConstraintGenerator) *console.Com
 
 		generator := validation.NewGenerator(constraints)
 
-		bs, err := generator.Generate(cfg, src)
+		bs, err := generator.Generate(cfg, src, tagName)
 		if err != nil {
 			return fmt.Errorf("failed to generate validation code: %v", err)
 		}

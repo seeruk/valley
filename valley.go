@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/fatih/structtag"
@@ -57,6 +58,7 @@ type Context struct {
 	Receiver   string
 	FieldName  string
 	FieldAlias string
+	TagName    string
 	VarName    string
 	Path       string
 	PathKind   PathKind
@@ -74,12 +76,13 @@ func (c Context) Clone() Context {
 
 // Source represents the information Valley needs about a particular source file.
 type Source struct {
-	FileName string
-	FileSet  *token.FileSet
-	Package  string
-	Imports  []Import
-	Methods  Methods
-	Structs  Structs
+	FileName    string
+	FileSet     *token.FileSet
+	Package     string
+	Imports     []Import
+	Methods     Methods
+	Structs     Structs
+	StructNames []string
 }
 
 // Import represents information about a Go import that Valley uses to generate code.
@@ -111,9 +114,10 @@ type Structs map[string]Struct
 
 // Struct represents the information we need about a struct in some Go source code.
 type Struct struct {
-	Name   string
-	Node   *ast.StructType
-	Fields Fields
+	Name       string
+	Node       *ast.StructType
+	Fields     Fields
+	FieldNames []string
 }
 
 // Fields is a map from struct field name to Value.
@@ -128,7 +132,7 @@ type Value struct {
 }
 
 // GetFieldAliasFromTag ...
-func GetFieldAliasFromTag(name, tag string) (string, error) {
+func GetFieldAliasFromTag(name, tagName, tag string) (string, error) {
 	if tag == "" {
 		return name, nil
 	}
@@ -138,9 +142,14 @@ func GetFieldAliasFromTag(name, tag string) (string, error) {
 		return "", fmt.Errorf("failed to parse struct tag: %q: %v", tag, err)
 	}
 
-	parsedTag, err := parsedTags.Get("valley")
-	if err == nil {
-		return parsedTag.Value(), nil
+	parsedTag, err := parsedTags.Get(tagName)
+	if err != nil {
+		return name, nil
+	}
+
+	splitTag := strings.Split(parsedTag.Value(), ",")
+	if len(splitTag) > 0 {
+		return splitTag[0], nil
 	}
 
 	return name, nil

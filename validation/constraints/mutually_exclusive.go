@@ -74,14 +74,16 @@ func mutuallyExclusiveGenerator(ctx valley.Context, fieldType ast.Expr, opts []a
 	structType := ctx.Source.Structs[ctx.TypeName]
 
 	// TODO: This is a little gross...
-	for _, structField := range structType.Fields {
+	for _, structFieldName := range structType.FieldNames {
+		structField := structType.Fields[structFieldName]
+
 		for _, field := range fields {
 			name := structField.Name
 			if field != name {
 				continue
 			}
 
-			alias, err := valley.GetFieldAliasFromTag(name, structField.Tag)
+			alias, err := valley.GetFieldAliasFromTag(name, ctx.TagName, structField.Tag)
 			if err != nil {
 				return output, fmt.Errorf("failed to generate output field name: %v", err)
 			}

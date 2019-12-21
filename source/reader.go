@@ -5,6 +5,7 @@ import (
 	"go/parser"
 	"go/token"
 	"path"
+	"sort"
 	"strings"
 	"unicode/utf8"
 
@@ -52,6 +53,15 @@ func Read(srcPath string) (valley.Source, error) {
 			}
 		}
 	}
+
+	structNames := make([]string, 0, len(source.Structs))
+	for structName := range source.Structs {
+		structNames = append(structNames, structName)
+	}
+
+	sort.Strings(structNames)
+
+	source.StructNames = structNames
 
 	return source, nil
 }
@@ -102,12 +112,22 @@ func readGenDecl(d *ast.GenDecl, source *valley.Source) {
 			continue
 		}
 
+		fields := readStructFields(structType)
+		fieldNames := make([]string, 0, len(fields))
+
+		for fieldName := range fields {
+			fieldNames = append(fieldNames, fieldName)
+		}
+
+		sort.Strings(fieldNames)
+
 		// At this point, we definitely have a struct.
 		structName := typeSpec.Name.Name
 		source.Structs[structName] = valley.Struct{
-			Name:   structName,
-			Node:   structType,
-			Fields: readStructFields(structType),
+			Name:       structName,
+			Node:       structType,
+			Fields:     fields,
+			FieldNames: fieldNames,
 		}
 	}
 }

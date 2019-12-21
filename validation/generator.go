@@ -40,7 +40,7 @@ func NewGenerator(constraints map[string]valley.ConstraintGenerator) *Generator 
 
 // Generate attempts to generate the code (returned as bytes) to validate code in the given package,
 // using the given configuration.
-func (g *Generator) Generate(config valley.Config, source valley.Source) ([]byte, error) {
+func (g *Generator) Generate(config valley.Config, source valley.Source, tagName string) ([]byte, error) {
 	typeNames := make([]string, 0, len(config.Types))
 	for typeName := range config.Types {
 		typeNames = append(typeNames, typeName)
@@ -50,7 +50,7 @@ func (g *Generator) Generate(config valley.Config, source valley.Source) ([]byte
 	sort.Strings(typeNames)
 
 	for _, typeName := range typeNames {
-		err := g.generateType(config, source, typeName)
+		err := g.generateType(config, source, tagName, typeName)
 		if err != nil {
 			return nil, err
 		}
@@ -102,7 +102,7 @@ func (g *Generator) Generate(config valley.Config, source valley.Source) ([]byte
 
 // generateType generates the entire Validate method for a particular type (found in the given
 // package with the given type name.
-func (g *Generator) generateType(config valley.Config, source valley.Source, typeName string) error {
+func (g *Generator) generateType(config valley.Config, source valley.Source, tagName, typeName string) error {
 	typ := config.Types[typeName]
 
 	s, ok := source.Structs[typeName]
@@ -130,6 +130,7 @@ func (g *Generator) generateType(config valley.Config, source valley.Source, typ
 		Source:   source,
 		TypeName: typeName,
 		Receiver: receiver,
+		TagName:  tagName,
 		VarName:  receiver,
 		PathKind: valley.PathKindStruct,
 	}
@@ -161,7 +162,7 @@ func (g *Generator) generateType(config valley.Config, source valley.Source, typ
 		}
 
 		ctx.FieldName = fieldName
-		ctx.FieldAlias, err = valley.GetFieldAliasFromTag(fieldName, f.Tag)
+		ctx.FieldAlias, err = valley.GetFieldAliasFromTag(fieldName, tagName, f.Tag)
 		if err != nil {
 			return fmt.Errorf("failed to get field alias from struct tag: %v", err)
 		}

@@ -28,12 +28,12 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		// MutuallyInclusive uses it's own block to lock down nonEmpty's scope.
 		var nonEmpty []string
 
-		if !(len(e.Texts) == 0) {
-			nonEmpty = append(nonEmpty, "texts")
-		}
-
 		if !(len(e.Text) == 0) {
 			nonEmpty = append(nonEmpty, "text")
+		}
+
+		if !(len(e.Texts) == 0) {
+			nonEmpty = append(nonEmpty, "texts")
 		}
 
 		if len(nonEmpty) > 0 && len(nonEmpty) != 2 {
@@ -43,7 +43,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 				PathKind: "struct",
 				Message:  "fields are mutually inclusive",
 				Details: map[string]interface{}{
-					"fields": []string{"texts", "text"},
+					"fields": []string{"text", "texts"},
 				},
 			})
 
@@ -54,12 +54,12 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		// MutuallyInclusive uses it's own block to lock down nonEmpty's scope.
 		var nonEmpty []string
 
-		if !(e.Int2 == nil) {
-			nonEmpty = append(nonEmpty, "int2")
-		}
-
 		if !(e.Int == 0) {
 			nonEmpty = append(nonEmpty, "int")
+		}
+
+		if !(e.Int2 == nil) {
+			nonEmpty = append(nonEmpty, "int2")
 		}
 
 		if !(len(e.Ints) == 0) {
@@ -73,7 +73,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 				PathKind: "struct",
 				Message:  "fields are mutually inclusive",
 				Details: map[string]interface{}{
-					"fields": []string{"int2", "int", "ints"},
+					"fields": []string{"int", "int2", "ints"},
 				},
 			})
 
@@ -84,20 +84,20 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		// ExactlyNRequired uses it's own block to lock down nonEmpty's scope.
 		var nonEmpty []string
 
-		if !(len(e.Text) == 0) {
-			nonEmpty = append(nonEmpty, "text")
+		if !(e.Int == 0) {
+			nonEmpty = append(nonEmpty, "int")
 		}
 
 		if !(e.Int2 == nil) {
 			nonEmpty = append(nonEmpty, "int2")
 		}
 
-		if !(e.Int == 0) {
-			nonEmpty = append(nonEmpty, "int")
-		}
-
 		if !(len(e.Ints) == 0) {
 			nonEmpty = append(nonEmpty, "ints")
+		}
+
+		if !(len(e.Text) == 0) {
+			nonEmpty = append(nonEmpty, "text")
 		}
 
 		if len(nonEmpty) != 3 {
@@ -108,7 +108,7 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 				Message:  "exact number of required fields not met",
 				Details: map[string]interface{}{
 					"num_required": 3,
-					"fields":       []string{"text", "int2", "int", "ints"},
+					"fields":       []string{"int", "int2", "ints", "text"},
 				},
 			})
 
@@ -553,7 +553,7 @@ func (n NestedExample) Validate(path *valley.Path) []valley.ConstraintViolation 
 	path.Write(".")
 
 	if len(n.Text) == 0 {
-		size := path.Write("Text")
+		size := path.Write("text")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",

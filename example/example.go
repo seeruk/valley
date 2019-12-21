@@ -1,6 +1,6 @@
 package main
 
-//go:generate valley ./example.go
+//go:generate valley ./example.go -t json
 
 import (
 	"math"
@@ -20,21 +20,21 @@ var timeYosemite = time.Date(1890, time.October, 1, 0, 0, 0, 0, time.UTC)
 
 // Example ...
 type Example struct {
-	Bool      bool                       `json:"bool,omitempty" valley:"bool"`
+	Bool      bool                       `json:"bool,omitempty"`
 	Chan      <-chan string              `json:"chan" valley:"chan"`
-	Text      string                     `json:"text" valley:"text"`
+	Text      string                     `json:"text"`
 	Texts     []string                   `json:"texts" valley:"texts"`
-	TextMap   map[string]string          `json:"text_map" valley:"text_map"`
-	Adults    int                        `json:"adults" valley:"adults"`
+	TextMap   map[string]string          `json:"text_map"`
+	Adults    int                        `json:"adults"`
 	Children  int                        `json:"children" valley:"children"`
-	Int       int                        `json:"int" valley:"int"`
+	Int       int                        `json:"int"`
 	Int2      *int                       `json:"int2" valley:"int2"`
-	Ints      []int                      `json:"ints" valley:"ints"`
+	Ints      []int                      `json:"ints"`
 	Float     float64                    `json:"float" valley:"float"`
 	Time      time.Time                  `json:"time" valley:"time"`
-	Times     []time.Time                `json:"times" valley:"times"`
+	Times     []time.Time                `json:"times"`
 	Nested    *NestedExample             `json:"nested" valley:"nested"`
-	Nesteds   []*NestedExample           `json:"nesteds" valley:"nesteds"`
+	Nesteds   []*NestedExample           `json:"nesteds"`
 	NestedMap map[NestedExample]struct{} `json:"nested_map" valley:"nested_map"`
 }
 
