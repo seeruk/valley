@@ -90,8 +90,6 @@ func TestCreateFile(t *testing.T) {
 		_, err = os.Stat(filePath)
 		assert.NoError(t, err)
 
-		t.Log(filePath)
-
 		err = os.Remove(filePath)
 		require.NoError(t, err)
 	})

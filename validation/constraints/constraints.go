@@ -72,7 +72,7 @@ func GenerateEmptinessPredicate(varName string, fieldType ast.Expr) (string, []v
 	// If we can't tell what the type is by reading the source, fall back to reflection in this
 	// case. There are more efficient things that a consumer of Valley can do, but this is easy, and
 	// also powers MutuallyExclusive, etc.
-	return fmt.Sprintf("reflect.ValueOf(%s).IsZero()", varName), []valley.Import{{Path: "reflect"}}
+	return fmt.Sprintf("reflect.ValueOf(%s).IsZero()", varName), []valley.Import{{Path: "reflect", Alias: "reflect"}}
 }
 
 // GenerateStandardConstraint ...

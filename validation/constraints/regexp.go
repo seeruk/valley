@@ -14,7 +14,7 @@ func Regexp(regexp *regexp.Regexp) valley.Constraint {
 	return valley.Constraint{}
 }
 
-// regexpStringGenerator ...
+// regexpGenerator ...
 func regexpGenerator(ctx valley.Context, fieldType ast.Expr, opts []ast.Expr) (valley.ConstraintGeneratorOutput, error) {
 	var output valley.ConstraintGeneratorOutput
 	var predicate string
