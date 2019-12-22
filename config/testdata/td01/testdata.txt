@@ -11,7 +11,7 @@
        Opts: ([]ast.Expr) (len=1 cap=1) {
         (*ast.Ident)(true)
        },
-       Pos: (token.Pos) 1056
+       Pos: (token.Pos) 1515
       }
      },
      Elements: ([]valley.ConstraintConfig) <nil>,
@@ -23,7 +23,7 @@
        Predicate: (ast.Expr) <nil>,
        Name: (string) (len=54) "github.com/seeruk/valley/validation/constraints.NotNil",
        Opts: ([]ast.Expr) <nil>,
-       Pos: (token.Pos) 1104
+       Pos: (token.Pos) 1563
       }
      },
      Elements: ([]valley.ConstraintConfig) <nil>,
@@ -35,7 +35,7 @@
        Predicate: (ast.Expr) <nil>,
        Name: (string) (len=56) "github.com/seeruk/valley/validation/constraints.Required",
        Opts: ([]ast.Expr) <nil>,
-       Pos: (token.Pos) 1009
+       Pos: (token.Pos) 1468
       }
      },
      Elements: ([]valley.ConstraintConfig) <nil>,
@@ -44,8 +44,24 @@
    }
   },
   (string) (len=7) "Subject": (valley.TypeConfig) {
-   Constraints: ([]valley.ConstraintConfig) <nil>,
-   Fields: (map[string]valley.FieldConfig) (len=3) {
+   Constraints: ([]valley.ConstraintConfig) (len=1 cap=1) {
+    (valley.ConstraintConfig) {
+     Predicate: (ast.Expr) <nil>,
+     Name: (string) (len=65) "github.com/seeruk/valley/validation/constraints.MutuallyExclusive",
+     Opts: ([]ast.Expr) (len=2 cap=2) {
+      (*ast.SelectorExpr)({
+       X: (*ast.Ident)(s),
+       Sel: (*ast.Ident)(SomeSlice)
+      }),
+      (*ast.SelectorExpr)({
+       X: (*ast.Ident)(s),
+       Sel: (*ast.Ident)(SomeMap)
+      })
+     },
+     Pos: (token.Pos) 639
+    }
+   },
+   Fields: (map[string]valley.FieldConfig) (len=5) {
     (string) (len=8) "SomeBool": (valley.FieldConfig) {
      Constraints: ([]valley.ConstraintConfig) (len=1 cap=1) {
       (valley.ConstraintConfig) {
@@ -54,22 +70,130 @@
        Opts: ([]ast.Expr) (len=1 cap=1) {
         (*ast.Ident)(true)
        },
-       Pos: (token.Pos) 593
+       Pos: (token.Pos) 771
       }
      },
      Elements: ([]valley.ConstraintConfig) <nil>,
      Keys: ([]valley.ConstraintConfig) <nil>
     },
-    (string) (len=7) "SomePtr": (valley.FieldConfig) {
+    (string) (len=7) "SomeMap": (valley.FieldConfig) {
      Constraints: ([]valley.ConstraintConfig) (len=1 cap=1) {
+      (valley.ConstraintConfig) {
+       Predicate: (ast.Expr) <nil>,
+       Name: (string) (len=57) "github.com/seeruk/valley/validation/constraints.MinLength",
+       Opts: ([]ast.Expr) (len=1 cap=1) {
+        (*ast.BasicLit)({
+         ValuePos: (token.Pos) 997,
+         Kind: (token.Token) INT,
+         Value: (string) (len=1) "1"
+        })
+       },
+       Pos: (token.Pos) 985
+      }
+     },
+     Elements: ([]valley.ConstraintConfig) (len=1 cap=1) {
+      (valley.ConstraintConfig) {
+       Predicate: (ast.Expr) <nil>,
+       Name: (string) (len=51) "github.com/seeruk/valley/validation/constraints.Min",
+       Opts: ([]ast.Expr) (len=1 cap=1) {
+        (*ast.BasicLit)({
+         ValuePos: (token.Pos) 1019,
+         Kind: (token.Token) INT,
+         Value: (string) (len=1) "1"
+        })
+       },
+       Pos: (token.Pos) 1013
+      }
+     },
+     Keys: ([]valley.ConstraintConfig) (len=1 cap=1) {
+      (valley.ConstraintConfig) {
+       Predicate: (ast.Expr) <nil>,
+       Name: (string) (len=57) "github.com/seeruk/valley/validation/constraints.MinLength",
+       Opts: ([]ast.Expr) (len=1 cap=1) {
+        (*ast.BasicLit)({
+         ValuePos: (token.Pos) 1043,
+         Kind: (token.Token) INT,
+         Value: (string) (len=1) "3"
+        })
+       },
+       Pos: (token.Pos) 1031
+      }
+     }
+    },
+    (string) (len=7) "SomePtr": (valley.FieldConfig) {
+     Constraints: ([]valley.ConstraintConfig) (len=2 cap=2) {
       (valley.ConstraintConfig) {
        Predicate: (ast.Expr) <nil>,
        Name: (string) (len=54) "github.com/seeruk/valley/validation/constraints.NotNil",
        Opts: ([]ast.Expr) <nil>,
-       Pos: (token.Pos) 641
+       Pos: (token.Pos) 822
+      },
+      (valley.ConstraintConfig) {
+       Predicate: (*ast.SelectorExpr)({
+        X: (*ast.Ident)(s),
+        Sel: (*ast.Ident)(SomeBool)
+       }),
+       Name: (string) (len=54) "github.com/seeruk/valley/validation/constraints.NotNil",
+       Opts: ([]ast.Expr) <nil>,
+       Pos: (token.Pos) 1100
       }
      },
      Elements: ([]valley.ConstraintConfig) <nil>,
+     Keys: ([]valley.ConstraintConfig) <nil>
+    },
+    (string) (len=9) "SomeSlice": (valley.FieldConfig) {
+     Constraints: ([]valley.ConstraintConfig) (len=2 cap=2) {
+      (valley.ConstraintConfig) {
+       Predicate: (ast.Expr) <nil>,
+       Name: (string) (len=57) "github.com/seeruk/valley/validation/constraints.MinLength",
+       Opts: ([]ast.Expr) (len=1 cap=1) {
+        (*ast.BasicLit)({
+         ValuePos: (token.Pos) 883,
+         Kind: (token.Token) INT,
+         Value: (string) (len=1) "1"
+        })
+       },
+       Pos: (token.Pos) 871
+      },
+      (valley.ConstraintConfig) {
+       Predicate: (ast.Expr) <nil>,
+       Name: (string) (len=57) "github.com/seeruk/valley/validation/constraints.MaxLength",
+       Opts: ([]ast.Expr) (len=1 cap=1) {
+        (*ast.BasicLit)({
+         ValuePos: (token.Pos) 899,
+         Kind: (token.Token) INT,
+         Value: (string) (len=3) "128"
+        })
+       },
+       Pos: (token.Pos) 887
+      }
+     },
+     Elements: ([]valley.ConstraintConfig) (len=2 cap=2) {
+      (valley.ConstraintConfig) {
+       Predicate: (ast.Expr) <nil>,
+       Name: (string) (len=57) "github.com/seeruk/valley/validation/constraints.MinLength",
+       Opts: ([]ast.Expr) (len=1 cap=1) {
+        (*ast.BasicLit)({
+         ValuePos: (token.Pos) 929,
+         Kind: (token.Token) INT,
+         Value: (string) (len=1) "1"
+        })
+       },
+       Pos: (token.Pos) 917
+      },
+      (valley.ConstraintConfig) {
+       Predicate: (ast.Expr) <nil>,
+       Name: (string) (len=57) "github.com/seeruk/valley/validation/constraints.MaxLength",
+       Opts: ([]ast.Expr) (len=1 cap=1) {
+        (*ast.BasicLit)({
+         ValuePos: (token.Pos) 945,
+         Kind: (token.Token) INT,
+         Value: (string) (len=2) "32"
+        })
+       },
+       Pos: (token.Pos) 933
+      }
+     },
      Keys: ([]valley.ConstraintConfig) <nil>
     },
     (string) (len=8) "SomeText": (valley.FieldConfig) {
@@ -78,7 +202,7 @@
        Predicate: (ast.Expr) <nil>,
        Name: (string) (len=56) "github.com/seeruk/valley/validation/constraints.Required",
        Opts: ([]ast.Expr) <nil>,
-       Pos: (token.Pos) 546
+       Pos: (token.Pos) 721
       }
      },
      Elements: ([]valley.ConstraintConfig) <nil>,
