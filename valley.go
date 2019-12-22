@@ -74,6 +74,12 @@ func (c Context) Clone() Context {
 	return c
 }
 
+// Module represents the information Valley needs about Go Modules used in the current project.
+type Module struct {
+	Path string
+	Dir  string
+}
+
 // Source represents the information Valley needs about a particular source file.
 type Source struct {
 	FileName    string

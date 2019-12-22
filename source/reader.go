@@ -1,8 +1,12 @@
 package source
 
 import (
+	"bytes"
+	"encoding/json"
 	"go/ast"
 	"go/token"
+	"io"
+	"os/exec"
 	"path"
 	"sort"
 	"strings"
@@ -15,6 +19,9 @@ import (
 // with an extract of information about the methods and structs in that file.
 func Read(fileSet *token.FileSet, file *ast.File, srcPath string) valley.Source {
 	var source valley.Source
+
+	modules := readModules()
+	_ = modules
 
 	for _, imp := range file.Imports {
 		impPath := strings.Trim(imp.Path.Value, "\"")
@@ -56,6 +63,37 @@ func Read(fileSet *token.FileSet, file *ast.File, srcPath string) valley.Source 
 	source.StructNames = structNames
 
 	return source
+}
+
+// readModules ...
+func readModules() []valley.Module {
+	cmd := exec.Command("go", "list", "-m", "-json", "all")
+
+	bs, err := cmd.CombinedOutput()
+	if err != nil {
+		return nil
+	}
+
+	decoder := json.NewDecoder(bytes.NewReader(bs))
+
+	var modules []valley.Module
+
+	for {
+		var module valley.Module
+
+		err := decoder.Decode(&module)
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return nil
+		}
+
+		modules = append(modules, module)
+	}
+
+	return modules
 }
 
 // readFuncDecl reads a Go function declaration and adds contents that are relevant to the given
