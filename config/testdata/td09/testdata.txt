@@ -1,4 +1,4 @@
-Description: should error if a constraint is used from within the same package
+Description: should error if a constraint is not an exported function within a package
 
 Config:
 

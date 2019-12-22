@@ -29,7 +29,7 @@ func TestBuildFromSource(t *testing.T) {
 		{name: "td06", desc: "should ignore statements in a constraints method's body that can't be used"},
 		{name: "td07", desc: "should error if a value passed to Constraints is not a function call"},
 		{name: "td08", desc: "should error if a constraint is used from within the same package"},
-		{name: "td09", desc: "should error if a constraint is used from within the same package"},
+		{name: "td09", desc: "should error if a constraint is not an exported function within a package"},
 		{name: "td10", desc: "should error if a selector uses a package that can't be found in the imports list"},
 	}
 
