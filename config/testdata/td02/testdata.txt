@@ -1,0 +1,12 @@
+Description: should error if nothing is passed to 'Field'
+
+Config:
+
+(valley.Config) {
+ Types: (map[string]valley.TypeConfig) {
+ }
+}
+
+Error:
+
+(*errors.errorString)(exactly one argument should be passed to Field on line 15, col 2 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')

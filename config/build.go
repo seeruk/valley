@@ -54,13 +54,9 @@ func buildTypeConfig(src valley.Source, method valley.Method) (valley.TypeConfig
 		typeMethod := chain.Next
 
 		for typeMethod != nil {
+			// Assumed to always succeed at this point:
 			typeMethodCall := typeMethod.Call
-			typeMethodFunc, ok := typeMethodCall.Fun.(*ast.SelectorExpr)
-			if !ok {
-				// This should probably never happen given we know we're calling a method on valley.Type
-				// at this point. It should always have a selector, and it should always be the Type.
-				continue
-			}
+			typeMethodFunc := typeMethodCall.Fun.(*ast.SelectorExpr)
 
 			// Handle the different possible methods chained off of the Type type.
 			switch typeMethodFunc.Sel.Name {
@@ -181,14 +177,14 @@ func buildFieldsCall(src valley.Source, method valley.Method, predicate ast.Expr
 	fieldArg, ok := typeMethod.Call.Args[0].(*ast.SelectorExpr)
 	if !ok {
 		// The argument passed to Field must be a selector (i.e. a field on the type).
-		return "", config, errorOn(src, fieldArg.Pos(), "value passed to Field should selector")
+		return "", config, errorOn(src, typeMethod.Call.Pos(), "value passed to Field should be a selector")
 	}
 
 	fieldArgOn, ok := fieldArg.X.(*ast.Ident)
 	if !ok || fieldArgOn.Name != method.Receiver {
 		// The argument passed to Field must be on an ident (i.e. the type). Additionally,
 		// the argument passed to Field must be on the receiver for the constraints method.
-		return "", config, errorOn(src, fieldArg.Pos(), "value passed to Field should field on the receiver's type")
+		return "", config, errorOn(src, fieldArg.Pos(), "value passed to Field should be a field on the receiver's type")
 	}
 
 	fieldConfig, err := buildFieldConfig(src, predicate, typeMethod.Next)

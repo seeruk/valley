@@ -1,0 +1,12 @@
+Description: should error if a value passed to Constraints is not a function call
+
+Config:
+
+(valley.Config) {
+ Types: (map[string]valley.TypeConfig) {
+ }
+}
+
+Error:
+
+(*errors.errorString)(constraint must be a function call on line 14, col 34 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')

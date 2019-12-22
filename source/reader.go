@@ -61,7 +61,7 @@ func Read(fileSet *token.FileSet, file *ast.File, srcPath string) valley.Source 
 // readFuncDecl reads a Go function declaration and adds contents that are relevant to the given
 // valley Source.
 func readFuncDecl(d *ast.FuncDecl, source *valley.Source) {
-	if d.Recv == nil {
+	if d.Recv == nil || len(d.Recv.List) == 0 || len(d.Recv.List[0].Names) == 0 {
 		return
 	}
 

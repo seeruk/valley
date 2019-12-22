@@ -1,0 +1,12 @@
+Description: should error if a method is not called on 'Field'
+
+Config:
+
+(valley.Config) {
+ Types: (map[string]valley.TypeConfig) {
+ }
+}
+
+Error:
+
+(*errors.errorString)(a method should be called on Field on line 14, col 2 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')

@@ -1,0 +1,12 @@
+Description: should error if the value passed to 'Field' is not a selector
+
+Config:
+
+(valley.Config) {
+ Types: (map[string]valley.TypeConfig) {
+ }
+}
+
+Error:
+
+(*errors.errorString)(value passed to Field should be a selector on line 15, col 2 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')

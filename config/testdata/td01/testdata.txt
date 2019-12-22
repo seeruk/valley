@@ -1,3 +1,7 @@
+Description: should produce valid config from valid source
+
+Config:
+
 (valley.Config) {
  Types: (map[string]valley.TypeConfig) (len=2) {
   (string) (len=16) "SecondarySubject": (valley.TypeConfig) {
@@ -212,3 +216,7 @@
   }
  }
 }
+
+Error:
+
+(interface {}) <nil>

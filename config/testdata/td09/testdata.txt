@@ -1,0 +1,12 @@
+Description: should error if a constraint is used from within the same package
+
+Config:
+
+(valley.Config) {
+ Types: (map[string]valley.TypeConfig) {
+ }
+}
+
+Error:
+
+(*errors.errorString)(constraints must be exported functions in a package on line 14, col 34 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')

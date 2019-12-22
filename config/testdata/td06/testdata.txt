@@ -1,0 +1,29 @@
+Description: should ignore statements in a constraints method's body that can't be used
+
+Config:
+
+(valley.Config) {
+ Types: (map[string]valley.TypeConfig) (len=1) {
+  (string) (len=7) "Subject": (valley.TypeConfig) {
+   Constraints: ([]valley.ConstraintConfig) <nil>,
+   Fields: (map[string]valley.FieldConfig) (len=1) {
+    (string) (len=8) "SomeText": (valley.FieldConfig) {
+     Constraints: ([]valley.ConstraintConfig) (len=1 cap=1) {
+      (valley.ConstraintConfig) {
+       Predicate: (ast.Expr) <nil>,
+       Name: (string) (len=56) "github.com/seeruk/valley/validation/constraints.Required",
+       Opts: ([]ast.Expr) <nil>,
+       Pos: (token.Pos) 492
+      }
+     },
+     Elements: ([]valley.ConstraintConfig) <nil>,
+     Keys: ([]valley.ConstraintConfig) <nil>
+    }
+   }
+  }
+ }
+}
+
+Error:
+
+(interface {}) <nil>
