@@ -80,6 +80,11 @@ type Module struct {
 	Dir  string
 }
 
+// Package represents the information Valley needs about a Go package.
+type Package struct {
+	Name string
+}
+
 // Source represents the information Valley needs about a particular source file.
 type Source struct {
 	FileName    string

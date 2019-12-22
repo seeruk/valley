@@ -21,11 +21,16 @@ func Read(fileSet *token.FileSet, file *ast.File, srcPath string) valley.Source 
 	var source valley.Source
 
 	modules := readModules()
-	_ = modules
 
 	for _, imp := range file.Imports {
 		impPath := strings.Trim(imp.Path.Value, "\"")
-		impName := path.Base(impPath)
+
+		impName, ok := readModuleName(modules, impPath)
+		if !ok {
+			// Fallback to "dumb" way of guessing package name based on path.
+			impName = path.Base(impPath)
+		}
+
 		if imp.Name != nil {
 			impName = imp.Name.Name
 		}
@@ -71,6 +76,7 @@ func readModules() []valley.Module {
 
 	bs, err := cmd.CombinedOutput()
 	if err != nil {
+		// TODO: Warn?
 		return nil
 	}
 
@@ -87,6 +93,7 @@ func readModules() []valley.Module {
 		}
 
 		if err != nil {
+			// TODO: Warn?
 			return nil
 		}
 
@@ -94,6 +101,41 @@ func readModules() []valley.Module {
 	}
 
 	return modules
+}
+
+// readModuleName ...
+func readModuleName(modules []valley.Module, impPath string) (string, bool) {
+	var module valley.Module
+	for _, m := range modules {
+		if strings.HasPrefix(impPath, m.Path) {
+			module = m
+		}
+	}
+
+	// Didn't find a matching module.
+	if module.Path == "" || module.Dir == "" {
+		return "", false
+	}
+
+	relativePath := strings.TrimPrefix(impPath, module.Path)
+
+	cmd := exec.Command("go", "list", "-json", path.Join(module.Dir, relativePath))
+
+	bs, err := cmd.CombinedOutput()
+	if err != nil {
+		// TODO: Warn?
+		return "", false
+	}
+
+	var pkg valley.Package
+
+	err = json.Unmarshal(bs, &pkg)
+	if err != nil {
+		// TODO: Warn?
+		return "", false
+	}
+
+	return pkg.Name, true
 }
 
 // readFuncDecl reads a Go function declaration and adds contents that are relevant to the given

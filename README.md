@@ -401,12 +401,17 @@ that, the generated code also has to compile, further protecting you from runtim
 
 ## TODO
 
-* Proper import resolution, using `go list`? We can get the package name to guarantee we import
-something with the correct package name.
-    * This might eventually also allow us to resolve imported types where we currently can't.
 * Add some benchmarks to the README, preferably against something open source using reflection.
 * The ability to define constraints in a separate file (in the same package, i.e. read the whole
 package and generate code for the one file based on the context provided by the whole package).
+    * Maybe also the ability to define constraints in a function instead of on a method. Maybe also
+    in a function in a separate package... More complex CLI usage there though.
+* Better resolution of underlying types. Right now if a type is imported from any other file or
+package than the one we're generating code for we can't tell what type it really is (e.g. is it a
+struct, slice, map, int really?). If we could figure out those underlying types, the tool would be a
+little more flexible. In particular, `Elements` and `Keys` currently only work on plain collection
+types because that's the only way we can figure out the key / value type to pass to constraint
+generators.
 * The ability to attach multiple constraints methods to a type, that generate different validate
 functions (the `Valid` constraint would need an option to override which method is called).
 
