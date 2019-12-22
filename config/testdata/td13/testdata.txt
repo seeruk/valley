@@ -1,0 +1,12 @@
+Description: should ignore methods that don't look like constraints methods
+
+Config:
+
+(valley.Config) {
+ Types: (map[string]valley.TypeConfig) {
+ }
+}
+
+Error:
+
+(interface {}) <nil>

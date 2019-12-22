@@ -31,6 +31,10 @@ func TestBuildFromSource(t *testing.T) {
 		{name: "td08", desc: "should error if a constraint is used from within the same package"},
 		{name: "td09", desc: "should error if a constraint is not an exported function within a package"},
 		{name: "td10", desc: "should error if a selector uses a package that can't be found in the imports list"},
+		{name: "td11", desc: "should error if 'When' is given anything other than a single argument"},
+		{name: "td12", desc: "should error if multiple chained method calls are invalid on 'Field'"},
+		{name: "td13", desc: "should ignore methods that don't look like constraints methods"},
+		{name: "td14", desc: "should ignore statements in a constraint method's body that are invalid"},
 	}
 
 	for _, tc := range tt {

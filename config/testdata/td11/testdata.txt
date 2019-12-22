@@ -1,0 +1,12 @@
+Description: should error if 'When' is given anything other than a single argument
+
+Config:
+
+(valley.Config) {
+ Types: (map[string]valley.TypeConfig) {
+ }
+}
+
+Error:
+
+(*errors.errorString)(exactly one argument should be passed to When on line 15, col 2 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')

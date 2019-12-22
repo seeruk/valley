@@ -1,0 +1,17 @@
+Description: should ignore statements in a constraint method's body that are invalid
+
+Config:
+
+(valley.Config) {
+ Types: (map[string]valley.TypeConfig) (len=1) {
+  (string) (len=7) "Subject": (valley.TypeConfig) {
+   Constraints: ([]valley.ConstraintConfig) <nil>,
+   Fields: (map[string]valley.FieldConfig) {
+   }
+  }
+ }
+}
+
+Error:
+
+(interface {}) <nil>

@@ -1,0 +1,12 @@
+Description: should error if multiple chained method calls are invalid on 'Field'
+
+Config:
+
+(valley.Config) {
+ Types: (map[string]valley.TypeConfig) {
+ }
+}
+
+Error:
+
+(*errors.errorString)(constraint must be a function call on line 16, col 15 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')

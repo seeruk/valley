@@ -108,12 +108,8 @@ func buildCallChain(src valley.Source, method valley.Method, stmt ast.Stmt) (*ca
 		return nil, false
 	}
 
-	callExpr, ok := exprStmt.X.(*ast.CallExpr)
-	if !ok {
-		// This also protects us later, chain.Next should never be nil after this check.
-		warnOn(src, stmt.Pos(), "skipping line that is not a call expression")
-		return nil, false
-	}
+	// NOTE: Currently assumed to always work, not sure if this can ever not be true at this point.
+	callExpr := exprStmt.X.(*ast.CallExpr)
 
 	// Each call expression in a Go AST function body is right-to-left, so the last method call
 	// is the first thing you see. We want the opposite, because it's easier to verify what the
@@ -354,10 +350,8 @@ func collectConstraintsMethods(src valley.Source) map[string]valley.Method {
 				continue
 			}
 
-			selectorPkg, ok := selector.X.(*ast.Ident)
-			if !ok {
-				continue
-			}
+			// NOTE: Pretty sure this can't happen, we'll fail at parsing the file first.
+			selectorPkg := selector.X.(*ast.Ident)
 
 			imp, ok := findImportByName(src.Imports, selectorPkg.Name)
 			if !ok || imp.Path != importPath {
