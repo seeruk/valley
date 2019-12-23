@@ -2,13 +2,105 @@
 
 Valley is tool for generating plain Go validation code based on your Go code.
 
+## Installation
+
+You can install the latest version of Valley using the following command. Alternatively, you can use
+a tagged version at the end for a specific release:
+
+```
+$ GO111MODULE=on go get -v github.com/seeruk/valley/cmd/valley@latest
+```
+
 ## Usage
 
-...
+Valley reads Go source code, and generates validation code based upon it. Valley will look at a
+given file, pick out it's types and methods and identify types that appear to be configuring
+validation constraints. That can be any struct type defined in a file, as long as it has any method
+that returns nothing, and accepts a `valley.Type` as it's only argument:
+
+```go
+package example
+
+import (
+    "github.com/seeruk/valley"
+    "github.com/seeruk/valley/validation/constraints"
+)
+
+// Request ...
+type Request struct {
+    Inputs []string `valley:"inputs"`
+    Page   int      `valley:"page"`
+}
+
+// Constraints ...
+func (r Request) Constraints(t valley.Type) {
+    t.Field(r.Inputs).
+        Constraints(constraints.MaxLength(256)). // Applies to the whole []string
+        Elements(constraints.MaxLength(16))      // Applies to each string in the []string
+    t.Field(r.Page).
+        Constraints(constraints.Min(1), constraints.Max(99))
+}
+```
+
+See `./example/example.go` for a more comprehensive example of usage.
+
+Once you've prepared you Go file, execute Valley, passing the file path as an argument:
+
+```
+$ valley ./example.go
+```
+
+By default this will produce another file alongside the input file (in the above example that would
+`./example_validate.go`). You can customise where the file is output using the `-o` or `--output`
+flag.
+
+### Output
+
+If any validation constraints are violated, the generated `Validate` method will return those
+violations. They contain a path, the kind of thing they're referencing, a message, and some misc
+details that vary depending on which constraint was violated. For example:
+
+```json
+[
+  {
+    "path": ".inputs.[0]",
+    "path_kind": "element",
+    "message": "a value is required"
+  }
+]
+```
+
+You may have noticed the struct tags on the example `Request` struct earlier. Those can be used to
+customise the output in the `"path"` key in the constraint violation. By default it will use the
+field name as it's written in the Go source code. You can choose to use existing tags (e.g. a `json`
+struct tag) by passing the `-t` or `--tag` flag with the name of the struct tag you'd like to use
+instead. The `json` struct tag is a very common use-case.
 
 ## Extending
 
-...
+Currently the only option for extending Valley is to create a custom Valley binary. Don't worry
+though, this is really straightforward. The main function for Valley is a single line - and it's the
+only line you should need to use to create a custom binary.
+
+```go
+os.Exit(cli.NewApplication(constraints.BuiltIn).Run(os.Args[1:], os.Environ()))
+```
+
+The only part that you need to change is the set of constraints you'd like to use. Valley uses it's
+exposed `BuiltIn` constraints which is a map. You can make a copy of this map and add your own, or
+create your own entirely new set of constraints.
+
+The map's key is the fully qualified name of the constraint function, mapped to the constraint
+generator (i.e. the function that returns the generated code and any other information like imports
+and variables to place in the generate file).
+
+Take a look at the `BuiltIn` constraints to see how they work. A straightforward one to look at is
+the `Valid` constraint.
+
+Constraint generators are themselves constrained by the information that Valley is able to provide
+them. I hope that this information can be expanded upon in the future, but generally speaking this
+is all information from the source file that is read initially. Eventually I'd like to extend that
+to the package that file is in, and then further to any packages imported by that package, etc.
 
 ## Built-In Constraints
 
