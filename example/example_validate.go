@@ -3,7 +3,6 @@ package main
 
 import fmt "fmt"
 import valley "github.com/seeruk/valley"
-import notfloopreally "github.com/seeruk/valley/floop"
 import math "math"
 import reflect "reflect"
 import strconv "strconv"
@@ -366,14 +365,14 @@ func (e Example) Validate(path *valley.Path) []valley.ConstraintViolation {
 		path.TruncateRight(size)
 	}
 
-	if !notfloopreally.PatternGreeting.MatchString(e.Text) {
+	if !patternGreeting.MatchString(e.Text) {
 		size := path.Write("text")
 		violations = append(violations, valley.ConstraintViolation{
 			Path:     path.String(),
 			PathKind: "field",
 			Message:  "value must match regular expression",
 			Details: map[string]interface{}{
-				"regexp": notfloopreally.PatternGreeting.String(),
+				"regexp": patternGreeting.String(),
 			},
 		})
 		path.TruncateRight(size)
