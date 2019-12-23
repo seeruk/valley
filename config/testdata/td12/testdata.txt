@@ -9,4 +9,4 @@ Config:
 
 Error:
 
-(*errors.errorString)(constraint must be a function call on line 16, col 15 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')
+(*errors.errorString)(constraint must be a function call on line 16, col 15 in 'config/testdata.go')

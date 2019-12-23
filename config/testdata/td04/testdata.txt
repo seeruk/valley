@@ -9,4 +9,4 @@ Config:
 
 Error:
 
-(*errors.errorString)(value passed to Field should be a selector on line 15, col 2 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')
+(*errors.errorString)(value passed to Field should be a selector on line 15, col 2 in 'config/testdata.go')

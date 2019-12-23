@@ -9,4 +9,4 @@ Config:
 
 Error:
 
-(*errors.errorString)(constraints must be exported functions in a package on line 14, col 16 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')
+(*errors.errorString)(constraints must be exported functions in a package on line 14, col 16 in 'config/testdata.go')

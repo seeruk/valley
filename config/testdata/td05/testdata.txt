@@ -9,4 +9,4 @@ Config:
 
 Error:
 
-(*errors.errorString)(value passed to Field should be a field on the receiver's type on line 15, col 10 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')
+(*errors.errorString)(value passed to Field should be a field on the receiver's type on line 15, col 10 in 'config/testdata.go')

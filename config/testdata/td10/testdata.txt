@@ -9,4 +9,4 @@ Config:
 
 Error:
 
-(*errors.errorString)(constraint must be defined in an imported package on line 14, col 34 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')
+(*errors.errorString)(constraint must be defined in an imported package on line 14, col 34 in 'config/testdata.go')

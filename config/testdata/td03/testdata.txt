@@ -9,4 +9,4 @@ Config:
 
 Error:
 
-(*errors.errorString)(a method should be called on Field on line 14, col 2 in '/Users/seer/git/github.com/seeruk/valley/config/testdata.go')
+(*errors.errorString)(a method should be called on Field on line 14, col 2 in 'config/testdata.go')

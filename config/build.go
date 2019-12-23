@@ -1,11 +1,15 @@
 package config
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"go/ast"
 	"go/token"
+	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/seeruk/valley"
 )
@@ -397,7 +401,30 @@ func messageOn(src valley.Source, pos token.Pos, message string, args ...interfa
 		srcPath = src.FileName
 	}
 
+	// This just won't do anything if it fails, and will either leave us with just the filename, or
+	// the full absolute path.
+	srcPath = pathRelativeToModuleRoot(srcPath)
+
 	args = append(args, position.Line, position.Column, srcPath)
 
 	return fmt.Sprintf(message+" on line %d, col %d in '%s'", args...)
+}
+
+// pathRelativeToModuleRoot ...
+func pathRelativeToModuleRoot(in string) string {
+	cmd := exec.Command("go", "list", "-m", "-json")
+
+	bs, err := cmd.CombinedOutput()
+	if err != nil {
+		return in
+	}
+
+	var module valley.Module
+
+	err = json.Unmarshal(bs, &module)
+	if err != nil {
+		return in
+	}
+
+	return strings.TrimPrefix(in, module.Dir+string(os.PathSeparator))
 }
