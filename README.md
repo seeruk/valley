@@ -530,7 +530,7 @@ MIT
 
 ## Contributions
 
-Feel free to open a [pull request][1], or file an [issue][2] on Github. I always welcome
+Feel free to open a [pull request][1], or file an [issue][2] on GitHub. I always welcome
 contributions as long as they're for the benefit of all (potential) users of this project.
 
 If you're unsure about anything, feel free to ask about it in an issue before you get your heart set
