@@ -493,7 +493,23 @@ that, the generated code also has to compile, further protecting you from runtim
 
 ## TODO
 
-* Assess output of all constraints. Most constraints should probably be optional. Are they?
+* Assess output of all constraints. Many constraints should probably be optional. Are they?
+Constraints that probably should only apply if a value is set:
+    * DeepEquals
+    * Equals
+    * Length
+    * Max
+    * MaxLength
+    * Min
+    * MinLength
+    * NotEquals
+    * OneOf
+    * Regexp
+    * RegexpString
+    * TimeAfter
+    * TimeBefore
+    * TimeStringAfter
+    * TimeStringBefore
 * Add some benchmarks to the README, preferably against something open source using reflection.
 * The ability to define constraints in a separate file (in the same package, i.e. read the whole
 package and generate code for the one file based on the context provided by the whole package).
